@@ -1,0 +1,22 @@
+<!--
+ Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
+-->
+<featureLists>
+    <require>
+        <define>rbac</define>
+        <path>./rbac.api</path>
+    </require>
+    <item>
+        <feature>storage</feature>
+    </item>
+    
+    <item>
+        <feature>orchestration</feature>
+    </item>
+    <item>
+        <feature>setting</feature>
+    </item>
+    <item>
+        <feature>proxy</feature>
+    </item>
+</featureLists>
