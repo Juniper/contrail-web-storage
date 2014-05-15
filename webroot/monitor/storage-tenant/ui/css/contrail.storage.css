@@ -1,0 +1,351 @@
+.ceph-widget-header{
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #DCE8F1;
+    color: #3182bd;
+    padding-left: 3px;
+    height: 33px;
+    position: relative;
+}
+
+.label-status{
+    margin-left: 5px;
+    width: 90%;
+    background: transparent;
+    border: 1px solid #3182BD;
+    text-align: center;
+    cursor: none;
+}
+.status-message{
+    color: black;
+    font-weight: normal;
+    font-size: 1.5em;
+    line-height: 1.5em;
+}
+.icon-status{
+    margin-left: 20px;
+    color: grey;
+    font-size: 1.5em;
+    cursor: none;
+}
+
+.success-color{
+    color: #2CA02C;
+}
+.down-color{
+    color: #B94A48;
+}
+.idle-color{
+    color: #898989;
+}
+.info-color{
+    color: #3182BD;
+}
+.warning-color{
+    color: #f89406;
+}
+
+.node use {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.node {
+  font: 10px Open Sans;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+  opacity: 0.3;
+}
+.pools-bar-chart .ui-tabs-nav {
+    height: 0px;
+    padding: 0px 0px 0px 10px !important;
+    font-size: 13px;
+    border-bottom: 0px !important;
+    background-color: #ffffff !important;
+}
+.pools-bar-chart .ui-tabs-panel{
+    padding: 12px 0px !important;
+}
+.pools-bar-chart svg {
+    height: 65px;
+    margin-top: 10px;
+}
+.disks-bar-chart svg{
+    height: 65px;
+}
+.disks-bar-chart .nv-legend-text {
+    font-size: 13px !important;
+}
+.disks-bar-chart .ui-tabs-nav {
+    height: 0px;
+    padding: 0px 0px 0px 10px !important;
+    font-size: 13px;
+    border-bottom: 0px !important;
+    background-color: #ffffff !important;
+}
+.disks-bar-chart .ui-tabs-panel{
+    padding: 12px 0px !important;
+}
+.cluster-activity-chart .ui-tabs-nav {
+    height: 0px;
+    padding: 0px 0px 0px 10px !important;
+    font-size: 13px;
+    border-bottom: 0px !important;
+    background-color: #ffffff !important;
+}
+.cluster-activity-chart .ui-tabs-panel{
+    padding: 12px 0px !important;
+}
+.cluster-activity-chart svg{
+    height: 88px;
+    width: 100%;
+}
+
+#usage-dial {
+    width: 150px;
+    height: 170px;
+    position: relative;
+}
+.usage-arc path {
+    stroke: #ffffff;
+    stroke-width: 0px;
+}
+
+.status-arc path {
+    stroke: #ffffff;
+    stroke-width: 1px;
+}
+
+#usage-labelbox {
+    position: absolute;
+    top:70px;
+    left: 10px;
+    width: 130px;
+    text-align: center;
+    line-height: 15px;
+    z-index: 1;
+}
+.usage-perc-label{
+    stroke: #636363;
+    font-size: 1.2em;
+    font-family: Open Sans;
+    color: #636363;
+}
+.usage-perc-crit-label{
+    stroke: #636363;
+    font-size: 1.2em;
+    font-family: Open Sans;
+    color: #D62728;
+}
+.usage-perc-warn-label{
+    stroke: #636363;
+    font-size: 1.2em;
+    font-family: Open Sans;
+    color: #FF7F0E;
+}
+
+.df-used-label{
+    font-size: 13px;
+    font-family: Open Sans;
+    font-weight: 400;
+    color: #3182BD;
+}
+.df-total-label{
+    font-size: 13px;
+    font-family: Open Sans;
+    font-weight: 400;
+    color: #3182BD;
+}
+
+.infra-stor-chart g.nv-lineChart g.nv-group{
+    fill-opacity: .3 !important;
+}
+.infra-stor-chart g.nv-multibarHorizontal g.nv-group{
+    fill-opacity: .6 !important;
+    stroke-width: 2;
+}
+.infra-stor-chart g.nv-scatterChart g.nv-group,
+.infra-stor-chart g.nv-scatterChart g.nv-group .nv-point.hover,
+.infra-stor-chart g.nv-scatterChart g.nv-single-point g.nv-group .nv-point,
+.infra-stor-chart g.nv-scatterChart g.nv-single-point g.nv-group .nv-point.hover {
+    fill-opacity: .5 !important;
+}
+
+
+/* old dash usage labelbox
+#usage-labelbox {
+    position: absolute;
+    top:90px;
+    left: 80px;
+    width: 136px;
+    text-align: center;
+    z-index: 1;
+}
+.usage-perc-label{
+    stroke: #636363;
+    font-size: 2.5em;
+    font-family: Open Sans;
+    color: #636363;
+}
+.usage-perc-crit-label{
+    stroke: #636363;
+    font-size: 2.5em;
+    font-family: Open Sans;
+    color: #D62728;
+}
+.usage-perc-warn-label{
+    stroke: #636363;
+    font-size: 2.5em;
+    font-family: Open Sans;
+    color: #FF7F0E;
+}
+
+.df-used-label{
+    font-size: 0.8em;
+    font-family: Open Sans;
+    font-weight: 400;
+    color: #3182BD;
+}
+.df-total-label{
+    font-size: 0.8em;
+    font-family: Open Sans;
+    font-weight: 400;
+    color: #3182BD;
+}*/
+
+#usage-donut {
+    width: 300px;
+    height: 250px;
+    margin-top: -30px;
+    margin-bottom: 20px;
+}
+
+#usage-details{
+    margin-top: -10px;
+    margin-left: 0px;
+    font-weight: bold;
+    font-family: "Helvetica Neue","Helvetica","Arial","sans-serif";
+}
+.icon-avail{
+    margin-left: 5px;
+    color: #C6DBEF;
+}
+.clear{
+    clear: both;
+}
+
+#df-avail{
+    margin-left: 2px;   
+}
+.icon-used{
+    margin-left: 60px;
+    color: #1F77B4;
+}
+
+#df-used{
+    margin-left: 2px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #3182BD;
+}
+#df-total{
+    margin-left: 2px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #3182BD;
+}
+.grid-monitor{
+    font-weight: normal;    
+}
+.slick-row .grid-status-label{
+    text-align: center;
+}
+
+#osd-bubble{
+    height: 290px;
+    margin: 0px 20px 0px 0px;
+}
+#gridOSDs-list{
+    border: none;
+    font-weight: normal;
+}
+
+.osd-details{
+    font-weight: normal;
+    visibility: visible;
+}
+.osd-details-default{
+    font-weight: normal;
+    visibility: hidden;
+}
+
+.osds-list{
+    height: auto;
+    margin-left: 0px;
+}
+  
+.osds-list{
+    white-space: normal;
+}
+
+#svg-osd-tree-osd{
+    visibility: hidden;
+}
+#svg-osd-tree-host{
+    visibility: hidden;
+}
+.tree-tip .tooltip {
+    display: block;
+    position: absolute;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+/*
+#usage-gauge-container {
+    background: transparent url("/img/kendo/gauge-container.png") no-repeat 50% 50%;
+    width: 300px;
+    height: 200px;
+    text-align: center;
+    margin: 0 0 30px 50px;
+}
+
+#usage-gauge {
+    width: 330px;
+    height: 330px;
+    margin: 0 auto 0;
+}
+
+#health-status{
+    width: 200px;
+    height: 20px;
+    background: transparent;
+    border: 1px solid #3182BD;
+    text-align: center;
+}
+#monitor-status{
+    width: 200px;
+    height: 20px;
+    background: transparent;
+    border: 1px solid #3182BD;
+    color: black;
+    text-align: center;
+}
+#activity-status{
+    width: 200px;
+    height: 20px;
+    background: transparent;
+    border: 1px solid #3182BD;
+    text-align: center;
+}
+*/
