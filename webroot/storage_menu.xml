@@ -1,0 +1,96 @@
+<!--
+ Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
+-->
+
+<menu>
+    <items>
+        <item>
+            <label>MONITOR</label>
+            <depedencies>
+                <role></role>
+            </depedencies>
+            <items>
+                <item>
+                    <label>Infrastructure</label>
+                    <items>
+                       <item>
+                            <hash>mon_infra_storage</hash>
+                            <label>Overview</label>
+                            <rootDir>/monitor/infra</rootDir>
+                            <view>monitor_infra_dashboard.view</view>
+                            <view>monitor_infra_storagenode.view</view>
+                            <js>monitor_infra_utils.js</js>
+                            <js>monitor_infra_dashboard.js</js>
+                            <js>monitor_infra_storagenode.js</js>
+                            <class>infraMonitorView</class>
+                            <queryParams>
+                                <node>Storage Nodes</node>
+                            </queryParams>
+                            <searchStrings>Monitor Storage Nodes</searchStrings>
+                        </item> 
+                        <!--
+                        <item>
+                            <label>Software Upgrade</label>
+                        </item>
+                        -->
+                    </items>
+                </item>
+                <item>
+                    <name>storage</name>
+                    <label>Storage</label>
+                    <items>
+                        <item>
+                            <hash>mon_storage_dashboard</hash>
+                            <label>Storage</label>
+                            <rootDir>/monitor/tenant_storage</rootDir>
+                            <view>tenant_monitor_storage.view</view>
+                            <js>tenant_monitor_storage.js</js>
+                            <class>tenantStorageMonitorView</class>
+                            <queryParams>
+                                <tab>Dashboard</tab>
+                            </queryParams>
+                            <searchStrings>Storage Dashboard</searchStrings>
+                        </item>
+                        <item>
+                            <hash>mon_storage_disks</hash>
+                            <label>Storage</label>
+                            <rootDir>/monitor/tenant_storage</rootDir>
+                            <view>tenant_monitor_storage.view</view>
+                            <js>tenant_monitor_storage.js</js>
+                            <js>tenant_monitor_disks.js</js>
+                            <class>tenantStorageMonitorView</class>
+                            <queryParams>
+                                <tab>Disks</tab>
+                            </queryParams>
+                            <searchStrings>Storage Disks</searchStrings>
+                        </item>
+                        <item>
+                            <hash>mon_storage_monitor</hash>
+                            <label>Storage</label>
+                            <rootDir>/monitor/tenant_storage</rootDir>
+                            <view>tenant_monitor_storage.view</view>
+                            <js>tenant_monitor_storage.js</js>
+                            <js>tenant_monitor_storMonitor.js</js>
+                            <class>tenantStorageMonitorView</class>
+                            <queryParams>
+                                <tab>Monitor</tab>
+                            </queryParams>
+                            <searchStrings>Storage Monitor</searchStrings>
+                        </item>
+                    </items>
+                </item>
+            </items>
+        </item>
+        <item>
+            <name>configure</name>
+            <label>CONFIGURE</label>
+            <items>
+            </items>
+        </item>
+        <item>
+            <label>SETTING</label>
+            <items>
+            </items>
+        </item>
+    </items>
+</menu>
