@@ -15,6 +15,8 @@
                     <rootDir>/monitor/infra/common/ui</rootDir>
                     <js>monitor_infra_constants.js</js>
                     <js>monitor_infra_utils.js</js>
+                    <js>monitor_infra_storage_constants.js</js>
+                    <js>monitor_infra_storage_utils.js</js>
                     <view>monitor_infra_common.view</view>
                     <class>infraDashboardView</class>
                     <items>
@@ -23,7 +25,9 @@
                             <label>Overview</label>
                             <rootDir>/monitor/infra/dashboard/ui</rootDir>
                             <view>monitor_infra_dashboard.view</view>
+                            <view>monitor_infra_storage_dashboard.view</view>
                             <js>monitor_infra_dashboard.js</js>
+                            <js>monitor_infra_storage_dashboard.js</js>
                             <class>infraDashboardView</class>
                             <queryParams>
                                 <tab>vRouters</tab>
