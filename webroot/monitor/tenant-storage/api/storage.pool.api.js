@@ -3,7 +3,7 @@
  */
 
 var commonUtils = require('../../../utils/common.utils'),
-    storageRest= require('./storage.server.api'),
+    storageRest= require('../../../common/api/storage.rest.api'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
 

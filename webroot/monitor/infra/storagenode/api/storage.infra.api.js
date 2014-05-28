@@ -4,7 +4,7 @@
 
 var 
     commonUtils = require('../../../utils/common.utils'),
-    storageRest= require('../storage-tenant/storageRest.api'),
+    storageRest= require('../common/api/storage.rest.api'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
     osdApi= require('../storage-tenant/storage.osd.api'),
