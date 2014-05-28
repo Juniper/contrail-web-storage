@@ -37,8 +37,7 @@ cephMonitorView = function () {
                 //initializing with HEALTH_DOWN
                 // d['health'] = 'HEALTH_DOWN';
                 d['hostNameColor'] = '#D62728';
-                d['act-health'] = d['health'];
-                d['details'] = '';
+              
                 d['gb_total'] = kiloByteToGB(d['kb_total']);
                 d['gb_used'] = kiloByteToGB(d['kb_used']);
                 d['gb_avail'] = kiloByteToGB(d['kb_avail']);
@@ -50,14 +49,12 @@ cephMonitorView = function () {
                 else
                     d['hostNameColor'] = 'label-info';
 
-                if(d['health'] == 'HEALTH_WARN')
+                if(d['act_health'] == 'HEALTH_WARN')
                     d['healthColor'] = 'label-warning';
-                else if (d['health'] == 'HEALTH_OK')
+                else if (d['act_health'] == 'HEALTH_OK')
                     d['healthColor'] = 'label-success';
                 else{
                     d['healthColor'] = 'label-important';
-                    d['health'] = 'HEALTH_DOWN';
-                    d['act-health'] = d['health'];
                 }
                 retArr.push(d);
             });
@@ -99,11 +96,11 @@ cephMonitorView = function () {
                         cssClass: 'grid-status-label',
                         formatter:function(r,c,d,cd,dc){
                             var health = '';
-                            if(dc['act-health'] == 'HEALTH_OK')
+                            if(dc['act_health'] == 'HEALTH_OK')
                                 health = 'Ok';
-                            else if(dc['act-health'] == 'HEALTH_WARN')
+                            else if(dc['act_health'] == 'HEALTH_WARN')
                                 health = 'Warn';
-                            else if(dc['act-health'] == 'HEALTH_DOWN')
+                            else if(dc['act_health'] == 'HEALTH_DOWN')
                                 health = 'Down';
                             else{}
                             return '<span style= "text-align: center" class="grid-monitor label ' + dc['healthColor'] + '">' + health + '</span>';
