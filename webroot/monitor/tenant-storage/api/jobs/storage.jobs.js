@@ -6,7 +6,7 @@ var util = require('util'),
     qs = require('querystring'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
-    storageRest= require('../storage.server.api')
+    storageRest= require('../../common/api/storage.rest.api')
     assert = require('assert');
 
 

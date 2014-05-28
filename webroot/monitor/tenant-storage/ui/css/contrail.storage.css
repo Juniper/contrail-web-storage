@@ -75,11 +75,12 @@
     padding: 12px 0px !important;
 }
 .pools-bar-chart svg {
-    height: 65px;
-    margin-top: 10px;
+    height: 70px;
+    margin-top: 15px;
 }
 .disks-bar-chart svg{
-    height: 65px;
+    height: 85px;
+    margin-top: 15px;
 }
 .disks-bar-chart .nv-legend-text {
     font-size: 13px !important;
@@ -102,16 +103,17 @@
     background-color: #ffffff !important;
 }
 .cluster-activity-chart .ui-tabs-panel{
-    padding: 12px 0px !important;
+    padding: 16px 0px !important;
 }
 .cluster-activity-chart svg{
-    height: 88px;
+    height: 101px;
     width: 100%;
+    margin-top: 10px;
 }
 
 #usage-dial {
     width: 150px;
-    height: 170px;
+    height: 190px;
     position: relative;
 }
 .usage-arc path {

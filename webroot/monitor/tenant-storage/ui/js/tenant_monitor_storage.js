@@ -74,6 +74,13 @@ function storInfraDashboardClass () {
         healthStatusObj = data;
         healthStatusRefresh();
     }
+    this.getClusterMonitorData = function(){
+        return healthStatusObj;
+    }
+    this.setClusterMonitorData = function(data){
+        healthStatusObj = data;
+        monitorStatusRefresh();
+    }
     this.getClusterActivityData = function(){
         return actStatusObj;
     }
@@ -511,29 +518,17 @@ function parseClusterHealthData(result){
 function parseClusterMonitorData(result){
     var retObj={};
     if(result != null){
-        var status = result['monitor_status']['overall_status'];
-        var monsact = result['monitor_status']['mons_activity'];
-
+        var status = result['overall_status'];
+        console.log("Status:"+status);
         if (status == 'HEALTH_WARN'){
             retObj['monitor-status'] = 'WARN';
-            $.each(monsact, function(idx,d){
-                var obj = {};
-                retObj['details'] = [];
-                if(d['health'] == 'HEALTH_WARN'){
-                    obj['name'] = d['name'];
-                    obj['details'] = d['details'];
-                    obj['latency'] = d['latency'];
-                    obj['skew'] = d['skew'];
-                    retObj['details'].push(obj);
-                }
-            });
         }
         else if (status == 'HEALTH_OK')
             retObj['monitor-status'] = 'OK';
         else
             retObj['monitor-status'] = status;
     }
-    return retObj;
+   tenantStorageMonitorView.setClusterMonitorData(retObj);
 }
 
 function parseCephClusterDFData(result){
@@ -781,15 +776,15 @@ function getClusterHealthStatus(){
 }
 
 function getClusterMonitorStatus(){
-
+    startWidgetLoading('dashHealth');
     $.ajax({
-        url: '/api/tenant/storage/cluster/monitor/status',
+        url: '/api/tenant/storage/cluster/monitors/summary',
         dataType: "json",
         cache: false
 
     }).done(function(response){
-        var dataResponse = parseClusterMonitorData(response);
-        tenantStorageMonitorView.setClusterMonitorData(dataResponse);
+        parseClusterMonitorData(response);
+        endWidgetLoading('dashHealth');
     }).fail(function(result) {
 
     });
@@ -915,7 +910,6 @@ function monitorStatusRefresh(){
     $("#monitor-status").text(monStatusObj['monitor-status']);
     $("#monitor-status-icon").addClass(getIconClass(monStatusObj['monitor-status']));
     $("#monitor-status-icon").addClass(getIconColorClass(monStatusObj['monitor-status']));
-    $("#monitor-status-icon").tooltip(options['tooltipText']=monStatusObj['details']);
 }
 
 function usageDial(){
@@ -1345,6 +1339,7 @@ function diskScatterPlot(){
 function statusDataRefresh(){
 
     getClusterHealthStatus();
+    getClusterMonitorStatus();
     getClusterDFStatus();
     getClusterPools();
     getOSDsStatus();

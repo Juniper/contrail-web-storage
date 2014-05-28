@@ -100,17 +100,6 @@
                 </div>
             </div>
             <div style="float: left;width: 150px;margin-left: -100%;">
-                <div id="dashHealthBox" class="widget-box transparent">
-                    <div class="widget-header"></div>
-                    <div class="widget-body">
-                        <div class="widget-main padding-4">
-                                <span class="label label-status">
-                                    <span id="health-status" class="status-message"></span>
-                                    <i id="health-status-icon" class="icon-status"></i>
-                                </span>
-                        </div>
-                    </div>
-                </div>
                 <div id="dashUsageBox" class="widget-box transparent">
                     <div class="widget-header"></div>
                     <div class="widget-body">
@@ -124,6 +113,29 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                 </div>
+                <div id="dashHealthBox" class="widget-box transparent">
+                    <div class="widget-header"></div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="info-color">
+                                <ul>Cluster</ul>
+                            </div>
+                            <span class="label label-status">
+                                <span id="health-status" class="status-message"></span>
+                                <i id="health-status-icon" class="icon-status"></i>
+                            </span>
+                        </div>
+                         <div class="widget-main">
+                            <div class="info-color">
+                                <ul>Monitor</ul>
+                            </div>
+                            <span class="label label-status">
+                                <span id="monitor-status" class="status-message"></span>
+                                <i id="monitor-status-icon" class="icon-status"></i>
+                            </span>
                         </div>
                     </div>
                 </div>
