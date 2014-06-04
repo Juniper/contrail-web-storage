@@ -1,0 +1,33 @@
+<!--
+ Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
+-->
+
+<jobLists>
+  <!-- Define module name here which is being referenced in the generated 
+       file
+   -->
+   <require>
+      <define>storageConfig</define>
+      <path>../js/storage.config.global</path>
+  </require>
+  <require>
+      <define>jobsApi</define>
+      <path>storageConfig.core_path + '/src/serverroot/jobs/core/jobs.api'</path>
+  </require>
+  <require>
+      <define>jobsProcess</define>
+      <path>../api/jobs/storage.jobsProcess.api</path>
+  </require>
+
+  <require>
+      <define>config</define>
+      <path>storageConfig.core_path + '/config/config.global'</path>
+  </require>
+
+     <!-- Storage cluster status -->
+  <item>
+    <jobName>getStorageClusterStatus</jobName>
+    <callback>processStorageClusterStatusRequestByJob</callback>
+  </item>   
+</jobLists>
+

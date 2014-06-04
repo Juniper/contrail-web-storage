@@ -2,7 +2,11 @@
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 
-var commonUtils = require('../../../utils/common.utils'),
+var storageConfig = require('../../../common/js/storage.config.global');
+
+
+var   commonUtils = require(storageConfig.core_path +
+                    '/src/serverroot/utils/common.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,

@@ -3,36 +3,53 @@
 -->
 
 <urlLists>
-    
+    <require>
+        <define>storageConfig</define>
+        <path>../js/storage.config.global</path>
+     </require>
+     <require>
+        <define>longPoll</define>
+        <path>storageConfig.core_path + '/src/serverroot/web/core/longPolling.api'</path>
+     </require>
+     <require>
+        <define>cacheApi</define>
+        <path>storageConfig.core_path + '/src/serverroot/web/core/cache.api'</path>
+    </require>
+    <require>
+        <define>rbac</define>
+        <path>storageConfig.core_path + '/src/serverroot/web/core/rbac.api'</path>
+    </require>
+
    <!--  Contrail Storage API  -->
+
     <require>
         <define>storageInfraApi</define>
-        <path>../api/storage/storage.infra.api</path>
+        <path>../../monitor/infra/storagenode/api/storage.infra.api</path>
     </require>
 
     <require>
         <define>storageDashboardApi</define>
-        <path>../api/storage/storage.dashboard.api</path>
+        <path>../../monitor/tenant-storage/api/storage.dashboard.api</path>
     </require>
     
     <require>
         <define>storageMonsApi</define>
-        <path>../api/storage/storage.mons.api</path>
+        <path>../../monitor/tenant-storage/api/storage.mons.api</path>
     </require>
 
     <require>
         <define>storageOsdsApi</define>
-        <path>../api/storage/storage.osd.api</path>
+        <path>../../monitor/tenant-storage/api/storage.osd.api</path>
     </require>
     
     <require>
         <define>storagePGsApi</define>
-        <path>../api/storage/storage.pg.api</path>
+        <path>../../monitor/tenant-storage/api/storage.pg.api</path>
     </require>    
 
     <require>
         <define>storagePoolsApi</define>
-        <path>../api/storage/storage.pool.api</path>
+        <path>../../monitor/tenant-storage/api/storage.pool.api</path>
     </require>   
 
     <item>
