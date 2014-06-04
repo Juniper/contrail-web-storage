@@ -1,11 +1,15 @@
 /*
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
+var storageConfig = require('../../../common/js/storage.config.global');
 
-var cacheApi = require('../../core/cache.api'),
-    global   = require('../../../common/global'),
-    commonUtils = require('../../../utils/common.utils'),
-    storageRest= require('../common/api/storage.rest.api'),
+var cacheApi = require(storageConfig.core_path +
+                    '/src/serverroot/web/core/cache.api'),
+    global = require(storageConfig.core_path + 
+                        '/src/serverroot/common/global'),
+    commonUtils = require(storageConfig.core_path +
+                        '/src/serverroot/utils/common.utils'),
+    storageRest= require('../../../common/api/storage.rest.api'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
 

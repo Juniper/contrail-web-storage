@@ -1,14 +1,16 @@
 /*
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
+var storageConfig = require('../../../../common/js/storage.config.global');
 
 var 
-    commonUtils = require('../../../utils/common.utils'),
-    storageRest= require('../common/api/storage.rest.api'),
+    commonUtils = require(storageConfig.core_path +
+                    '/src/serverroot/utils/common.utils'),
+    storageRest= require('../../../../common/api/storage.rest.api'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
-    osdApi= require('../storage-tenant/storage.osd.api'),
-    monsApi= require('../storage-tenant/storage.mons.api'),
+    osdApi= require('../../../tenant-storage/api/storage.osd.api'),
+    monsApi= require('../../../tenant-storage/api/storage.mons.api'),
     storageInfraApi = module.exports;
 
 function getTopologyURLs(appData){

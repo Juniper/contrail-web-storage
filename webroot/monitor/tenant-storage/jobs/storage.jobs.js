@@ -2,11 +2,13 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 
+var storageConfig = require('../../../common/js/storage.config.global');
+
 var util = require('util'),
     qs = require('querystring'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
-    storageRest= require('../../common/api/storage.rest.api')
+    storageRest= require('../../../common/api/storage.rest.api')
     assert = require('assert');
 
 

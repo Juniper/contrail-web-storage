@@ -2,10 +2,16 @@
  Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
 -->
 <featureLists>
+
+    <require>
+        <define>storageConfig</define>
+        <path>../js/storage.config.global</path>
+    </require>
     <require>
         <define>rbac</define>
-        <path>./rbac.api</path>
+        <path>storageConfig.core_path + '/src/serverroot/web/core/rbac.api'</path>
     </require>
+
     <item>
         <feature>storage</feature>
     </item>

@@ -2,10 +2,11 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 
-var rest = require('./rest.api');
-var global = require('./global');
-var assert = require('assert');
-var storageConfig = require('../../../common/js/storage.config.global.js');
+ var storageConfig = require('../../common/js/storage.config.global');
+
+var rest  = require(storageConfig.core_path + '/src/serverroot/common/rest.api'),
+    global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+    assert = require('assert');
 
 var serverIp = global.DFLT_SERVER_IP;
 var serverPort = '5005';
