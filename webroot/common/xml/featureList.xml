@@ -11,6 +11,9 @@
         <define>rbac</define>
         <path>storageConfig.core_path + '/src/serverroot/web/core/rbac.api'</path>
     </require>
+    <item>
+        <feature>monitoring</feature>
+    </item>
 
     <item>
         <feature>storage</feature>

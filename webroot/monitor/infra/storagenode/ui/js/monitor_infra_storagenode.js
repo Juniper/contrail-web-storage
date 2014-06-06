@@ -9,7 +9,7 @@ storageNodesView = function(){
     }
     function populateStorageNodes(){
 
-        infraMonitorView.clearTimers();
+        infraMonitorUtils.clearTimers();
         summaryChartsInitializationStatus['storageNode'] = false;
         var storNodesTemplate = contrail.getTemplate4Id("storagenodes-template");
         $(pageContainer).html(storNodesTemplate({}));
@@ -125,8 +125,10 @@ storageNodesView = function(){
 }
 storageNodeView = function(){
     var self = this;
-    var storNodeTabStrip = "storage_tabstrip";
-    var storageNodeTabs = ['details', 'disks', 'monitor'];
+    var storNodeTabStrip = "storage-tabstrip";
+    var storNodeTabs = ['details', 'disks', 'monitor'];
+    var storNodeDisksTabStrip = "storage-disks-tabstrip";
+    var storNodeDisksTabs = ['summary', 'details'];
     this.load = function(obj){
         pushBreadcrumb([obj['name']]);
         storNodeInfo = obj;
@@ -159,13 +161,13 @@ storageNodeView = function(){
     this.populateStorageNode = function(obj){
         if(obj['tab'] == null)
             obj['tab'] = '';
-        if (!isInitialized('#storage_tabstrip')) {
+        if (!isInitialized('#storage-tabstrip')) {
             var storNodeTemplate = Handlebars.compile($("#storagenode-template").html());
             $(pageContainer).html(storNodeTemplate(storNodeInfo));
 
-            $("#storage_tabstrip").contrailTabs({
+            $("#storage-tabstrip").contrailTabs({
                 activate:function (e, ui) {
-                    infraMonitorView.clearTimers();
+                    //infraMonitorView.clearTimers();
                     var selTab = ui.newTab.context.innerText;
                     if (selTab == 'Disks') {
                         populateDisksTab(storNodeInfo);
@@ -180,7 +182,7 @@ storageNodeView = function(){
             });
         }
         if (obj['tab'] != '' && obj['tab'] != 'details') {
-            selectTab(storNodeTabStrip,storageNodeTabs.indexOf(obj['tab'].split(':')[0]));
+            selectTab(storNodeTabStrip,storNodeTabs.indexOf(obj['tab'].split(':')[0]));
             if (obj['tab'].split(':')[0] == 'disks') {
                 populateDisksTab(obj);
             }
@@ -212,219 +214,332 @@ storageNodeView = function(){
         return alertsList.sort(bgpMonitor.sortInfraAlerts);
     }
 
-    function populateDisksTab(obj){
-        if(obj['tab'].split(':')[1] == 'all' || obj['tab'].split(':')[1] == null){
-            layoutHandler.setURLHashParams({tab: 'disks:all', node: 'Storage Nodes:' + obj['name']}, {triggerHashChange: false});
+    function populateDisksTab(obj) {
+        if (!isInitialized('#storage-disks-tabstrip')) {
+            $("#storage-disks-tabstrip").contrailTabs({
+                activate: function (e, ui) {
+                    //infraMonitorView.clearTimers();
+                    var selTab = ui.newTab.context.innerText;
+                    if (selTab == 'Summary') {
+                        populateDisksSummaryTab(storNodeInfo);
+                    } else if (selTab == 'Details') {
+                        populateDiskDetailsTab(storNodeInfo);
+                    }
+                }
+            });
+        }
+
+        if (obj['tab'].split(':')[1] == 'summary' || obj['tab'].split(':')[1] == null) {
+            populateDisksSummaryTab(obj);
+        }
+        else{
+            populateDiskDetailsTab(obj);
+        }
+    }
+
+    function populateDisksSummaryTab(obj){
+        selectTab(storNodeDisksTabStrip,storNodeDisksTabs.indexOf('summary'));
+        layoutHandler.setURLHashParams({tab: 'disks:summary', node: 'Storage Nodes:' + obj['name']}, {triggerHashChange: false});
+        $.ajax({
+            url: '/api/admin/monitor/infrastructure/storagenodes/details?hostname=' + obj['name']
+        }).done(function (response) {
+            var osds = response.host_details.osds;
+            var hostname = obj['name'];
+            var osdArr = [];
+            var osdsDV = new ContrailDataView();
+            var statusTemplate = contrail.getTemplate4Id("storage-status-template");
+            $.each(osds, function (idx, osd) {
+                if (osd.kb) {
+                    osd.avail_percent = parseFloat(((osd.kb_avail / osd.kb) * 100).toFixed(2));
+                    osd.gb = formatBytes(osd.kb * 1024);
+                    osd.gb_avail = formatBytes(osd.kb_avail * 1024);
+                    osd.gb_used = formatBytes(osd.kb_used * 1024);
+                }
+                else {
+                    osd.gb = 'N/A';
+                    osd.gb_used = 'N/A';
+                    osd.gb_avail = 'N/A';
+                    osd.avail_percent = 'N/A';
+                }
+                osd.hostname = hostname;
+
+                osd.status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
+                if(osd.status == 'down')
+                    osd.status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
+                osd.cluster_status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
+                if(osd.cluster_status == 'out')
+                    osd.cluster_status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
+
+                osdArr.push(osd);
+            });
+            osdsDV.setData(osdArr);
+
+            $("#gridDisksDash").contrailGrid({
+
+                header: {
+                    title: {
+                        text: 'Disks',
+                        cssClass: 'blue',
+                        icon: 'icon-list',
+                        iconCssClass: 'blue'
+                    }
+                },
+                columnHeader: {
+                    columns: [
+                        {
+                            field: "id",
+                            name: "ID",
+                            width: 30
+                        },
+                        {
+                            field: "status",
+                            name: "Status",
+                            formatter: function(r,c,v,cd,dc){
+                                return dc['status_tmpl'];
+                            },
+                            width: 30
+                        },
+                        {
+                            field: "cluster_status",
+                            name: "Membership",
+                            formatter: function(r,c,v,cd,dc){
+                                return dc['cluster_status_tmpl'];
+                            },
+                            cssClass: 'grid-status-label',
+                            width: 40
+                        },
+                        {
+                            field: "name",
+                            name: "OSD name",
+                            events: {
+                                onClick: function(e,dc){
+                                    onDisksRowSelChange(dc);
+                                }
+                            },
+                            cssClass: 'cell-hyperlink-blue',
+                            minWidth: 80
+                        },
+                        {
+                            field: "gb",
+                            name: "Total GB",
+                            minWidth: 100
+                        },
+                        {
+                            field: "gb_used",
+                            name: "Used GB",
+                            minWidth: 100
+                        },
+                        {
+                            field: "avail_percent",
+                            name: "Available %",
+                            minWidth: 100
+                        }
+                    ]
+                },
+                body: {
+                    options: {
+                        autoHeight: true,
+                        checkboxSelectable: false,
+                        enableAsyncPostRender: true,
+                        forceFitColumns: true,
+                        detail: {
+                            template: '',
+                            onInit: function (e, dc) {
+                                var noDataStr = "N/A";
+                                setTimeout(function () {
+                                    var detailsInfo = [
+                                        {lbl: 'UUID', value: dc['uuid']},
+                                        {lbl: 'Hostname', value: dc['hostname']},
+                                        {lbl: 'State', value: dc['state']},
+                                        {lbl: 'Apply Latency', value: (function () {
+                                            try {
+                                                var perf = ifNullOrEmpty(dc['fs_perf_stat']['apply_latency_ms'], noDataStr);
+                                                if (perf != noDataStr) {
+                                                    return perf + ' ms';
+                                                }
+                                                return noDataStr;
+                                            } catch (e) {
+                                                return noDataStr;
+                                            }
+                                        })},
+                                        {lbl: 'Commit Latency', value: (function () {
+                                            try {
+                                                var perf = ifNullOrEmpty(dc['fs_perf_stat']['commit_latency_ms'], noDataStr);
+                                                if (perf != noDataStr) {
+                                                    return perf + ' ms';
+                                                }
+                                                return noDataStr;
+                                            } catch (e) {
+                                                return noDataStr;
+                                            }
+                                        })}
+                                    ];
+                                    var moreLink = '#p=mon_infra_storage&q[tab]=disks:details:'+ dc['name'] +'&q[node]=Storage+Nodes:'+ dc['hostname'];
+                                    var detailsTmpl = contrail.getTemplate4Id('storage-grid-details-template');
+                                    $(e.detailRow).html(detailsTmpl({d:detailsInfo, detailLink:moreLink}));
+                                    $("#gridDisksDash").data('contrailGrid').adjustDetailRowHeight(dc.id);
+                                }, 1000);
+                            },
+                            onExpand: function (e, dc) {
+
+                            },
+                            onCollapse: function (e, dc) {
+
+                            }
+                        }
+                    },
+                    dataSource: {
+                        dataView: osdsDV
+                    },
+                    statusMessages: {
+                        loading: {
+                            text: 'Loading Disks..'
+                        },
+                        empty: {
+                            text: 'No Disks to display'
+                        },
+                        errorGettingData: {
+                            type: 'error',
+                            iconClasses: 'icon-warning',
+                            text: 'Error in getting Data.'
+                        }
+                    }
+                },
+                footer: {
+                    pager: {
+                        options: {
+                            pageSize: 10,
+                            pageSizeSelect: [ 5, 10, 50 ]
+                        }
+                    }
+                }
+            });
+            var dvGrid = $("#gridDisksDash").data('contrailGrid');
+            dvGrid.removeGridLoading();
+        }).fail(function (result) {
+
+        });
+
+        function onDisksRowSelChange(dc) {
+            populateDisksTab({tab: 'disks:details:'+dc['name'], name: dc['hostname']});
+        }
+
+
+    }
+
+    function populateDiskDetailsTab(obj){
+        var deferredObj = $.Deferred();
+        selectTab(storNodeDisksTabStrip,storNodeDisksTabs.indexOf('details'));
+
+        if (obj['tab'] == "" || obj['tab'].split(':')[0] == null) {
             $.ajax({
                 url: '/api/admin/monitor/infrastructure/storagenodes/details?hostname=' + obj['name']
             }).done(function (response) {
                 var osds = response.host_details.osds;
-                var hostname = obj['name'];
-                var osdArr = [];
-                var osdsDV = new ContrailDataView();
-                $.each(osds, function (idx, osd) {
-                    if (osd.kb) {
-                        osd.avail_percent = parseFloat(((osd.kb_avail / osd.kb) * 100).toFixed(2));
-                        osd.gb = formatBytes(osd.kb * 1024);
-                        osd.gb_avail = formatBytes(osd.kb_avail * 1024);
-                        osd.gb_used = formatBytes(osd.kb_used * 1024);
-                    }
-                    else {
-                        osd.gb = 'N/A';
-                        osd.gb_used = 'N/A';
-                        osd.gb_avail = 'N/A';
-                        osd.avail_percent = 'N/A';
-                    }
-                    osd.hostname = hostname;
-                    osdArr.push(osd);
-                });
-                osdsDV.setData(osdArr);
-
-                $("#gridDisksDash").contrailGrid({
-
-                    header: {
-                        title: {
-                            text: 'Disks',
-                            cssClass: 'blue',
-                            icon: 'icon-list',
-                            iconCssClass: 'blue'
-                        }
-                    },
-                    columnHeader: {
-                        columns: [
-                            {
-                                field: "id",
-                                name: "ID",
-                                width: 50
-                            },
-                            {
-                                field: "status",
-                                name: "Status",
-                                formatter: function (r, c, d, cd, dc) {
-                                    if (dc.status == "up")
-                                        return '<span class="grid-osd label label-info">up</span>';
-                                    else if (dc.status == "down")
-                                        return '<span class="grid-osd label label-important">down</span>';
-                                },
-                                cssClass: 'grid-status-label',
-                                width: 50
-                            },
-                            {
-                                field: "cluster_status",
-                                name: "Cluster Status",
-                                formatter: function (r, c, d, cd, dc) {
-                                    if (dc.cluster_status == "in")
-                                        return '<span class="grid-osd label label-success">in</span>';
-                                    else if (dc.cluster_status == "out")
-                                        return '<span class="grid-osd label label-warning">out</span>';
-                                },
-                                cssClass: 'grid-status-label',
-                                width: 100
-                            },
-                            {
-                                field: "name",
-                                name: "OSD name",
-                                width: 80
-                            },
-                            {
-                                field: "gb",
-                                name: "Total GB",
-                                width: 100
-                            },
-                            {
-                                field: "gb_used",
-                                name: "Used GB",
-                                width: 100
-                            },
-                            {
-                                field: "avail_percent",
-                                name: "Available %",
-                                width: 100
-                            }
-                        ]
-                    },
-                    body: {
-                        options: {
-                            autoHeight: true,
-                            checkboxSelectable: false,
-                            enableAsyncPostRender: true,
-                            forceFitColumns: true,
-                            detail: {
-                                template: '<p>Details :</p>',
-                                onInit: function (e, dc) {
-                                    console.log(dc);
-                                    setTimeout(function () {
-                                        $.each(dc, function (idx, val) {
-                                            console.log(idx, val)
-                                            $(e.detail).addClass('basicDetails');
-                                            $(e.detailRow).append('<p><span style="color: steelblue"> ' + idx + '</span> : ' + val + '</p>');
-                                        });
-                                        $("#gridDisksDash").data('contrailGrid').adjustDetailRowHeight(dc.id);
-                                    }, 1000);
-                                },
-                                onExpand: function (e, dc) {
-                                    console.log('Detail Expand: ');
-                                    console.log(dc);
-                                },
-                                onCollapse: function (e, dc) {
-                                    console.log('Detail Collapse: ');
-                                    console.log(dc);
-                                }
-                            }
-                        },
-                        dataSource: {
-                            dataView: osdsDV
-                        },
-                        statusMessages: {
-                            loading: {
-                                text: 'Loading Disks..'
-                            },
-                            empty: {
-                                text: 'No Disks to display'
-                            },
-                            errorGettingData: {
-                                type: 'error',
-                                iconClasses: 'icon-warning',
-                                text: 'Error in getting Data.'
-                            }
-                        }
-                    },
-                    footer: {
-                        pager: {
-                            options: {
-                                pageSize: 5,
-                                pageSizeSelect: [ 5, 10, 50 ]
-                            }
-                        }
-                    }
-                });
-
-            }).fail(function (result) {
-
+                obj['tab'] = 'disks:details:' + osds[0].name;
+                deferredObj.resolve();
             });
-            var dvGrid = $("#gridDisksDash").data('contrailGrid');
-            console.log($("#gridDisksDash").data('contrailGrid'));
-
+        } else {
+            deferredObj.resolve();
         }
-        else{
-            $('#gridDisksDash').hide();
-            $('#disk-dashboard').show();
+
+        deferredObj.done(function(){
             layoutHandler.setURLHashParams({tab: obj['tab'], node: 'Storage Nodes:' + obj['name']}, {triggerHashChange: false});
-            var osdName = obj['tab'].split(':')[1];
+            var osdName = obj['tab'].split(':')[2];
             var diskDashTemplate = contrail.getTemplate4Id('dashboard-template');
-            $('#disk-dashboard').html(diskDashTemplate({title:'Disk',colCount:2, showSettings:true, widgetBoxId:'diskDash'}));
+            $('#disk-dashboard').html(diskDashTemplate({title: 'Disk', colCount: 2, showSettings: true, widgetBoxId: 'diskDash'}));
             startWidgetLoading('diskDash');
             $.ajax({
                 url: '/api/tenant/storage/cluster/osd/details?name=' + osdName
             }).done(function (response) {
-                console.log(response);
-
                 var diskData = response.osd_details;
                 var noDataStr = "N/A",
                     diskDashboardInfo;
 
                 diskDashboardInfo = [
-                    {lbl:'Name', value:diskData['name']},
-                    {lbl:'Hostname', value:diskData['host']},
-                    {lbl:'IP Address',value:(function(){
-                        try{
-                            var ip = ifNullOrEmpty(diskData['public_addr'],noDataStr);
-                            return ip.split(':')[0] +', Port: '+ ip.split(':')[1];
-                        } catch(e){return noDataStr;}
-                    })()},
-                    {lbl:'Status', value:diskData['status'] != '-' ? diskData['status'] : noDataStr},
-                    {lbl:'Cluster Status', value:diskData['cluster_status'] != '-' ? diskData['cluster_status'] : noDataStr},
-                    {lbl:'Total Space', value:formatBytes(diskData['kb']*1024)},
-                    {lbl:'Used', value:formatBytes(diskData['kb_used']*1024)},
-                    {lbl:'Available', value: formatBytes(diskData['kb_avail']*1024) + ' ( ' + parseFloat(((diskData['kb_avail'] / diskData['kb']) * 100).toFixed(2)) +"% )"},
-                    {lbl:'UUID', value: diskData['uuid']},
-                    {lbl:'Apply Latency', value:(function(){
-                        try{
-                            var perf = ifNullOrEmpty(diskData['fs_perf_stat']['apply_latency_ms'],noDataStr);
-                            if(perf){
-                                return perf + ' ms' ;
-                            }
+                    {lbl: 'Name', value: diskData['name']},
+                    {lbl: 'Hostname', value: diskData['host']},
+                    {lbl: 'IP Address', value: (function () {
+                        try {
+                            var ip = ifNullOrEmpty(diskData['public_addr'], noDataStr);
+                            return ip.split(':')[0] + ', Port: ' + ip.split(':')[1];
+                        } catch (e) {
                             return noDataStr;
-                        } catch(e){return noDataStr;}
-                    })},
-                    {lbl:'Commit Latency', value:(function(){
+                        }
+                    })()},
+                    {lbl: 'Status', value: (function(){
+                        var statusTmpl = contrail.getTemplate4Id('storage-status-template');
+                        if(diskData['status'] == "up")
+                            return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
+                        else if(diskData['status'] == "down")
+                            return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
+                        else
+                            return noDataStr;
+                    })()},
+                    {lbl: 'Cluster Membership', value: (function(){
+                        var statusTmpl = contrail.getTemplate4Id('storage-status-template');
+                        if(diskData['cluster_status'] == "in")
+                            return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
+                        else if(diskData['cluster_status'] == "out")
+                            return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
+                        else
+                            return noDataStr;
+                    })()},
+                    {lbl: 'Total Space', value: (function(){
                         try{
-                            var perf = ifNullOrEmpty(diskData['fs_perf_stat']['commit_latency_ms'],noDataStr);
-                            if(perf){
+                            if(diskData['kb'])
+                                return formatBytes(diskData['kb'] * 1024);
+                        } catch (e) {
+                            return noDataStr;
+                        }
+                    })()},
+                    {lbl: 'Used', value: (function(){
+                        try{
+                            if(diskData['kb_used'])
+                                return formatBytes(diskData['kb_used'] * 1024);
+                        } catch (e) {
+                            return noDataStr;
+                        }
+                    })()},
+                    {lbl: 'Available', value: (function(){
+                        try{
+                            if(diskData['kb_avail'])
+                                return formatBytes(diskData['kb_avail'] * 1024) + ' ( ' + parseFloat(((diskData['kb_avail'] / diskData['kb']) * 100).toFixed(2)) + "% )";
+                        } catch (e) {
+                            return noDataStr;
+                        }
+                    })()},
+                    {lbl: 'UUID', value: diskData['uuid']},
+                    {lbl: 'Apply Latency', value: (function () {
+                        try {
+                            var perf = ifNullOrEmpty(diskData['fs_perf_stat']['apply_latency_ms'], noDataStr);
+                            if (perf != noDataStr) {
                                 return perf + ' ms';
                             }
                             return noDataStr;
-                        } catch(e){return noDataStr;}
+                        } catch (e) {
+                            return noDataStr;
+                        }
+                    })},
+                    {lbl: 'Commit Latency', value: (function () {
+                        try {
+                            var perf = ifNullOrEmpty(diskData['fs_perf_stat']['commit_latency_ms'], noDataStr);
+                            if (perf != noDataStr) {
+                                return perf + ' ms';
+                            }
+                            return noDataStr;
+                        } catch (e) {
+                            return noDataStr;
+                        }
                     })}
                 ];
                 var dashboardBodyTemplate = Handlebars.compile($("#dashboard-body-template").html());
-                $('#dashboard-box .widget-body').html(dashboardBodyTemplate({colCount:2, d:diskDashboardInfo, nodeData:diskData, showSettings:true}));
+                $('#dashboard-box .widget-body').html(dashboardBodyTemplate({colCount: 2, d: diskDashboardInfo, nodeData: diskData, showSettings: true}));
                 endWidgetLoading('diskDash');
 
             });
+        });
 
-
-        }
 
     }
 
@@ -436,8 +551,7 @@ storageNodeView = function(){
         layoutHandler.setURLHashParams({tab:'details', node:'Storage Nodes:' + obj['name']},{triggerHashChange:false});
         var dashboardTemplate = contrail.getTemplate4Id('dashboard-template');
         $('#storagenode-dashboard').html(dashboardTemplate({title:'Storage Node',colCount:2, showSettings:true, widgetBoxId:'dashboard'}));
-        $('#storage-sparklines-box .widget-header').initWidgetHeader({title:'Components',widgetBoxId :'storageSparklines'});
-        $('#disks-chart-box .widget-header').initWidgetHeader({title:'Disks',widgetBoxId :'disksChart'});
+        $('#storage-sparklines-box .widget-header').initWidgetHeader({title:'Disks',widgetBoxId :'storageSparklines'});
         startWidgetLoading('dashboard');
         $.ajax({
             url:'/api/admin/monitor/infrastructure/storagenodes/details?hostname=' + obj['name']
@@ -447,29 +561,38 @@ storageNodeView = function(){
             var noMonitor = "N/A",
                 storNodeDashboardInfo;
 
-                storNodeDashboardInfo = [
-                    {lbl:'Hostname', value:obj['name']},
-                    {lbl:'IP Address',value:(function(){
-                        try{
-                            var ip = ifNullOrEmpty(storNodeData['ip'],noDataStr);
-                            return ip;
-                        } catch(e){return noDataStr;}
-                    })()},
-                    {lbl:'Status', value:storNodeData['status'] != '-' ? storNodeData['status'] : noDataStr},
-                    {lbl:'Total Space', value:formatBytes(storNodeData['kb_total']*1024)},
-                    {lbl:'Used', value:formatBytes(storNodeData['kb_used']*1024)},
-                    {lbl:'Available', value: storNodeData['avail_percent']+"%"},
-                    {lbl:'Disks', value: storNodeData['osds'].length},
-                    {lbl:'Monitor', value:(function(){
-                        try{
-                            var mntr = ifNullOrEmpty(storNodeData['monitor'],noDataStr);
-                            if(mntr['health']){
-                                return '<i class="icon-check-sign"></i>' ;
-                            }
-                            return noMonitor
-                        } catch(e){return noMonitor;}
-                    })}
-                ];
+            storNodeDashboardInfo = [
+                {lbl:'Hostname', value:obj['name']},
+                {lbl:'IP Address',value:(function(){
+                    try{
+                        var ip = ifNullOrEmpty(storNodeData['ip'],noDataStr);
+                        return ip;
+                    } catch(e){return noDataStr;}
+                })()},
+                {lbl:'Status', value:storNodeData['status'] != '-' ? storNodeData['status'] : noDataStr},
+                {lbl:'Total Space', value:formatBytes(storNodeData['kb_total']*1024)},
+                {lbl:'Used', value:formatBytes(storNodeData['kb_used']*1024)},
+                {lbl:'Available', value: storNodeData['avail_percent']+"%"},
+                {lbl:'Disks', value: storNodeData['osds'].length},
+                {lbl:'Monitor', value:(function(){
+                    try{
+                        var mntr = ifNullOrEmpty(storNodeData['monitor'],noDataStr);
+                        if(mntr['health']){
+                            var monHealth = storNodeData.monitor.health;
+                            var statusTmpl = contrail.getTemplate4Id('storage-status-template');
+                            if (monHealth == 'HEALTH_OK')
+                                return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" ok</span>";
+                            else if (monHealth == 'HEALTH_WARN')
+                                return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" warn</span>";
+                            else if (monHealth == 'HEALTH_CRIT')
+                                return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" critical</span>";
+                            else
+                                return 'N/A';
+                        }
+                        return noMonitor
+                    } catch(e){return noMonitor;}
+                })}
+            ];
             var dashboardBodyTemplate = Handlebars.compile($("#dashboard-body-template").html());
             $('#dashboard-box .widget-body').html(dashboardBodyTemplate({colCount:2, d:storNodeDashboardInfo, nodeData:storNodeData, showSettings:true}));
             endWidgetLoading('dashboard');
@@ -530,20 +653,18 @@ storageNodeView = function(){
                     osd.y= yscale[0];
             });
             retArr.sort(bgpMonitor.sortNodesByColor);
-            var deferredObj = $.Deferred();
             initDeferred({renderFn:'initScatterChart',selector:$('#disks-bubble'),parseFn:function(response) {
                 return {title:'Disks',xLbl:'Available (%)',yLbl:'Total Storage (GB)',
                     forceX: xscale, forceY: yscale,
                     chartOptions:{xPositive:true,addDomainBuffer:true},
                     d:[{key:'Disks',values:retArr}]};
             }});
-            endWidgetLoading('storageSparklines');
 
             var keys = [
                 [{'key': 'IN'},
-                {'values': [
-                    {'label':'Cluster Status'},
-                    {'value': inCnt}
+                    {'values': [
+                        {'label':'Cluster Status'},
+                        {'value': inCnt}
                     ]}
                 ],
                 [{'key': 'OUT'},
@@ -570,12 +691,11 @@ storageNodeView = function(){
             ];
             statusSeries.push(keys);
 
-            $('#storDisksTotal').text(retArr.length);
             $('#storDiskUpDown').html(function() {
                     var content = '';
-                    content = content + upCnt + ' / ';
+                    content = content + '<span style="color: ' + d3Colors['blue'] + ';">' + upCnt + ' up </span> , ';
                     if (outCnt > 0)
-                        content = content + '</span><span style="color: ' + d3Colors['red'] + ';">' + downCnt ;
+                        content = content + '<span style="color: ' + d3Colors['red'] + ';">' + downCnt + ' down</span>';
                     else
                         content = content + downCnt;
                     return content;
@@ -583,26 +703,15 @@ storageNodeView = function(){
             );
             $('#storDiskInOut').html(function() {
                     var content = '';
-                    content = content + inCnt + ' / ';
+                    content = content + '<span style="color: ' + d3Colors['green'] + ';">' + inCnt + ' in </span> , ';
                     if (outCnt > 0)
-                        content = content + '</span><span style="color: ' + d3Colors['orange'] + ';">' + outCnt ;
+                        content = content + '<span style="color: ' + d3Colors['orange'] + ';">' + outCnt + ' out </span>';
                     else
                         content = content + outCnt;
                     return content;
                 }
             );
-            $('#storMonitorHealth').html(function() {
-                var monHealth = storNodeData.monitor.health;
-                if (monHealth == 'HEALTH_OK')
-                    return '<span class="label label-status" style= "background: ' + d3Colors['green'] + ';">OK</span>';
-                else if (monHealth == 'HEALTH_WARN')
-                    return '<span class="label label-status" style= "background: ' + d3Colors['orange'] + ';">WARN</span>';
-                else if (monHealth == 'HEALTH_CRIT')
-                    return '<span class="label label-status" style= "background: ' + d3Colors['red'] + ';">CRITICAL</span>';
-                else
-                    return 'N/A';
-            });
-            endWidgetLoading('disksChart');
+            endWidgetLoading('storageSparklines');
         });
 
     }
@@ -626,14 +735,14 @@ function drawDisksBarChart(selector, data, chart, chartOptions){
 
     nv.addGraph(function(){
         var chart = nv.models.multiBarHorizontalChart()
-                .x(function(d) { return d.label })
-                .y(function(d) { return d.value })
-                .margin({top: 30, right: 20, bottom: 10, left: 5})
-                .height(65)
-                .showValues(false)
-                .tooltips(true)
-                .stacked(false)
-                .showControls(false);
+            .x(function(d) { return d.label })
+            .y(function(d) { return d.value })
+            .margin({top: 30, right: 20, bottom: 10, left: 5})
+            .height(65)
+            .showValues(false)
+            .tooltips(true)
+            .stacked(false)
+            .showControls(false);
 
 
         chart.yAxis.tickFormat(d3.format('.0f'));
@@ -642,11 +751,11 @@ function drawDisksBarChart(selector, data, chart, chartOptions){
         console.log($(selector), data.length);
 
         /*
-        chart.dispatch.on('stateChange', chartOptions['stateChangeFunction']);
-        chart.scatter.dispatch.on('elementClick', chartOptions['elementClickFunction']);
-        chart.scatter.dispatch.on('elementMouseout',chartOptions['elementMouseoutFn']);
-        chart.scatter.dispatch.on('elementMouseover',chartOptions['elementMouseoverFn']);
-        */
+         chart.dispatch.on('stateChange', chartOptions['stateChangeFunction']);
+         chart.scatter.dispatch.on('elementClick', chartOptions['elementClickFunction']);
+         chart.scatter.dispatch.on('elementMouseout',chartOptions['elementMouseoutFn']);
+         chart.scatter.dispatch.on('elementMouseover',chartOptions['elementMouseoverFn']);
+         */
         if(!($(selector).is(':visible'))) {
             $(selector).find('svg').bind("refresh", function() {
                 d3.select($(selector)[0]).select('svg').datum(data).call(chart);
@@ -659,7 +768,7 @@ function drawDisksBarChart(selector, data, chart, chartOptions){
         nv.utils.windowResize(function(){
             updateChartOnResize(selector,chart);
 
-        return chart;
+            return chart;
         });
 
     });

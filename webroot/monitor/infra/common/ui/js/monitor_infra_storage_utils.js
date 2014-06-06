@@ -1,3 +1,17 @@
+var infraMonitorStorageAlertUtils = {
+    processStorageNodeAlerts : function(obj){
+        var alertsList = [];
+        var infoObj = {name:obj['name'],type:'Storage Node',ip:obj['ip']};
+        if(obj['isDiskDown'] == true)
+            alertsList.push($.extend({},{sevLevel:sevLevels['WARNING'],msg:infraAlertMsgs['DISK_DOWN']},infoObj));
+        if(obj['errorStrings'] != null && obj['errorStrings'].length > 0){
+            $.each(obj['errorStrings'],function(idx,errorString){
+                alertsList.push($.extend({},{sevLevel:sevLevels['WARNING'],msg:errorString},infoObj));
+            });
+        }
+        return alertsList.sort(bgpMonitor.sortInfraAlerts);
+    }
+}
 
 var infraMonitorStorageUtils = {
     /**
@@ -5,8 +19,6 @@ var infraMonitorStorageUtils = {
      */
     parseStorageNodesDashboardData : function (result) {
         var retArr = [];
-        //Reset the counter
-        infraMonitorView.downNodeCnt['storageNode'] = 0;
         var hosts = result.topology.hosts;
         $.each(hosts, function (idx, host) {
             var obj = {};
@@ -25,7 +37,7 @@ var infraMonitorStorageUtils = {
             obj['status'] = host.status;
             obj['color'] = getStorageNodeColor(host, obj);
             obj['downNodeCnt'] = 0;
-            obj['nodeAlerts'] = self.processStorageNodeAlerts(obj);
+            obj['nodeAlerts'] = infraMonitorStorageAlertUtils.processStorageNodeAlerts(obj);
             obj['alerts'] = obj['nodeAlerts'].sort(bgpMonitor.sortInfraAlerts);
 
             if (obj['color'] == d3Colors['red']) {
@@ -33,11 +45,7 @@ var infraMonitorStorageUtils = {
             }
             retArr.push(obj);
         });
-        infraMonitorView.downNodeCnt['storageNode'] = result.topology.total_down_node;
-        infraViewModel.storageNodeDownCnt(infraMonitorView.downNodeCnt['storageNode']);
-        infraViewModel.storageNodeUpCnt(result.topology.total_node - infraMonitorView.downNodeCnt['storageNode']);
         retArr.sort(bgpMonitor.sortNodesByColor);
-        dashboardDataObj.storageNodesData(retArr);
         return retArr;
     }
 }
@@ -57,3 +65,11 @@ function getAllStorageNodes(defferedObj,dataSource){
             loadedDeferredObj:defferedObj});
 }
 
+function getStorageNodeColor(d,obj) {
+    obj = ifNull(obj,{});
+    if(obj['status'] == "down")
+        return d3Colors['red'];
+    if(obj['status'] == "warn")
+        return d3Colors['orange'];
+    return d3Colors['blue'];
+}

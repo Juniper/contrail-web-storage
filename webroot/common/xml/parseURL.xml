@@ -19,8 +19,36 @@
         <define>rbac</define>
         <path>storageConfig.core_path + '/src/serverroot/web/core/rbac.api'</path>
     </require>
+    <require>
+        <define>commonUtils</define>
+        <path>storageConfig.core_path + '/src/serverroot/utils/common.utils'</path>
+    </require>
 
-   <!--  Contrail Storage API  -->
+    <item>
+        <url>/api/service/networking/orchestration/model</url>
+        <method>get</method>
+        <feature>orchestration</feature>
+        <callback>commonUtils.getOrchestrationPluginModel</callback>
+    </item>
+    <item>
+        <url>/api/service/networking/web-server-info</url>
+        <method>get</method>
+        <feature>monitoring</feature>
+        <callback>commonUtils.getWebServerInfo</callback>
+    </item>
+    <require>
+        <define>timeout</define>
+        <!-- Available tags for timeout
+            timeout         - Request timeout in seconds
+            timeoutCallback - Callback to be called once request times out, if
+                              not provided, then default callback
+                              defHandleReqTimeout() gets called
+         -->
+        <path>request-timeout</path>
+    </require>
+
+
+    <!--  Contrail Storage API  -->
 
     <require>
         <define>storageInfraApi</define>
