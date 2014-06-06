@@ -1,33 +1,51 @@
 <!--
  Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
 -->
-
+<!--
+Access tag details 
+If the access tag is not there then every one can access the menu/menu items
+If access tag is there then only the roles and orchestration models mentioned in the tags are allowed
+If any role/orchModel tag is with negation(!) value then every one has access to menu/menu item except the one mentioned with negation
+and need to add the iconClass tag wherever we need to show some icons
+ -->
 <menu>
     <items>
         <item>
-            <label>MONITOR</label>
-            <depedencies>
-                <role></role>
-            </depedencies>
+            <label>Monitor</label>
+            <name>monitor</name>
+            <iconClass>icon-bar-chart</iconClass>
             <items>
                 <item>
                     <label>Infrastructure</label>
                     <rootDir>/monitor/infra/common/ui</rootDir>
+                    <!-- following two files doesn't belong here. this needs to be accessed from core/common place.
+                        for now will copy the files to web storage repo
+                     -->
                     <js>monitor_infra_constants.js</js>
                     <js>monitor_infra_utils.js</js>
                     <js>monitor_infra_storage_constants.js</js>
                     <js>monitor_infra_storage_utils.js</js>
                     <view>monitor_infra_common.view</view>
                     <class>infraDashboardView</class>
+                    <iconClass>icon-desktop</iconClass>
+                    <access>
+                        <roles>
+                            <role>admin</role>
+                        </roles>
+                        <orchModels>
+                            <model>openstack</model>
+                            <model>cloudstack</model>
+                        </orchModels>
+                    </access>
                     <items>
                         <item>
                             <hash>mon_infra_dashboard</hash>
-                            <label>Overview</label>
+                            <label>Dashboard</label>
                             <rootDir>/monitor/infra/dashboard/ui</rootDir>
-                            <view>monitor_infra_dashboard.view</view>
-                            <view>monitor_infra_storage_dashboard.view</view>
-                            <js>monitor_infra_dashboard.js</js>
                             <js>monitor_infra_storage_dashboard.js</js>
+                            <!-- following file needs to be accessed from common core -->
+                            <js>monitor_infra_dashboard.js</js>
+                            <view>monitor_infra_storage_dashboard.view</view>
                             <class>infraDashboardView</class>
                             <queryParams>
                                 <tab>vRouters</tab>
@@ -36,14 +54,11 @@
                         </item>
                         <item>
                             <hash>mon_infra_storage</hash>
-                            <label>Overview</label>
+                            <label>Storage Nodes</label>
                             <rootDir>/monitor/infra/storagenode/ui</rootDir>
-                            <view>monitor_infra_storagenode.view</view>
                             <js>monitor_infra_storagenode.js</js>
+                            <view>monitor_infra_storagenode.view</view>
                             <class>storNodesView</class>
-                            <queryParams>
-                                <node>Storage Nodes</node>
-                            </queryParams>
                             <searchStrings>Monitor Storage Nodes</searchStrings>
                         </item>
                     </items>
@@ -51,13 +66,26 @@
                 <item>
                     <name>storage</name>
                     <label>Storage</label>
+                    <rootDir>/monitor/tenant-storage/common/ui</rootDir>
+                    <js>tenant_monitor_storage.js</js>
+                    <view>tenant_monitor_storage.view</view>
+                    <iconClass>icon-tasks</iconClass>
+                    <access>
+                        <roles>
+                            <role>admin</role>
+                        </roles>
+                        <orchModels>
+                            <model>openstack</model>
+                            <model>cloudstack</model>
+                        </orchModels>
+                    </access>
                     <items>
                         <item>
                             <hash>mon_storage_dashboard</hash>
-                            <label>Storage</label>
-                            <rootDir>/monitor/tenant_storage</rootDir>
-                            <view>tenant_monitor_storage.view</view>
-                            <js>tenant_monitor_storage.js</js>
+                            <label>Dashboard</label>
+                            <rootDir>/monitor/tenant-storage/dashboard/ui</rootDir>
+                            <js>tenant_monitor_storage_dashboard.js</js>
+                            <view>tenant_monitor_storage_dashboard.view</view>
                             <class>tenantStorageMonitorView</class>
                             <queryParams>
                                 <tab>Dashboard</tab>
@@ -66,11 +94,10 @@
                         </item>
                         <item>
                             <hash>mon_storage_disks</hash>
-                            <label>Storage</label>
-                            <rootDir>/monitor/tenant_storage</rootDir>
-                            <view>tenant_monitor_storage.view</view>
-                            <js>tenant_monitor_storage.js</js>
-                            <js>tenant_monitor_disks.js</js>
+                            <label>Disks</label>
+                            <rootDir>/monitor/tenant-storage/disks/ui</rootDir>
+                            <js>tenant_monitor_storage_disks.js</js>
+                            <view>tenant_monitor_storage_disks.view</view>
                             <class>tenantStorageMonitorView</class>
                             <queryParams>
                                 <tab>Disks</tab>
@@ -79,11 +106,10 @@
                         </item>
                         <item>
                             <hash>mon_storage_monitor</hash>
-                            <label>Storage</label>
-                            <rootDir>/monitor/tenant_storage</rootDir>
-                            <view>tenant_monitor_storage.view</view>
-                            <js>tenant_monitor_storage.js</js>
-                            <js>tenant_monitor_storMonitor.js</js>
+                            <label>Monitor</label>
+                            <rootDir>/monitor/tenant-storage/monitor/ui</rootDir>
+                            <js>tenant_monitor_storage_monitor.js</js>
+                            <view>tenant_monitor_storage_monitor.view</view>
                             <class>tenantStorageMonitorView</class>
                             <queryParams>
                                 <tab>Monitor</tab>
@@ -96,17 +122,22 @@
         </item>
         <item>
             <name>configure</name>
-            <label>CONFIGURE</label>
+            <label>Configure</label>
+            <iconClass>icon-wrench</iconClass>
             <items>
             </items>
         </item>
         <item>
-            <label>SETTING</label>
+            <label>Setting</label>
+            <name>setting</name>
+            <iconClass>icon-cog</iconClass>
             <items>
             </items>
         </item>
         <item>
-            <label>QUERY</label>
+            <label>Query</label>
+            <name>query</name>
+            <iconClass>icon-search</iconClass>
             <items>
             </items>
         </item>
