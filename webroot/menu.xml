@@ -60,6 +60,7 @@ and need to add the iconClass tag wherever we need to show some icons
                     <label>Storage</label>
                     <rootDir>/monitor/tenant-storage/common/ui</rootDir>
                     <js>tenant_monitor_storage.js</js>
+                    <css>contrail.storage.css</css>
                     <view>tenant_monitor_storage.view</view>
                     <iconClass>icon-tasks</iconClass>
                     <access>
