@@ -1,3 +1,4 @@
+var storageConsoleTimer = [];
 var infraMonitorStorageAlertUtils = {
     processStorageNodeAlerts : function(obj){
         var alertsList = [];
@@ -47,6 +48,19 @@ var infraMonitorStorageUtils = {
         });
         retArr.sort(bgpMonitor.sortNodesByColor);
         return retArr;
+    },
+    getDownNodeCnt : function(data) {
+        var downNodes = $.grep(data,function(obj,idx) {
+            return obj['color'] == d3Colors['red'];
+        });
+        return downNodes.length;
+    },
+    clearTimers : function () {
+        $.each(storageConsoleTimer, function (idx, value) {
+            logMessage("clearing timer:", value);
+            clearTimeout(value)
+        });
+        storageConsoleTimer = [];
     }
 }
 
@@ -73,3 +87,88 @@ function getStorageNodeColor(d,obj) {
         return d3Colors['orange'];
     return d3Colors['blue'];
 }
+
+/**
+ * This function takes parsed nodeData from the infra parse functions and returns object with all alerts displaying in dashboard tooltip,
+ * and tooltip messages array
+ */
+function getNodeStatusForSummaryPages(data,page) {
+    var result = {},msgs = [],tooltipAlerts = [];
+    for(var i = 0;i < data['alerts'].length; i++) {
+        if(data['alerts'][i]['tooltipAlert'] != false) {
+            tooltipAlerts.push(data['alerts'][i]);
+            msgs.push(data['alerts'][i]['msg']);
+        }
+    }
+    //Status is pushed to messages array only if the status is "UP" and tooltip alerts(which are displaying in tooltip) are zero
+    if(ifNull(data['status'],"").indexOf('Up') > -1 && tooltipAlerts.length == 0) {
+        msgs.push(data['status']);
+        tooltipAlerts.push({msg:data['status'],sevLevel:sevLevels['INFO']});
+    } else if(ifNull(data['status'],"").indexOf('Down') > -1) {
+        //Need to discuss and add the down status
+        //msgs.push(data['status']);
+        //tooltipAlerts.push({msg:data['status'],sevLevel:sevLevels['ERROR']})
+    }
+    result['alerts'] = tooltipAlerts;
+    result['nodeSeverity'] = data['alerts'][0] != null ? data['alerts'][0]['sevLevel'] : sevLevels['INFO'];
+    result['messages'] = msgs;
+    var statusTemplate = contrail.getTemplate4Id('statusTemplate');
+    if(page == 'summary')
+        return statusTemplate({sevLevel:result['nodeSeverity'],sevLevels:sevLevels});
+    return result;
+}
+
+function updateStorageChartsForSummary(dsData, nodeType) {
+    var title,key,chartId,isChartInitialized = false,tooltipFn;
+    var nodeData = dsData;
+    var data = [];
+    if(nodeData != null){
+        data = updateCharts.setUpdateParams($.extend(true,[],nodeData));
+    }
+    if(nodeType == 'storageNode'){
+        title = 'Storage Nodes';
+        key = 'Storage Nodes';
+        chartId = 'storageNodes-bubble';
+        tooltipFn = bgpMonitor.storageNodeTooltipFn;
+    }
+    var chartsData = [{title:title,d:[{key:key,values:data}],xLbl:'Available (%)',yLbl:'Total Storage (GB)',chartOptions:{tooltipFn:tooltipFn,xPositive:true,addDomainBuffer:true},link:{hashParams:{p:'mon_bgp',q:{node:'storageNode'}}},widgetBoxId:'recent'}];
+    var chartObj = {},nwObj = {};
+    if(!storageSummaryChartsInitializationStatus[key]){
+        $('#' + chartId).initScatterChart(chartsData[0]);
+        storageSummaryChartsInitializationStatus[key] = true;
+    }  else {
+        chartObj['selector'] = $('#content-container').find('#' + chartId + ' > svg').first()[0];
+        chartObj['data'] = [{key:key,values:data}];
+        chartObj['type'] = 'infrabubblechart';
+        updateCharts.updateView(chartObj);
+    }
+}
+
+bgpMonitor['getTooltipContents'] = function (e) {
+        //Get the count of overlapping bubbles
+        var series = e['series'];
+        var processDetails = e['point']['processDetails'];
+        var tooltipContents = [
+            {lbl: 'Host Name', value: e['point']['name']},
+            {lbl: 'Total Space', value: e['point']['total']},
+            {lbl: 'Available', value: $.isNumeric(e['point']['available_perc']) ? e['point']['available_perc'] + '%' : e['point']['available_perc']}
+        ];
+        if (e['point']['type'] == 'storageNode') {
+            tooltipContents.push(
+                {lbl: 'Disks', value: e['point']['osds'].length}
+            );
+            $.each(e['point']['alerts'], function (idx, obj) {
+                if (obj['tooltipAlert'] != false)
+                    tooltipContents.push({lbl: ifNull(obj['tooltipLbl'], 'Events'), value: obj['msg']});
+            });
+        } else if (e['point']['type'] == 'disk') {
+            tooltipContents.push(
+                {lbl: 'Status', value: e['point']['status'] + '&' + e['point']['cluster_status']}
+            );
+            $.each(e['point']['alerts'], function (idx, obj) {
+                if (obj['tooltipAlert'] != false)
+                    tooltipContents.push({lbl: ifNull(obj['tooltipLbl'], 'Events'), value: obj['msg']});
+            });
+        }
+        return tooltipContents;
+    };

@@ -9,8 +9,8 @@ storageNodesView = function(){
     }
     function populateStorageNodes(){
 
-        infraMonitorUtils.clearTimers();
-        summaryChartsInitializationStatus['storageNode'] = false;
+        infraMonitorStorageUtils.clearTimers();
+        storageSummaryChartsInitializationStatus['storageNode'] = false;
         var storNodesTemplate = contrail.getTemplate4Id("storagenodes-template");
         $(pageContainer).html(storNodesTemplate({}));
         var storageNodeDS = new SingleDataSource('storageNodeDS');
@@ -20,7 +20,7 @@ storageNodesView = function(){
         //Initialize widget header
         $('#storageNodes-header').initWidgetHeader({title:'Storage Nodes',widgetBoxId :'recent'});
         $(storageNodeDS).on('change',function() {
-            updateChartsForSummary(storageNodesDataSource.getItems(),'storage');
+            updateStorageChartsForSummary(storageNodesDataSource.getItems(),'storage');
         });
         $('#gridStorageNodes').contrailGrid({
             header : {
