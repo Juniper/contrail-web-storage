@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 var storageConfig = require('../../../../common/js/storage.config.global');
-
+var storageApi= require('../../../../common/api/storage.api.constants');
 var 
     commonUtils = require(storageConfig.core_path +
                     '/src/serverroot/utils/common.utils'),
@@ -15,16 +15,16 @@ var
 
 function getTopologyURLs(appData){
     var dataObjArr = [];
-    urlOSDsFromPG = "/pg/dump?dumpcontents=osds";
+    urlOSDsFromPG = storageApi.url.pgDumpOSDs;
     commonUtils.createReqObj(dataObjArr, urlOSDsFromPG, null, null, 
                                          null, null, appData);
-    urlOSDTree = "/osd/tree";
+    urlOSDTree = storageApi.url.osdTree;
     commonUtils.createReqObj(dataObjArr, urlOSDTree, null, null, 
                                          null, null, appData);
-    urlOSDDump = "/osd/dump";
+    urlOSDDump = storageApi.url.osdDump;
     commonUtils.createReqObj(dataObjArr, urlOSDDump, null, null, 
                                          null, null, appData);
-    urlMons = "/status";
+    urlMons = storageApi.url.status;
     commonUtils.createReqObj(dataObjArr, urlMons, null, null, 
                                          null, null, appData);
     return dataObjArr;

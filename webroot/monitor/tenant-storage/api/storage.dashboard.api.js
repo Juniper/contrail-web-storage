@@ -3,6 +3,8 @@
  */
 var storageConfig = require('../../../common/js/storage.config.global');
 
+var storageApi= require('../../../common/api/storage.api.constants');
+
 var cacheApi = require(storageConfig.core_path +
                     '/src/serverroot/web/core/cache.api'),
     global = require(storageConfig.core_path + 
@@ -16,7 +18,7 @@ var cacheApi = require(storageConfig.core_path +
 storageDashboardApi = module.exports;
 
 function getStorageClusterStatus(req, res ){
-    url = "/status";
+    url = storageApi.url.status;//"/status";
    // console.log("get data:"+url);
     cacheApi.queueDataFromCacheOrSendRequest(req, res, global.STR_JOB_TYPE_CACHE,
                                              global.STR_STORAGE_TYPE_CLUSTER, url,
@@ -25,7 +27,7 @@ function getStorageClusterStatus(req, res ){
 
 
 function getStorageClusterHealthStatus(req, res, appData){
-    url = "/health";
+    url = storageApi.url.health;//"/health";
    storageRest.apiGet(url, appData, function (error, resultJSON) {
         if(!error && (resultJSON)) {
             var resultJSON = parseStorageHealthStatusData(resultJSON);
@@ -56,15 +58,15 @@ function parseStorageHealthStatusData(resultJSON){
 
 
 function getStorageClusterActivity(req, res,appData){
-    url = "/status";
-     storageRest.apiGet(url, appData,url, function (error, resultJSON) {
-            if(!error && (resultJSON)) {
-                var resultJSON = parseStorageClusterActivityData(resultJSON);
-                commonUtils.handleJSONResponse(null, res, resultJSON);
-            } else {
-                commonUtils.handleJSONResponse(error, res, null);
-            }
-        });  
+    url = storageApi.url.status;
+    storageRest.apiGet(url, appData,url, function (error, resultJSON) {
+        if(!error && (resultJSON)) {
+            var resultJSON = parseStorageClusterActivityData(resultJSON);
+            commonUtils.handleJSONResponse(null, res, resultJSON);
+        } else {
+            commonUtils.handleJSONResponse(error, res, null);
+        }
+    });  
 }
 
 function parseStorageClusterActivityData(activityJSON){
@@ -72,15 +74,15 @@ function parseStorageClusterActivityData(activityJSON){
 }
 
 function getStorageClusterUsageData(req, res, appData){
-    url = "/df";
-     storageRest.apiGet(url, appData, function (error, resultJSON) {
-            if(!error && (resultJSON)) {
-                var resultJSON = parseStorageClusterUsageData(resultJSON);
-                commonUtils.handleJSONResponse(null, res, resultJSON);
-            } else {
-                commonUtils.handleJSONResponse(error, res, null);
-            }
-        });  
+    url = storageApi.url.df;//"/df";
+    storageRest.apiGet(url, appData, function (error, resultJSON) {
+        if(!error && (resultJSON)) {
+            var resultJSON = parseStorageClusterUsageData(resultJSON);
+            commonUtils.handleJSONResponse(null, res, resultJSON);
+        } else {
+            commonUtils.handleJSONResponse(error, res, null);
+        }
+    });  
 }
 
 function parseStorageClusterUsagaeData(usageJSON){
@@ -90,7 +92,7 @@ function parseStorageClusterUsagaeData(usageJSON){
 
 
 function getStorageClusterDFStatus(req, res, appData){
-    url = "/df";
+    url = storageApi.url.df;
     storageRest.apiGet(url, appData, function (error, resultJSON) {
         if(!error && (resultJSON)) {
             var resultJSON = parseStorageDFData(resultJSON);
@@ -108,7 +110,7 @@ function parseStorageDFData(dfDataJSON){
 }
 
 function getStorageClusterThroughput(req, res, appData){
-    url = "/pg/dump?dumpcontents=summary";
+    url = storageApi.url.pgDumpSummary;//"/pg/dump?dumpcontents=summary";
     storageRest.apiGet(url, appData, function (error, resultJSON) {
             if(!error && (resultJSON)) {
                 var resultJSON = parseStorageClusterThroughput(resultJSON);
@@ -165,7 +167,7 @@ function parseStorageClusterThroughput(tPutJSON){
 }
 
 function getStorageClusterLatency(req, res, appData){
-    url = "/pg/dump?dumpcontents=summary";
+    url = storageApi.url.pgDumpSummary;
     storageRest.apiGet(url, appData, function (error, resultJSON) {
             if(!error && (resultJSON)) {
                 var resultJSON = parseStorageClusterLatency(resultJSON);
