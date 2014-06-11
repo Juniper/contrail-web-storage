@@ -3,6 +3,7 @@
  */
 
 var storageConfig = require('../../../common/js/storage.config.global');
+var storageApi= require('../../../common/api/storage.api.constants');
 
 
 var   commonUtils = require(storageConfig.core_path +
@@ -16,7 +17,7 @@ var   commonUtils = require(storageConfig.core_path +
 
 
 function getMonitorSummary(req, res, appData){
-     url = "/status";
+     url = storageApi.url.status;
      storageRest.apiGet(url, appData,function (error, resultJSON) {
             if(!error && (resultJSON)) {
                 var resultJSON = parseMonitorSummary(resultJSON);
@@ -33,15 +34,15 @@ function parseMonitorSummary(resultJSON){
 
 function getMonitorDetails(req, res, appData){
     var mon_name = req.param('name');
-     url = "/status";
-     storageRest.apiGet(url, appData,function (error, resultJSON) {
-            if(!error && (resultJSON)) {
-                var resultJSON = parseMonitorDetails(mon_name,resultJSON);
-                commonUtils.handleJSONResponse(null, res, resultJSON);
-            } else {
-                commonUtils.handleJSONResponse(error, res, null);
-            }
-        });   
+    url = storageApi.url.status;
+    storageRest.apiGet(url, appData,function (error, resultJSON) {
+        if(!error && (resultJSON)) {
+            var resultJSON = parseMonitorDetails(mon_name,resultJSON);
+            commonUtils.handleJSONResponse(null, res, resultJSON);
+        } else {
+            commonUtils.handleJSONResponse(error, res, null);
+        }
+    });   
 }
 
 function parseMonitorDetails(name, resultJSON){

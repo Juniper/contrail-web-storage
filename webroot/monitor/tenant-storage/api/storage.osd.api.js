@@ -3,7 +3,7 @@
  */
 
 var storageConfig = require('../../../common/js/storage.config.global');
-
+var storageApi= require('../../../common/api/storage.api.constants');
 
 var   commonUtils = require(storageConfig.core_path +
                     '/src/serverroot/utils/common.utils'),
@@ -13,7 +13,7 @@ var   commonUtils = require(storageConfig.core_path +
     storageOsdsApi = module.exports;
 
 function getStorageOSDStatus(req, res, appData){
-    url = "/osd/stat";
+    url = storageApi.url.osdStat;//"/osd/stat";
      storageRest.apiGet(url, appData, function (error, resultJSON) {
             if(!error && (resultJSON)) {
                 var resultJSON = parseStorageOSDStatus(resultJSON);
@@ -114,13 +114,13 @@ function parseStorageOSDDetails(name, resultJSON){
 
 function getOSDListURLs(appData){
     var dataObjArr = [];
-    urlOSDsFromPG = "/pg/dump?dumpcontents=osds";
+    urlOSDsFromPG = storageApi.url.pgDumpOSDs;//"/pg/dump?dumpcontents=osds";
     commonUtils.createReqObj(dataObjArr, urlOSDsFromPG, null, null, 
                                          null, null, appData);
-    urlOSDTree = "/osd/tree";
+    urlOSDTree = storageApi.url.osdTree;//"/osd/tree";
     commonUtils.createReqObj(dataObjArr, urlOSDTree, null, null, 
                                          null, null, appData);
-    urlOSDDump = "/osd/dump";
+    urlOSDDump = storageApi.url.osdDump;//"/osd/dump";
     commonUtils.createReqObj(dataObjArr, urlOSDDump, null, null, 
                                          null, null, appData);
     return dataObjArr;

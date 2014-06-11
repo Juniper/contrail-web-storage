@@ -2,7 +2,9 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 
- var storageConfig = require('../../common/js/storage.config.global');
+var storageConfig = require('../js/storage.config.global');
+
+var storageApi= require('./storage.api.constants');
 
 var rest  = require(storageConfig.core_path + '/src/serverroot/common/rest.api'),
     global = require(storageConfig.core_path + '/src/serverroot/common/global'),
@@ -10,7 +12,7 @@ var rest  = require(storageConfig.core_path + '/src/serverroot/common/rest.api')
 
 var serverIp = global.DFLT_SERVER_IP;
 var serverPort = '5005';
-var serverUrlVersion= "/api/v0.1";
+//var serverUrlVersion= storageApi.rest.serverVersion;
 
 
 if (storageConfig.ceph.server_ip) {
@@ -30,7 +32,7 @@ function apiGet (url, appData, callback)
 {
     var headers = {};
     headers['Accept'] = 'application/json';
-    url = serverUrlVersion + url;
+    url = storageApi.rest.serverVersion + url;
     
     storageServer.api.get(url, function(err, data) {
         callback(err, data);
