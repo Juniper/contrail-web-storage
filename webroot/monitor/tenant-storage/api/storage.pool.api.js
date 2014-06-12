@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 var storageConfig = require('../../../common/js/storage.config.global');
-
+var storageApi= require('../../../common/api/storage.api.constants');
 
 var commonUtils = require(storageConfig.core_path +
                         '/src/serverroot/utils/common.utils'),
@@ -16,11 +16,11 @@ function getStoragePGPoolsSummary(req, res, appData){
 
     var dataObjArr = [];
     var resultJSON = [];
-    urlPools = "/pg/dump_pools_json";
+    urlPools = storageApi.url.pgDumpPools; //"/pg/dump_pools_json";
     commonUtils.createReqObj(dataObjArr, urlPools, null, null, 
                                          null, null, appData);
 
-    urlDF = "/df";
+    urlDF = storageApi.url.df;
     commonUtils.createReqObj(dataObjArr, urlDF, null, null, 
                                          null, null, appData);
 
@@ -67,11 +67,11 @@ function getStoragePGPoolDetails(req, res, appData){
     var dataObjArr = [];
     var resultJSON = [];
     var pool_name = req.param('name');
-    urlPools = "/pg/dump_pools_json";
+    urlPools = storageApi.url.pgDumpPools;
     commonUtils.createReqObj(dataObjArr, urlPools, null, null, 
                                          null, null, appData);
 
-    urlDF = "/df";
+    urlDF = storageApi.url.df;
     commonUtils.createReqObj(dataObjArr, urlDF, null, null, 
                                          null, null, appData);
 

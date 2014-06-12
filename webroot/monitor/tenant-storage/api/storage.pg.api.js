@@ -2,6 +2,7 @@
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 var storageConfig = require('../../../common/js/storage.config.global');
+var storageApi= require('../../../common/api/storage.api.constants');
 
 
 var commonUtils = require(storageConfig.core_path +
@@ -14,11 +15,11 @@ var commonUtils = require(storageConfig.core_path +
 function getStoragePGSummary(req, res, appData){
     var dataObjArr = [];
     var resultJSON = [];
-    urlStatus = "/status";
+    urlStatus = storageApi.url.status;
     commonUtils.createReqObj(dataObjArr, urlStatus, null, null, 
                                          null, null, appData);
 
-    urlPGSummary = "/pg/dump?dumpcontents=summary";
+    urlPGSummary = storageApi.url.pgDumpSummary;//"/pg/dump?dumpcontents=summary";
     commonUtils.createReqObj(dataObjArr, urlPGSummary, null, null, 
                                          null, null, appData);
      async.map(dataObjArr,
@@ -49,7 +50,7 @@ function parseStoragePGData(pgJSON){
 }
 
 function getStoragePGStuck(req, res, appData){
-    url = "/pg/dump_stuck";
+    url = storageApi.url.pgDumpStuck;//;"/pg/dump_stuck";
      storageRest.apiGet(url, appData, function (error, resultJSON) {
             if(!error && (resultJSON)) {
                 var resultJSON = parseStoragePGStuckData(resultJSON);
