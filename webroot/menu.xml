@@ -18,15 +18,9 @@ and need to add the iconClass tag wherever we need to show some icons
                 <item>
                     <label>Infrastructure</label>
                     <rootDir>/monitor/infra/common/ui</rootDir>
-                    <!-- following two files doesn't belong here. this needs to be accessed from core/common place.
-                        for now will copy the files to web storage repo
-                     -->
-                    <js>monitor_infra_constants.js</js>
-                    <js>monitor_infra_utils.js</js>
                     <js>monitor_infra_storage_constants.js</js>
                     <js>monitor_infra_storage_utils.js</js>
-                    <view>monitor_infra_common.view</view>
-                    <class>infraDashboardView</class>
+                    <view>monitor_infra_storage_common.view</view>
                     <iconClass>icon-desktop</iconClass>
                     <access>
                         <roles>
@@ -43,12 +37,10 @@ and need to add the iconClass tag wherever we need to show some icons
                             <label>Dashboard</label>
                             <rootDir>/monitor/infra/dashboard/ui</rootDir>
                             <js>monitor_infra_storage_dashboard.js</js>
-                            <!-- following file needs to be accessed from common core -->
-                            <js>monitor_infra_dashboard.js</js>
                             <view>monitor_infra_storage_dashboard.view</view>
-                            <class>infraDashboardView</class>
+                            <class>infraMonitorStorageDashView</class>
                             <queryParams>
-                                <tab>vRouters</tab>
+                                <tab>storageNode</tab>
                             </queryParams>
                             <searchStrings>Infrastructure Dashboard</searchStrings>
                         </item>
@@ -68,6 +60,7 @@ and need to add the iconClass tag wherever we need to show some icons
                     <label>Storage</label>
                     <rootDir>/monitor/tenant-storage/common/ui</rootDir>
                     <js>tenant_monitor_storage.js</js>
+                    <css>contrail.storage.css</css>
                     <view>tenant_monitor_storage.view</view>
                     <iconClass>icon-tasks</iconClass>
                     <access>

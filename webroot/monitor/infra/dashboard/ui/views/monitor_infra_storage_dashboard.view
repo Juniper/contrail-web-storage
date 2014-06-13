@@ -1,3 +1,15 @@
+<script type="text/x-handlebars-template" id="storageNode-dashboard-tab">
+    <div class="span12">
+        <div style="width: 160px">
+            <div id="sparkLineStorageStats" class="infobox-container"></div>
+        </div>
+        <div style="margin-left: 160px;">
+            <div id="storageNode-bubble" class="infra-node-chart" style="margin:-30px 0 0 0;height:290px"></div>
+        </div>
+    </div>
+</script>
+
+<!--
 <script type="text/x-handlebars-template" id="infra-storage-dashboard">
     <div class="row-fluid">
         <div class="row-fluid">
@@ -60,3 +72,4 @@
         </div>
     </div>
 </script>
+-->
