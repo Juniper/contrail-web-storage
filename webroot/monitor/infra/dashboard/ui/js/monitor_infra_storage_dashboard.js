@@ -34,7 +34,7 @@ function addStorageTabs() {
         this.updateView = function(data) {
             if(!isScatterChartInitialized('#storageNode-bubble')) {
                 $('#storageNodeStats-header').initWidgetHeader({title:'Storage Nodes',link:{hashParams:{p:'mon_infra_storage',q:{node:'Storage Nodes'}}}});
-                var chartsData = {title:'Storage Nodes',xLbl:'Available (%)',yLbl:'Total Storage (GB)',chartOptions:{xPositive:true,addDomainBuffer:true},d:[{key:'Storage Nodes',values:data}]};
+                var chartsData = {title:'Storage Nodes',xLbl:'Available (%)',yLbl:'Total Storage (GB)',chartOptions:{xPositive:true,tooltipFn:storageChartUtils.storageNodeTooltipFn,clickFn:storageChartUtils.onStorageNodeDrillDown,addDomainBuffer:true},d:[{key:'Storage Nodes',values:data}]};
                 $('#storageNode-bubble').initScatterChart(chartsData);
             } else {
             }

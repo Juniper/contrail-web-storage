@@ -4,9 +4,19 @@
 
 storageNodesView = function(){
     this.load = function(obj){
-        layoutHandler.setURLHashParams({node:'Storage Nodes'},{merge:false,triggerHashChange:false});
-        populateStorageNodes();
+        var hashParams = ifNullOrEmptyObject(obj['hashParams'],{node:''});
+        if (hashParams['node'].indexOf('Storage Nodes:') == 0) {
+            storNodeView.load({name: hashParams['node'].split(':')[1], tab: hashParams['tab']});
+        } else {
+            layoutHandler.setURLHashParams({node:'Storage Nodes'},{merge:false,triggerHashChange:false});
+            populateStorageNodes();    
+        }
     }
+
+    this.updateViewByHash = function(hashObj,lastHashObj) {
+        this.load({hashParams:hashObj});
+    }
+
     function populateStorageNodes(){
 
         infraMonitorStorageUtils.clearTimers();
@@ -20,7 +30,7 @@ storageNodesView = function(){
         //Initialize widget header
         $('#storageNodes-header').initWidgetHeader({title:'Storage Nodes',widgetBoxId :'recent'});
         $(storageNodeDS).on('change',function() {
-            updateStorageChartsForSummary(storageNodesDataSource.getItems(),'storage');
+            updateStorageChartsForSummary(storageNodesDataSource.getItems(),'storageNodes');
         });
         $('#gridStorageNodes').contrailGrid({
             header : {
@@ -117,6 +127,7 @@ storageNodesView = function(){
             storNodesGrid.showGridMessage('loading');
         }
     }
+
     function onStorNodeRowSelChange(dc) {
         var storNodesGrid = $('#gridStorageNodes').data('contrailGrid');
         storNodeView.load({name:dc['name']});
@@ -167,14 +178,11 @@ storageNodeView = function(){
 
             $("#storage-tabstrip").contrailTabs({
                 activate:function (e, ui) {
-                    //infraMonitorView.clearTimers();
                     var selTab = ui.newTab.context.innerText;
                     if (selTab == 'Disks') {
                         populateDisksTab(storNodeInfo);
-                        //$('#gridPeers').data('contrailGrid').refreshView();
                     } else if (selTab == 'Monitor') {
                         populateMonitorTab(storNodeInfo);
-                        //$('#gridRoutes').data('contrailGrid').refreshView();
                     } else if (selTab == 'Details') {
                         populateDetailsTab(storNodeInfo);
                     }
@@ -211,14 +219,13 @@ storageNodeView = function(){
                 alertsList.push($.extend({},{sevLevel:sevLevels['WARNING'],msg:errorString},infoObj));
             });
         }
-        return alertsList.sort(bgpMonitor.sortInfraAlerts);
+        return alertsList.sort(dashboardUtils.sortInfraAlerts);
     }
 
     function populateDisksTab(obj) {
         if (!isInitialized('#storage-disks-tabstrip')) {
             $("#storage-disks-tabstrip").contrailTabs({
                 activate: function (e, ui) {
-                    //infraMonitorView.clearTimers();
                     var selTab = ui.newTab.context.innerText;
                     if (selTab == 'Summary') {
                         populateDisksSummaryTab(storNodeInfo);
@@ -618,7 +625,7 @@ storageNodeView = function(){
                 osd['color'] = getOSDColor(osd);
                 osd['downNodeCnt'] = 0;
                 osd['nodeAlerts'] = self.processOSDAlerts(osd);
-                osd['alerts'] = osd['nodeAlerts'].sort(bgpMonitor.sortInfraAlerts);
+                osd['alerts'] = osd['nodeAlerts'].sort(dashboardUtils.sortInfraAlerts);
                 if(!isNaN(osd['x']))
                     xvals.push(osd['x']);
                 if(!isNaN(osd['y']))
@@ -652,11 +659,11 @@ storageNodeView = function(){
                 if(isNaN(osd.y))
                     osd.y= yscale[0];
             });
-            retArr.sort(bgpMonitor.sortNodesByColor);
+            retArr.sort(dashboardUtils.sortNodesByColor);
             initDeferred({renderFn:'initScatterChart',selector:$('#disks-bubble'),parseFn:function(response) {
                 return {title:'Disks',xLbl:'Available (%)',yLbl:'Total Storage (GB)',
                     forceX: xscale, forceY: yscale,
-                    chartOptions:{xPositive:true,addDomainBuffer:true},
+                    chartOptions:{xPositive:true, tooltipFn:storageChartUtils.diskTooltipFn, clickFn:storageChartUtils.onDiskDrillDown, addDomainBuffer:true},
                     d:[{key:'Disks',values:retArr}]};
             }});
 
