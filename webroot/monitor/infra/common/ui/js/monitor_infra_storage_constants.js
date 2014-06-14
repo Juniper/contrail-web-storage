@@ -17,7 +17,8 @@ var storageSummaryChartsInitializationStatus = {storageNode:false};
 
 var monitorInfraStorageUrls = {
     STORAGENODES_SUMMARY    : '/api/admin/monitor/infrastructure/storagenodes/summary',
-    STORAGENODE_DETAILS     : '/api/admin/monitor/infrastructure/storagenodes/details?hostname={0}'
+    STORAGENODE_DETAILS     : '/api/admin/monitor/infrastructure/storagenodes/details?hostname={0}',
+    DISK_DETAILS            : '/api/tenant/storage/cluster/osd/details?name={0}'
 }
 
 var monitorInfraUrls = {
