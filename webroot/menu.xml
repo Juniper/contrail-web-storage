@@ -81,7 +81,7 @@ and need to add the iconClass tag wherever we need to show some icons
                             <view>tenant_monitor_storage_dashboard.view</view>
                             <class>tenantStorageMonitorView</class>
                             <queryParams>
-                                <tab>Dashboard</tab>
+                                <node>Dashboard</node>
                             </queryParams>
                             <searchStrings>Storage Dashboard</searchStrings>
                         </item>
@@ -93,7 +93,7 @@ and need to add the iconClass tag wherever we need to show some icons
                             <view>tenant_monitor_storage_disks.view</view>
                             <class>tenantStorageMonitorView</class>
                             <queryParams>
-                                <tab>Disks</tab>
+                                <node>Disks</node>
                             </queryParams>
                             <searchStrings>Storage Disks</searchStrings>
                         </item>
@@ -105,7 +105,7 @@ and need to add the iconClass tag wherever we need to show some icons
                             <view>tenant_monitor_storage_monitor.view</view>
                             <class>tenantStorageMonitorView</class>
                             <queryParams>
-                                <tab>Monitor</tab>
+                                <node>Monitor</node>
                             </queryParams>
                             <searchStrings>Storage Monitor</searchStrings>
                         </item>

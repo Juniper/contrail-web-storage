@@ -207,7 +207,7 @@ cephOSDsView = function () {
     }
 
     this.load = function (obj) {
-        layoutHandler.setURLHashParams({node:'OSDs'},{merge:false,triggerHashChange:false});
+        layoutHandler.setURLHashParams({node:'Disks'},{merge:false,triggerHashChange:false});
         populateOSDs();
     };
     this.parseOSDsData = function(respData){
