@@ -163,7 +163,7 @@ storageNodeView = function(){
 
     this.getStorageNodeDetails = function(deferredObj,obj) {
         $.ajax({
-            url:'/api/admin/monitor/infrastructure/storagenodes/details?hostname=' + obj['name']
+            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['name'])
         }).done(function(response) {
             deferredObj.resolve(response);
         });
@@ -248,7 +248,7 @@ storageNodeView = function(){
         selectTab(storNodeDisksTabStrip,storNodeDisksTabs.indexOf('summary'));
         layoutHandler.setURLHashParams({tab: 'disks:summary', node: 'Storage Nodes:' + obj['name']}, {triggerHashChange: false});
         $.ajax({
-            url: '/api/admin/monitor/infrastructure/storagenodes/details?hostname=' + obj['name']
+            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['name'])
         }).done(function (response) {
             var osds = response.host_details.osds;
             var hostname = obj['name'];
@@ -440,7 +440,7 @@ storageNodeView = function(){
 
         if (obj['tab'] == "" || obj['tab'].split(':')[0] == null) {
             $.ajax({
-                url: '/api/admin/monitor/infrastructure/storagenodes/details?hostname=' + obj['name']
+                url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['name'])
             }).done(function (response) {
                 var osds = response.host_details.osds;
                 obj['tab'] = 'disks:details:' + osds[0].name;
@@ -457,7 +457,7 @@ storageNodeView = function(){
             $('#disk-dashboard').html(diskDashTemplate({title: 'Disk', colCount: 2, showSettings: true, widgetBoxId: 'diskDash'}));
             startWidgetLoading('diskDash');
             $.ajax({
-                url: '/api/tenant/storage/cluster/osd/details?name=' + osdName
+                url: contrail.format(monitorInfraStorageUrls['DISK_DETAILS'] , osdName)
             }).done(function (response) {
                 var diskData = response.osd_details;
                 var noDataStr = "N/A",
@@ -561,7 +561,7 @@ storageNodeView = function(){
         $('#storage-sparklines-box .widget-header').initWidgetHeader({title:'Disks',widgetBoxId :'storageSparklines'});
         startWidgetLoading('dashboard');
         $.ajax({
-            url:'/api/admin/monitor/infrastructure/storagenodes/details?hostname=' + obj['name']
+            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['name'])
         }).done(function (response) {
             var storNodeData = response.host_details;
             var noDataStr = "--";

@@ -361,10 +361,6 @@ function storInfraDashboardClass () {
     }
 
     this.loadViewFromNode = function (hashObj){
-        if(hashObj == '') {
-            hashObj = {};
-            hashObj['node'] = 'Dashboard';
-        }
         if (hashObj['node'].indexOf('Monitor:') == 0) {
             oneMntrView.load({name:hashObj['node'].split(':')[1], ip:hashObj['ip'],tab:hashObj['tab']});
         } else if (hashObj['node'].indexOf('Disks:') == 0) {
@@ -373,10 +369,10 @@ function storInfraDashboardClass () {
             onePgView.load({name:hashObj['node'].split(':')[1], ip:hashObj['ip'], uuid:hashObj['uuid'], tab:hashObj['tab']});
         } else {
             this.setCurrPage(hashObj['node']);
-            if(hashObj['node'] == 'Monitor Nodes'){
+            if(hashObj['node'] == 'Monitor'){
                 storInfraMonView.load();
             }
-            else if(hashObj['node'] == 'OSDs')
+            else if(hashObj['node'] == 'Disks')
                 storInfraOSDsView.load();
             else if(hashObj['node'] == 'Placement Groups')
                 storInfraPgView.load();
@@ -384,13 +380,18 @@ function storInfraDashboardClass () {
                 tenantStorageMonitorView.load();
         }
     }
-    this.load = function (newObj){
-        var hashParams = ifNull(newObj['hashParams'],{});
-        console.log(newObj['hashParams']);
-        var hashParams = newObj['hashParams'];
 
-        if(hashParams['node'] != null) {
-            var infraDashTemplate = Handlebars.compile($("#monitor-page-template").html());
+    this.load = function (){
+        self.updateViewByHash(layoutHandler.getURLHashParams());
+    }
+
+    this.updateViewByHash = function(obj) {
+        console.log(obj);
+
+        var hashParams = ifNullOrEmptyObject(obj,{node:'Dashboard'});
+        
+        if(hashParams['node'] != 'Dashboard') {
+            var infraDashTemplate = Handlebars.compile($("#tenant-page-template").html());
             $(contentContainer).html('');
             $(contentContainer).html(infraDashTemplate);
             tenantStorageMonitorView.loadViewFromNode(hashParams);
@@ -401,13 +402,9 @@ function storInfraDashboardClass () {
             $(contentContainer).html(infraDashboardTemplate);
             self.setCurrPage('Dashboard');
             tenantStorageMonitorView.updateClusterDashboard(hashParams);
-
-            //Initialize the common stuff
-            //$($('#dashboard-stats .widget-header')[0]).initWidgetHeader({title:'Logs',widgetBoxId :'logs'});
-            //$($('#dashboard-stats .widget-header')[1]).initWidgetHeader({title:'System Information', widgetBoxId: 'sysinfo'});
-            //$($('#dashboard-stats .widget-header')[2]).initWidgetHeader({title:'Alerts', widgetBoxId: 'alerts' });
         }
     }
+
     if(this.timerId){
         clearInterval(this.timerId);
     }
