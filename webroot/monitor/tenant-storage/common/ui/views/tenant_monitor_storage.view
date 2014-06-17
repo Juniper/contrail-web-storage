@@ -1,4 +1,4 @@
-<script type="text/x-handlebars-template" id="monitor-page-template">
+<script type="text/x-handlebars-template" id="tenant-page-template">
     <div class='contrail'>
         <div id='page-container' class='splitter-pane-content no-padding'></div>
         <div id="splitter" style="display:none">

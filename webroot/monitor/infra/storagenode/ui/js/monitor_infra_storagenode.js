@@ -660,12 +660,21 @@ storageNodeView = function(){
                     osd.y= yscale[0];
             });
             retArr.sort(dashboardUtils.sortNodesByColor);
-            initDeferred({renderFn:'initScatterChart',selector:$('#disks-bubble'),parseFn:function(response) {
-                return {title:'Disks',xLbl:'Available (%)',yLbl:'Total Storage (GB)',
-                    forceX: xscale, forceY: yscale,
-                    chartOptions:{xPositive:true, tooltipFn:storageChartUtils.diskTooltipFn, clickFn:storageChartUtils.onDiskDrillDown, addDomainBuffer:true},
-                    d:[{key:'Disks',values:retArr}]};
-            }});
+            initDeferred({
+                            renderFn    : 'initScatterChart',
+                            selector    : $('#disks-bubble'),
+                            parseFn     : function(response) { 
+                                            return {
+                                                title: 'Disks', xLbl: 'Available (%)', yLbl: 'Total Storage (GB)',
+                                                forceX: xscale, forceY: yscale,
+                                                chartOptions: {
+                                                    xPositive: true, tooltipFn: storageChartUtils.diskTooltipFn,
+                                                    clickFn: storageChartUtils.onDiskDrillDown, addDomainBuffer: true
+                                                },
+                                                d: [{key: 'Disks', values: retArr}]
+                                            };
+                            }
+                        });
 
             var keys = [
                 [{'key': 'IN'},
