@@ -6,6 +6,9 @@ var storageApi= require('../../../common/api/storage.api.constants');
 
 var commonUtils = require(storageConfig.core_path +
                         '/src/serverroot/utils/common.utils'),
+    global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+    logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
+    stMonUtils= require('../../../common/api/utils/storage.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
@@ -92,9 +95,94 @@ function parseStoragePGPoolDetails(name, poolJSON){
     return pJSON;
 }
 
+
+function getStoragePoolFlowSeries (req, res, appData) {
+    var source = req.query['hostName'];
+    var sampleCnt = req.query['sampleCnt'];
+    var minsSince = req.query['minsSince'];
+    var endTime = req.query['endTime'];
+    var poolName= req.query['poolName'];
+
+    var name = source +":"+poolName;
+
+    var tableName, whereClause,
+        selectArr = ["T", "name"];
+
+    tableName = 'StatTable.ComputeStoragePool.pool_stats';
+    selectArr.push("pool_stats.pool");
+    selectArr.push("pool_stats.reads");
+    selectArr.push("pool_stats.writes");
+    selectArr.push("pool_stats.read_kbytes");
+    selectArr.push("pool_stats.write_kbytes");
+    whereClause = [
+        {'Source':source},
+        {'name':name}
+    ];
+
+    whereClause = stMonUtils.formatAndClause(whereClause);
+    var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+    var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+    var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+    delete queryJSON['limit'];
+    delete queryJSON['dir'];
+    var selectEleCnt = queryJSON['select_fields'].length;
+    queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+    stMonUtils.executeQueryString(queryJSON,
+        commonUtils.doEnsureExecution(function(err, resultJSON)  {
+            resultJSON= formatFlowSeriesForPoolStats(resultJSON, timeObj, timeGran);
+            commonUtils.handleJSONResponse(err, res, resultJSON);
+        }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+
+}
+
+
+function formatFlowSeriesForPoolStats(storageFlowSeriesData, timeObj, timeGran)
+{
+    var len = 0;
+    var resultJSON = {};
+    try {
+        resultJSON['summary'] = {};
+        resultJSON['summary']['start_time'] = timeObj['start_time'];
+        resultJSON['summary']['end_time'] = timeObj['end_time'];
+        resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
+        resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
+        resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['uuid'];
+        resultJSON['summary']['pool_name'] = storageFlowSeriesData['value'][0]['pool_stats.pool'];
+        resultJSON['flow-series'] = formatPoolSeriesLoadXMLData(storageFlowSeriesData);
+        return resultJSON;
+    } catch (e) {
+        logutils.logger.error("In formatFlowSeriesForPoolStats(): JSON Parse error: " + e);
+        return null;
+    }
+}
+
+function formatPoolSeriesLoadXMLData (resultJSON)
+{
+    var results = [];
+    var counter = 0;
+    try {
+        resultJSON = resultJSON['value'];
+        counter = resultJSON.length;
+        for (var i = 0; i < counter; i++) {
+            results[i] = {};
+            results[i]['MessageTS'] = resultJSON[i]['T'];
+            results[i]['reads'] = resultJSON[i]['pool_stats.reads'];
+            results[i]['writes'] = resultJSON[i]['pool_stats.writes'];
+            results[i]['reads_kbytes'] = resultJSON[i]['pool_stats.read_kbytes'];
+            results[i]['writes_kbytes'] = resultJSON[i]['pool_stats.write_kbytes'];
+
+        }
+        return results;
+    } catch (e) {
+        logutils.logger.error("In formatPoolSeriesLoadXMLData(): JSON Parse error: " + e);
+        return null;
+    }
+}
+
 /* List all public functions */
-exports.getStoragePGPoolsSummary=getStoragePGPoolsSummary
-exports.getStoragePGPoolDetails=getStoragePGPoolDetails
+exports.getStoragePGPoolsSummary=getStoragePGPoolsSummary;
+exports.getStoragePGPoolDetails=getStoragePGPoolDetails;
+exports.getStoragePoolFlowSeries= getStoragePoolFlowSeries;
 
 
 

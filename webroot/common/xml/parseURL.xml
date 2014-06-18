@@ -156,7 +156,6 @@
         <feature>storage</feature>
         <callback>storageMonsApi.getMonitorDetails</callback>
     </item>
-    
     <item>
         <url>/api/tenant/storage/cluster/osds/summary</url>
         <method>get</method>
@@ -170,7 +169,6 @@
         <feature>storage</feature>
         <callback>storageOsdsApi.getStorageOSDDetails</callback>
     </item>
-
     <item>
         <url>/api/tenant/storage/cluster/osds/tree</url>
         <method>get</method>
@@ -205,7 +203,31 @@
         <feature>storage</feature>
         <callback>storagePGsApi.getStoragePGStuck</callback>
     </item>
+
+    <!-- flow-series of pool data by name and host -->
+    <item>
+        <url>/api/tenant/storage/cluster/pool/flow-series</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storagePoolsApi.getStoragePoolFlowSeries</callback>
+    </item>
+    <!-- flow-series of osd data by name and host -->
+    <item>
+        <url>/api/tenant/storage/cluster/osd/flow-series</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getStorageOSDFlowSeries</callback>
+    </item>
+    <!-- flow-series of disk data by name and host -->
+    <item>
+        <url>/api/tenant/storage/cluster/disk/flow-series</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageMonsApi.getStorageDiskFlowSeries</callback>
+    </item>
+
     <!-- Contrail Storage -->
+
 
    
 </urlLists>
