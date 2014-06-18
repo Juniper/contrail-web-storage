@@ -69,7 +69,8 @@ function parseStoragePGStuckData(pgStuckJSON){
 
 /* List all public functions */
 exports.getStoragePGSummary = getStoragePGSummary;
-exports.getStoragePGStuck=getStoragePGStuck
+exports.getStoragePGStuck=getStoragePGStuck;
+
 
 
 

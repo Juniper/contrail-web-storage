@@ -5,8 +5,11 @@
 var storageConfig = require('../../../common/js/storage.config.global');
 var storageApi= require('../../../common/api/storage.api.constants');
 
-var   commonUtils = require(storageConfig.core_path +
+var commonUtils = require(storageConfig.core_path +
                     '/src/serverroot/utils/common.utils'),
+    global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+    logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
+    stMonUtils= require('../../../common/api/utils/storage.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
@@ -23,6 +26,8 @@ function getStorageOSDStatus(req, res, appData){
             }
         });     
 }
+
+
 
 function parseStorageOSDStatus(osdJSON){
     var osdMapJSON ={};    
@@ -311,20 +316,101 @@ function parseOSDFromDump(osdTree, osdDump){
     return osdTree;
 }
 
+function getStorageOSDFlowSeries (req, res, appData) {
+    var source = req.query['hostName'];
+    var sampleCnt = req.query['sampleCnt'];
+    var minsSince = req.query['minsSince'];
+    var endTime = req.query['endTime'];
+    var osdName= req.query['osdName'];
+
+    var name = source +":"+osdName;
+
+    var tableName, whereClause,
+        selectArr = ["T", "name"];
+
+    tableName = 'StatTable.ComputeStorageOsd.osd_stats';
+    selectArr.push("osd_stats.uuid");
+    selectArr.push("osd_stats.osd_name");
+    selectArr.push("osd_stats.reads");
+    selectArr.push("osd_stats.writes");
+    selectArr.push("osd_stats.read_kbytes");
+    selectArr.push("osd_stats.write_kbytes");
+    whereClause = [
+        {'Source':source},
+        {'name':name}
+    ];
+
+    whereClause = stMonUtils.formatAndClause(whereClause);
+    var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+    var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+    var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+    delete queryJSON['limit'];
+    delete queryJSON['dir'];
+    var selectEleCnt = queryJSON['select_fields'].length;
+    queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+    stMonUtils.executeQueryString(queryJSON,
+        commonUtils.doEnsureExecution(function(err, resultJSON)  {
+            resultJSON= formatFlowSeriesForOsdStats(resultJSON, timeObj, timeGran);
+            commonUtils.handleJSONResponse(err, res, resultJSON);
+        }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+
+}
 
 
+function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran)
+{
+    var len = 0;
+    var resultJSON = {};
+    try{
+        resultJSON['summary'] = {};
+        resultJSON['summary']['start_time'] = timeObj['start_time'];
+        resultJSON['summary']['end_time'] = timeObj['end_time'];
+        resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
+        resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
+        resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['osd_stats.uuid'];
+        resultJSON['summary']['osd_name'] = storageFlowSeriesData['value'][0]['osd_stats.osd_name'];
+        resultJSON['flow-series'] = formatOsdSeriesLoadXMLData(storageFlowSeriesData);
+        return resultJSON;
+    } catch (e) {
+        logutils.logger.error("In formatFlowSeriesForOsdStats(): JSON Parse error: " + e);
+        return null;
+    }
+}
+
+function formatOsdSeriesLoadXMLData (resultJSON)
+{
+    var results = [];
+    var counter = 0;
+    try {
+        resultJSON = resultJSON['value'];
+        counter = resultJSON.length;
+       for (var i = 0; i < counter; i++) {
+            results[i] = {};
+            results[i]['MessageTS'] = resultJSON[i]['T'];
+            results[i]['reads'] = resultJSON[i]['osd_stats.reads'];
+            results[i]['writes'] = resultJSON[i]['osd_stats.writes'];
+            results[i]['reads_kbytes'] = resultJSON[i]['osd_stats.read_kbytes'];
+            results[i]['writes_kbytes'] = resultJSON[i]['osd_stats.write_kbytes'];
+        }
+        return results;
+    } catch (e) {
+        logutils.logger.error("In formatOsdSeriesLoadXMLData(): JSON Parse error: " + e);
+        return null;
+    }
+}
 
 /* List all public functions */
-exports.getStorageOSDSummary=getStorageOSDSummary
-exports.getStorageOSDStatus=getStorageOSDStatus
-exports.getStorageOSDTree=getStorageOSDTree
-exports.getStorageOSDTreeList=getStorageOSDTreeList
-exports.getStorageOSDDetails=getStorageOSDDetails
+exports.getStorageOSDSummary=getStorageOSDSummary;
+exports.getStorageOSDStatus=getStorageOSDStatus;
+exports.getStorageOSDTree=getStorageOSDTree;
+exports.getStorageOSDTreeList=getStorageOSDTreeList;
+exports.getStorageOSDDetails=getStorageOSDDetails;
 
 exports.parseOSDFromPG = parseOSDFromPG;
 exports.parseOSDFromDump= parseOSDFromDump;
 exports.parseHostFromOSD=parseHostFromOSD;
 exports.parseRootFromHost=parseRootFromHost;
+exports.getStorageOSDFlowSeries= getStorageOSDFlowSeries;
 
 
 

@@ -8,6 +8,9 @@ var storageApi= require('../../../common/api/storage.api.constants');
 
 var   commonUtils = require(storageConfig.core_path +
                     '/src/serverroot/utils/common.utils'),
+    global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+    logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
+    stMonUtils= require('../../../common/api/utils/storage.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
     storageUtils= require('../../../common/api/utils/storage.utils'),
     async = require('async'),
@@ -79,11 +82,101 @@ function consolidateMonitors(resultJSON){
      return emptyObj;
 }
 
+function getStorageDiskFlowSeries (req, res, appData) {
+    var source = req.query['hostName'];
+    var sampleCnt = req.query['sampleCnt'];
+    var minsSince = req.query['minsSince'];
+    var endTime = req.query['endTime'];
+    var diskName= req.query['diskName'];
+
+    var name = source +":"+diskName;
+
+    console.log("Name:"+name);
+    var tableName, whereClause,
+        selectArr = ["T", "name"];
+
+    tableName = 'StatTable.ComputeStorageDisk.disk_stats';
+    selectArr.push("disk_stats.uuid");
+    selectArr.push("disk_stats.disk_name");
+    selectArr.push("disk_stats.reads");
+    selectArr.push("disk_stats.writes");
+    selectArr.push("disk_stats.read_kbytes");
+    selectArr.push("disk_stats.write_kbytes");
+    selectArr.push("disk_stats.iops");
+    selectArr.push("disk_stats.bw");
+    whereClause = [
+        {'Source':source},
+        {'name':name}
+    ];
+
+    whereClause = stMonUtils.formatAndClause(whereClause);
+    var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+    var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+    var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+    delete queryJSON['limit'];
+    delete queryJSON['dir'];
+    var selectEleCnt = queryJSON['select_fields'].length;
+    queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+    stMonUtils.executeQueryString(queryJSON,
+        commonUtils.doEnsureExecution(function(err, resultJSON)  {
+            resultJSON= formatFlowSeriesForDiskStats(resultJSON, timeObj, timeGran);
+            commonUtils.handleJSONResponse(err, res, resultJSON);
+        }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+
+}
+
+
+function formatFlowSeriesForDiskStats(storageFlowSeriesData, timeObj, timeGran)
+{
+    var len = 0;
+    var resultJSON = {};
+    try{
+        resultJSON['summary'] = {};
+        resultJSON['summary']['start_time'] = timeObj['start_time'];
+        resultJSON['summary']['end_time'] = timeObj['end_time'];
+        resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
+        resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
+        resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['disk_stats.uuid'];
+        resultJSON['summary']['disk_name'] = storageFlowSeriesData['value'][0]['disk_stats.disk_name'];
+        resultJSON['flow-series'] = formatDiskSeriesLoadXMLData(storageFlowSeriesData);
+        return resultJSON;
+    } catch (e) {
+        logutils.logger.error("In formatFlowSeriesForDiskStats(): JSON Parse error: " + e);
+        return null;
+    }
+}
+
+function formatDiskSeriesLoadXMLData (resultJSON)
+{
+    var results = [];
+    var counter = 0;
+    try {
+        resultJSON = resultJSON['value'];
+        counter = resultJSON.length;
+        for (var i = 0; i < counter; i++) {
+            results[i] = {};
+            results[i]['MessageTS'] = resultJSON[i]['T'];
+            results[i]['reads'] = resultJSON[i]['disk_stats.reads'];
+            results[i]['writes'] = resultJSON[i]['disk_stats.writes'];
+            results[i]['reads_kbytes'] = resultJSON[i]['disk_stats.read_kbytes'];
+            results[i]['writes_kbytes'] = resultJSON[i]['disk_stats.write_kbytes'];
+            results[i]['iops'] = resultJSON[i]['disk_stats.iops'];
+            results[i]['bw'] = resultJSON[i]['disk_stats.bw'];
+
+        }
+        return results;
+    } catch (e) {
+        logutils.logger.error("In formatDiskSeriesLoadXMLData(): JSON Parse error: " + e);
+        return null;
+    }
+}
+
 
 /* List all public functions */
 exports.getMonitorSummary = getMonitorSummary;
 exports.getMonitorDetails = getMonitorDetails;
 exports.consolidateMonitors=consolidateMonitors;
+exports.getStorageDiskFlowSeries=getStorageDiskFlowSeries;
 
 
 
