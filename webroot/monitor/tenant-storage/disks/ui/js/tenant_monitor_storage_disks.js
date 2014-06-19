@@ -26,7 +26,8 @@ cephOSDsView = function () {
 
     this.setOSDsBubbleData = function(data){
         this.osdsBubbleData = data;
-        this.osdsBubble.refresh(this.osdsBubbleData);
+        updateDisksChart(this.osdsBubbleData);
+        //this.osdsBubble.refresh(this.osdsBubbleData);
     }
 
     this.setOSDsTreeData = function(data){
@@ -80,8 +81,9 @@ cephOSDsView = function () {
         });
 
         // scatter chart
-        this.osdsBubble.init();
-        this.osdsBubble.draw();
+        //this.osdsBubble.init();
+        //this.osdsBubble.draw();
+        
         // SVGs for Tree chart
         $("#svg-osd-tree-osd").html(svgOsd).contents();
         $("#svg-osd-tree-host").html(svgHost).contents();
@@ -148,7 +150,7 @@ cephOSDsView = function () {
                         width:100
                     },
                     {
-                        field:"avail_percent",
+                        field:"available_perc",
                         name:"Available %",
                         width:100
                     }
@@ -222,8 +224,10 @@ cephOSDsView = function () {
                 skip_osd_bubble = false;
 
                 if(osd.kb){
-                    osd.avail_percent = calcPercent(osd.kb_avail,osd.kb);
+                    osd.available_perc = calcPercent(osd.kb_avail,osd.kb);
+                    osd.x = parseFloat(osd.available_perc);
                     osd.gb =  kiloByteToGB(osd.kb);
+                    osd.y = parseFloat(osd.gb);
                     osd.gb_avail = kiloByteToGB(osd.kb_avail);
                     osd.gb_used = kiloByteToGB(osd.kb_used);
                 }
@@ -232,7 +236,7 @@ cephOSDsView = function () {
                     osd.gb = 'Not Available';
                     osd.gb_used = 'Not Available';
                     osd.gb_avail = 'Not Available';
-                    osd.avail_percent = 'Not Available';
+                    osd.available_perc = 'Not Available';
                 }
 
                 // Add to OSD scatter chart data of flag is not set
@@ -283,6 +287,7 @@ cephOSDsView = function () {
         }
         this.setOSDsDetailsData(osdArr);
         this.setOSDsBubbleData(retArr);
+        console.log(retArr);
         if(osdErrArr.length != 0){
             var msg = ' Following OSDs were not added to Scatter Chart due to insuffient data ';
             $.each(osdErrArr, function(idx, osd){
@@ -305,15 +310,79 @@ cephOSDsView = function () {
 
 storInfraOSDsView = new cephOSDsView();
 
+function updateDisksChart (data) {
+    if(!isScatterChartInitialized('#osds-bubble')) {
+        var chartsData = {  title   :'Disks',
+                            xLbl    :'Available (%)', 
+                            yLbl    :'Total Storage (GB)',
+                            chartOptions: {
+                                xPositive   :true,
+                                tooltipFn   :tenantStorageChartUtils.diskTooltipFn,
+                                clickFn     :tenantStorageChartUtils.onDiskDrillDown,
+                                addDomainBuffer :true
+                            },
+                            d:[{key:'disks',values:data}]
+                        };
+        $('#osds-bubble').initScatterChart(chartsData);
+        tenantStorageChartsInitializationStatus['disks'] = true;
+    } else {
+        //update chart value
+        updateTenantStorageCharts(data,'disks');
+    }
+            
+}
+
+function parseOSDsData (data) {
+    var retArr = [], osdErrArr = [];
+        var osdArr = [], osdUpInArr= [], osdDownArr = [], osdUpOutArr = [];
+        var skip_osd_bubble = new Boolean();
+
+        if(data != null){
+            var osds = data.osds;
+            $.each(osds, function(idx, osd){
+                skip_osd_bubble = false;
+
+                if(osd.kb){
+                    osd.available_perc = calcPercent(osd.kb_avail,osd.kb);
+                    osd.x = parseFloat(osd.available_perc);
+                    osd.gb =  kiloByteToGB(osd.kb);
+                    osd.total = formatBytes(osd.kb * 1024);
+                    osd.y = parseFloat(osd.gb);
+                    osd.gb_avail = kiloByteToGB(osd.kb_avail);
+                    osd.gb_used = kiloByteToGB(osd.kb_used);
+                }
+                else{
+                    skip_osd_bubble = true;
+                    osd.gb = 'Not Available';
+                    osd.gb_used = 'Not Available';
+                    osd.gb_avail = 'Not Available';
+                    osd.available_perc = 'Not Available';
+                }
+
+                // Add to OSD scatter chart data of flag is not set
+                if(!skip_osd_bubble){
+                    retArr.push(osd)
+                }
+                else{
+                    osdErrArr.push(osd.name);
+                }
+
+                // All OSDs data should be pushed here for List grid
+                osdArr.push(osd);
+            });
+        }
+        storInfraOSDsView.setOSDsDetailsData(osdArr);
+        storInfraOSDsView.setOSDsBubbleData(retArr);
+}
+
 function getOSDs(){
     $.ajax({
-        url: '/api/tenant/storage/cluster/osds/summary',
+        url: tenantMonitorStorageUrls['DISKS_SUMMARY'],
         dataType: "json",
         cache: false
 
     }).done(function(response){
-        test = response;
-        storInfraOSDsView.parseOSDsData(test);
+        parseOSDsData(response);
 
     }).fail(function(result) {
 
@@ -335,7 +404,7 @@ function osdScatterPlot(){
             //.transitionDuration(350)
             .size(25).sizeRange([200,200])
             .shape("circle")
-            .x(function(d){return d.avail_percent})
+            .x(function(d){return d.available_perc})
             .y(function(d){return d.gb})
             .tooltipContent(function(key, x, y, e, graph){
                 return '<h3>' + e.point.name + '</h3>' +
@@ -384,9 +453,10 @@ function osdScatterPlot(){
         //d3.selectAll('g.nv-wrap.nv-scatter').data()
 
         /* calculating X and Y axis ranges.
-         extent of gb and avail_percent of all OSDs in all groups
+         extent of gb and available_perc of all OSDs in all groups
          is taken and padding is added to eliminate circles shown on chart margin
          */
+
         var yvals = [];
         $.each(data, function(idx,grp){
             $.each(grp.values, function(i,osd){
@@ -401,7 +471,7 @@ function osdScatterPlot(){
         var xvals = [];
         $.each(data, function(idx,grp){
             $.each(grp.values, function(i,osd){
-                xvals.push(parseFloat(osd.avail_percent));
+                xvals.push(parseFloat(osd.available_perc));
             });
         });
         var xscale = d3.extent(xvals);
@@ -416,6 +486,7 @@ function osdScatterPlot(){
             .call(this.chart);
 
         nv.utils.windowResize(this.chart.update);
+        
 
     }
     function collide(node) {
@@ -494,7 +565,7 @@ function showOSDDetails(osd_name){
 
 function getOSDsTree(){
     $.ajax({
-        url: '/api/tenant/storage/cluster/osds/tree',
+        url: tenantMonitorStorageUrls['DISKS_TREE'],
         dataType: "json",
         cache: false
 

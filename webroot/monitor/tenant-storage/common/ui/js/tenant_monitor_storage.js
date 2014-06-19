@@ -6,6 +6,9 @@ function tenantStorageMonitorClass () {
     var self = this,
         currPage;
 
+    //Global refresh timeout in ms
+    var refreshTimeout = 30000;
+
     this.destroy = function () {
         var kGrid = $('.k-grid').data('kendoGrid');
         if(kGrid != null)
@@ -24,14 +27,18 @@ function tenantStorageMonitorClass () {
     }
 
     this.loadViewFromNode = function (hashObj){
+        /**
+        * set the current page for auto refresh 
+        */
+        this.setCurrPage(hashObj['node']);
+
         if (hashObj['node'].indexOf('Monitor:') == 0) {
             oneMntrView.load({name:hashObj['node'].split(':')[1], ip:hashObj['ip'],tab:hashObj['tab']});
         } else if (hashObj['node'].indexOf('Disks:') == 0) {
             oneOSDView.load({name:hashObj['node'].split(':')[1], ip:hashObj['ip'], uuid:hashObj['uuid'], tab:hashObj['tab'], filters:hashObj['filters']});
         } else if (hashObj['node'].indexOf('Placement Groups:') == 0) {
             onePgView.load({name:hashObj['node'].split(':')[1], ip:hashObj['ip'], uuid:hashObj['uuid'], tab:hashObj['tab']});
-        } else {
-            this.setCurrPage(hashObj['node']);
+        } else {            
             if(hashObj['node'] == 'Monitor'){
                 storInfraMonView.load();
             }
@@ -64,6 +71,24 @@ function tenantStorageMonitorClass () {
             self.setCurrPage('Dashboard');
             tenantStorageDashboardView.updateClusterDashboard(hashParams);
         }
+    }
+    if(this.timerId){
+        clearInterval(this.timerId);
+    }
+    else{
+        this.timerId = setInterval(function() {
+            var currPage = tenantStorageMonitorView.getCurrPage();
+            if( currPage == 'Dashboard'){
+                statusDataRefresh();
+            }
+            else if(currPage == 'Monitor'){
+                monitorGridDataRefresh();
+            }
+            else if(currPage == 'Disks'){
+                OSDsDataRefresh();
+            }
+
+        }, refreshTimeout);
     }
 
 }
