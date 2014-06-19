@@ -350,6 +350,9 @@ function parseOSDsData (data) {
                     osd.y = parseFloat(osd.gb);
                     osd.gb_avail = kiloByteToGB(osd.kb_avail);
                     osd.gb_used = kiloByteToGB(osd.kb_used);
+                    osd.color = getOSDColor(osd);
+                    osd.shape = 'circle';
+                    osd.size = 1;
                 }
                 else{
                     skip_osd_bubble = true;
@@ -578,20 +581,6 @@ function getOSDsTree(){
 
 }
 
-function getOSDColor(status, cluster_status){
-    if(status == 'up'){
-        if(cluster_status == 'in')
-            return color_success;
-        else if(cluster_status == 'out')
-            return color_warn;
-        else
-            return color_info;
-    }
-    else if (status == 'down')
-        return color_imp;
-    else{}
-}
-
 function getHostColor(osdColorArr){
     var host_color = color_info;
     $.each(osdColorArr, function(idx, color){
@@ -649,7 +638,7 @@ function parseOSDsTreeData(data){
         osdColorArr = [];
         osdStatusArr = [];
         $.each(host.children, function(idx, osd){
-            osd.color =  getOSDColor(osd.status, osd.cluster_status);
+            osd.color =  getOSDColor(osd);//getOSDColor(osd.status, osd.cluster_status);
             osdColorArr.push(osd.color);
             osdStatusArr.push(osd.status);
             osdStatusArr.push(osd.cluster_status);

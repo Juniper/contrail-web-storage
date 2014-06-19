@@ -70,9 +70,23 @@ function getIconColorClass(status){
     return labelClass;
 }
 
+function getOSDColor(d,obj){
+    if(d['status'] == 'up' ){
+        if(d['cluster_status'] == 'in')
+            return d3Colors['green'];
+        else if(d['cluster_status'] == 'out')
+            return d3Colors['orange']
+        else
+            return d3Colors['blue']
+    }
+    else if (d['status'] == 'down')
+        return d3Colors['red']
+    else{}
+}
+
 var tenantStorageChartUtils = {
     onDiskDrillDown:function(currObj) {
-         layoutHandler.setURLHashParams({node:'Disks', tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
+         layoutHandler.setURLHashParams({node:'Disks:' + currObj['host'] , tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
     },
     diskTooltipFn: function(currObj) {
         var tooltipContents = [
