@@ -14,15 +14,16 @@ cephOSDsView = function () {
     var currOSD = null;
     var osdsDV = new ContrailDataView();
 
-    /*osdDetailsDV = new kendo.data.DataSource({
-        pageSize:10,
-        sort: {field: "id", dir: "asc"}
-    });
-
-    singleOSDDS = new kendo.data.DataSource({pageSize:15});
-    */
     singleOSDDS = new ContrailDataView();
 
+    this.destroy = function () {
+        var kGrid = $('.k-grid').data('kendoGrid');
+        if(kGrid != null)
+            kGrid.destroy();
+        if(this.timerId){
+            clearInterval(this.timerId);
+        }
+    }
 
     this.setOSDsBubbleData = function(data){
         this.osdsBubbleData = data;
@@ -238,9 +239,9 @@ cephOSDsView = function () {
     }
 
     this.load = function (obj) {
-        layoutHandler.setURLHashParams({node:'Disks'},{merge:false,triggerHashChange:false});
         populateOSDs();
     };
+
     this.parseOSDsData = function(respData){
 
         var retArr = [], osdErrArr = [];
@@ -328,16 +329,25 @@ cephOSDsView = function () {
             this.setErrorMessage('None');
         }
     }
+
     function onTabActivate(e, ui){
         selTab = ui.newTab.context.innerText;
         if(selTab == "Scatter Plot"){
-            storInfraOSDsView.osdsBubble.refresh(storInfraOSDsView.osdsBubbleData);
+            tenantStorageDisksView.osdsBubble.refresh(tenantStorageDisksView.osdsBubbleData);
         }
     }
 
+    if(this.timerId){
+        clearInterval(this.timerId);
+    }
+    else{
+        this.timerId = setInterval(function() {
+            OSDsDataRefresh();   
+        }, refreshTimeout);
+    }
 }
 
-storInfraOSDsView = new cephOSDsView();
+tenantStorageDisksView = new cephOSDsView();
 
 function updateDisksChart (data) {
     if(!isScatterChartInitialized('#osds-bubble')) {
@@ -417,8 +427,8 @@ function parseOSDsData (data) {
             osdArr.push(osd);
         });
     }
-    storInfraOSDsView.setOSDsDetailsData(osdArr);
-    storInfraOSDsView.setOSDsBubbleData(retArr);
+    tenantStorageDisksView.setOSDsDetailsData(osdArr);
+    tenantStorageDisksView.setOSDsBubbleData(retArr);
 }
 
 function getOSDs(){
@@ -566,7 +576,7 @@ function osdScatterPlot(){
 function showOSDDetails(osd_name){
     var retArr = [];
 
-    osds = storInfraOSDsView.getOSDsDetailsData();
+    osds = tenantStorageDisksView.getOSDsDetailsData();
 
     var fields = ['Name', 'Host', 'UUID', 'Public Address', 'Reweight', 'Crush Weight', 'Depth',
         'Total GB', 'Available GB', 'Used GB', 'Apply Latency ms', 'Commit Latency ms', 'Down Stamp','Cluster Status', 'Status'];
@@ -605,7 +615,7 @@ function showOSDDetails(osd_name){
     }
     $("#osd-details").removeClass("osd-details-default");
     $("#osd-details").addClass("osd-details");
-    storInfraOSDsView.setSingleOSDData(retArr);
+    tenantStorageDisksView.setSingleOSDData(retArr);
     return retArr;
 }
 
@@ -694,7 +704,7 @@ function parseOSDsTreeData(data){
 
     root.color = getHostColor(hostColorArr);
     root.status = getHostStatus(hostStatusArr);
-    storInfraOSDsView.setOSDsTreeData(root);
+    tenantStorageDisksView.setOSDsTreeData(root);
 }
 
 function osdTree() {
@@ -761,8 +771,8 @@ function osdTree() {
                 .style("opacity", 0);
 
 
-            if (storInfraOSDsView.osdsTree.expandedNodes.length != 0) {
-                var clickedArr = storInfraOSDsView.osdsTree.expandedNodes.slice(0);
+            if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
+                var clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
                 source = selectiveCollapse(source, clickedArr);
             }
             else {
@@ -885,8 +895,8 @@ function osdTree() {
         var clickedArr = [];
 
         if(d.type == "host" || d.type == "root") {
-            if (storInfraOSDsView.osdsTree.expandedNodes.length != 0) {
-                clickedArr = storInfraOSDsView.osdsTree.expandedNodes.slice(0);
+            if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
+                clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
             }
             if (d.children) {
                 d._children = d.children;
@@ -902,17 +912,17 @@ function osdTree() {
 
             }
             if (clickedArr.length != 0) {
-                storInfraOSDsView.osdsTree.expandedNodes = clickedArr.slice(0);
+                tenantStorageDisksView.osdsTree.expandedNodes = clickedArr.slice(0);
             }
             else {
-                storInfraOSDsView.osdsTree.expandedNodes = [];
+                tenantStorageDisksView.osdsTree.expandedNodes = [];
             }
-            storInfraOSDsView.osdsTree.update(d, false);
+            tenantStorageDisksView.osdsTree.update(d, false);
         }
 
     }
     nodeMouseover = function(d){
-        var infoTooltip = storInfraOSDsView.osdsTree.infoTooltip;
+        var infoTooltip = tenantStorageDisksView.osdsTree.infoTooltip;
         var content = '';
 
         if(d.type == "host" || d.type == "root") {
@@ -942,7 +952,7 @@ function osdTree() {
 
     }
     nodeMouseout = function(d){
-        var infoTooltip = storInfraOSDsView.osdsTree.infoTooltip;
+        var infoTooltip = tenantStorageDisksView.osdsTree.infoTooltip;
 
         infoTooltip.transition()
             .duration(500)

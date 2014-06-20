@@ -59,9 +59,9 @@ and need to add the iconClass tag wherever we need to show some icons
                     <name>storage</name>
                     <label>Storage</label>
                     <rootDir>/monitor/tenant-storage/common/ui</rootDir>
-                    <js>tenant_monitor_storage.js</js>
                     <js>tenant_monitor_storage_constants.js</js>
                     <js>tenant_monitor_storage_utils.js</js>
+                    <js>tenant_monitor_storage.js</js>
                     <css>contrail.storage.css</css>
                     <view>tenant_monitor_storage.view</view>
                     <iconClass>icon-tasks</iconClass>
@@ -81,10 +81,7 @@ and need to add the iconClass tag wherever we need to show some icons
                             <rootDir>/monitor/tenant-storage/dashboard/ui</rootDir>
                             <js>tenant_monitor_storage_dashboard.js</js>
                             <view>tenant_monitor_storage_dashboard.view</view>
-                            <class>tenantStorageMonitorView</class>
-                            <queryParams>
-                                <node>Dashboard</node>
-                            </queryParams>
+                            <class>tenantStorageDashboardView</class>
                             <searchStrings>Storage Dashboard</searchStrings>
                         </item>
                         <item>
@@ -93,10 +90,7 @@ and need to add the iconClass tag wherever we need to show some icons
                             <rootDir>/monitor/tenant-storage/disks/ui</rootDir>
                             <js>tenant_monitor_storage_disks.js</js>
                             <view>tenant_monitor_storage_disks.view</view>
-                            <class>tenantStorageMonitorView</class>
-                            <queryParams>
-                                <node>Disks</node>
-                            </queryParams>
+                            <class>tenantStorageDisksView</class>
                             <searchStrings>Storage Disks</searchStrings>
                         </item>
                         <item>
@@ -106,9 +100,6 @@ and need to add the iconClass tag wherever we need to show some icons
                             <js>tenant_monitor_storage_monitor.js</js>
                             <view>tenant_monitor_storage_monitor.view</view>
                             <class>tenantStorageMonitorView</class>
-                            <queryParams>
-                                <node>Monitor</node>
-                            </queryParams>
                             <searchStrings>Storage Monitor</searchStrings>
                         </item>
                     </items>
