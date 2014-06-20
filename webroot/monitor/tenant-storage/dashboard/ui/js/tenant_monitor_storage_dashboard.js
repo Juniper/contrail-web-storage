@@ -14,9 +14,6 @@ function tenantStorageDashboardClass () {
         clusterThrptData, clusterIopsData, clusterLatencyData,
         disksBubbleData;
 
-    //Global refresh timeout in ms
-    var refreshTimeout = 30000;
-
     //for junkData
     var t1, t2, t3, t4, v, dataRead, dataWrite, dataObj, dataLat;
     //end of junkData
@@ -398,24 +395,6 @@ function tenantStorageDashboardClass () {
         }
     }
 
-    if(this.timerId){
-        clearInterval(this.timerId);
-    }
-    else{
-        this.timerId = setInterval(function() {
-            var currPage = tenantStorageDashboardView.getCurrPage();
-            if( currPage == 'Dashboard'){
-                statusDataRefresh();
-            }
-            else if(currPage == 'Monitor'){
-                monitorGridDataRefresh();
-            }
-            else if(currPage == 'Disks'){
-                OSDsDataRefresh();
-            }
-
-        }, refreshTimeout);
-    }
 }
 
 var tenantStorageDashboardView = new tenantStorageDashboardClass();

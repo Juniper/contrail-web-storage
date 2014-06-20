@@ -7,6 +7,9 @@ var color_info = '#1F77B4',
     color_warn = '#FF7F0E',
     color_imp = '#D62728';
 
+var tenantStorageChartsInitializationStatus = {
+    disks   : false,
+}
 
 var tenantMonitorStorageUrls = {
     CLUSTER_STATUS          : '/api/tenant/storage/cluster/status',
@@ -14,6 +17,8 @@ var tenantMonitorStorageUrls = {
     DF_STATUS               : '/api/tenant/storage/cluster/df/status',
     POOLS_SUMMARY           : '/api/tenant/storage/cluster/pools/summary',
     DISK_STATUS             : '/api/tenant/storage/cluster/osd/status',
+    DISKS_SUMMARY           : '/api/tenant/storage/cluster/osds/summary',
+    DISKS_TREE              : '/api/tenant/storage/cluster/osds/tree',
     THROUGHPUT_SUMMARY      : '/api/tenant/storage/cluster/throughput/summary',
     CLUSTER_LATENCY         : '/api/tenant/storage/cluster/latency',
 }

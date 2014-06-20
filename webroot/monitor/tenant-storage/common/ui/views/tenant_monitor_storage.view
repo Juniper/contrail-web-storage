@@ -191,31 +191,6 @@
     </div>
 </script>
 
-<script type="text/x-handlebars-template" id="storage-disks-template">
-    <div class="row-fluid">
-        <div class="span12">
-            <div id="osdsTabStrip">
-                <ul>
-                    <li><a href="#osdsBubbleTab">Scatter Plot</a></li>
-                    <li><a href="#osdsTreeTab">Host Tree</a></li>
-                </ul>
-                <div id="osdsBubbleTab">
-                    <div id="osd-bubble" ><svg><svg></div>
-                    <hr />
-                    <div class="osds-list row-fluid">
-                        <div id="gridOSDs"></div>
-                    </div>
-                </div>
-                <div id="osdsTreeTab">
-                    <div id="osd-tree" class="osd-tree"></div>
-                    <div id="tree-tip" class="tree-tip"></div>
-                    <div id="svg-osd-tree-osd"> </div>
-                    <div id="svg-osd-tree-host"> </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</script>
 
 <script type="text/x-handlebars-template" id="widget-header-template">
     <h4 class="smaller">
