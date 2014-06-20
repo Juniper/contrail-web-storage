@@ -12,6 +12,7 @@ cephOSDsView = function () {
     osdsTree = new osdTree();
     this.osdsTree = osdsTree;
     var currOSD = null;
+    var osdsDV = new ContrailDataView();
 
     /*osdDetailsDV = new kendo.data.DataSource({
         pageSize:10,
@@ -20,7 +21,6 @@ cephOSDsView = function () {
 
     singleOSDDS = new kendo.data.DataSource({pageSize:15});
     */
-    osdDetailsDV = new ContrailDataView();
     singleOSDDS = new ContrailDataView();
 
 
@@ -44,14 +44,14 @@ cephOSDsView = function () {
     }
 
     this.setOSDsDetailsData = function(data){
-        osdDetailsDV.setData(data);
+        osdsDV.setData(data);
         /*if( currOSD == null)
          showOSDDetails();
          */
     }
 
     this.getOSDsDetailsData = function(){
-        return osdDetailsDV.getItems();
+        return osdsDV.getItems();
     }
 
     this.setSingleOSDData = function(data){
@@ -79,126 +79,155 @@ cephOSDsView = function () {
         $('#osdsTabStrip').contrailTabs({
             activate: onTabActivate
         });
-
-        // scatter chart
-        //this.osdsBubble.init();
-        //this.osdsBubble.draw();
-        
+       
         // SVGs for Tree chart
         $("#svg-osd-tree-osd").html(svgOsd).contents();
         $("#svg-osd-tree-host").html(svgHost).contents();
 
         $("#gridOSDs").contrailGrid({
 
-            header : {
-                title : {
-                    text : 'Disks',
-                    cssClass : 'blue',
-                    icon : 'icon-list',
-                    iconCssClass : 'blue'
-                }
-            },
-            columnHeader : {
-                columns: [
-                    {
-                        field:"id",
-                        name:"ID",
-                        width:50
-                    },
-                    {
-                        field:"status",
-                        name:"Status",
-                        formatter:function(r,c,d,cd,dc){
-                            if(dc.status == "up")
-                                return '<span class="grid-osd label label-info">up</span>';
-                            else if(dc.status == "down")
-                                return '<span class="grid-osd label label-important">down</span>';
-                        },
-                        cssClass: 'grid-status-label',
-                        width:50
-                    },
-                    {
-                        field:"cluster_status",
-                        name:"Cluster Status",
-                        formatter:function(r,c,d,cd,dc){
-                            if(dc.cluster_status == "in")
-                                return '<span class="grid-osd label label-success">in</span>';
-                            else if(dc.cluster_status == "out")
-                                return '<span class="grid-osd label label-warning">out</span>';
-                        },
-                        cssClass: 'grid-status-label',
-                        width:100
-                    },
-                    {
-                        field:"name",
-                        name:"OSD name",
-                        width:80
-                    },
-                    {
-                        field:"host",
-                        name:"Host",
-                        width:150
-                    },
-                    {
-                        field:"gb",
-                        name:"Total GB",
-                        width:100
-                    },
-                    {
-                        field:"gb_used",
-                        name:"Used GB",
-                        width:100
-                    },
-                    {
-                        field:"available_perc",
-                        name:"Available %",
-                        width:100
+            header: {
+                    title: {
+                        text: 'Disks',
+                        cssClass: 'blue',
+                        icon: 'icon-list',
+                        iconCssClass: 'blue'
                     }
-                ]
-            },
-            body : {
-                options : {
-                    autoHeight : true,
-                    checkboxSelectable: false,
-                    lazyLoading: true,
-                    forceFitColumns: true,
-                    detail: {
-                        template: '<p>Details :</p>',
-                        onInit: function(e,dc) {
-                            setTimeout(function(){
-                                $.each(dc, function(idx,val){
-                                    $(e.detail).addClass('basicDetails');
-                                    $(e.detailRow).append('<p><span style="color: steelblue"> ' + idx +'</span> : ' + val +'</p>');
-                                });
-                                $("#gridOSDs").data('contrailGrid').adjustDetailRowHeight(dc.id);
-                            },1000);
+                },
+                columnHeader: {
+                    columns: [
+                        {
+                            field: "id",
+                            name: "ID",
+                            width: 30
                         },
-                        onExpand: function(e,dc) {
-
+                        {
+                            field: "status",
+                            name: "Status",
+                            formatter: function(r,c,v,cd,dc){
+                                return dc['status_tmpl'];
+                            },
+                            width: 30
                         },
-                        onCollapse: function(e,dc) {
+                        {
+                            field: "cluster_status",
+                            name: "Membership",
+                            formatter: function(r,c,v,cd,dc){
+                                return dc['cluster_status_tmpl'];
+                            },
+                            cssClass: 'grid-status-label',
+                            width: 40
+                        },
+                        {
+                            field: "name",
+                            name: "OSD name",
+                            events: {
+                                onClick: function(e,dc){
+                                    tenantStorageGridUtils.onDisksRowSelChange(dc);
+                                }
+                            },
+                            cssClass: 'cell-hyperlink-blue',
+                            minWidth: 80
+                        },
+                        {
+                            field: "host",
+                            name: "Hostname",
+                            minWidth: 80
+                        },
+                        {
+                            field: "gb",
+                            name: "Total GB",
+                            minWidth: 100
+                        },
+                        {
+                            field: "gb_used",
+                            name: "Used GB",
+                            minWidth: 100
+                        },
+                        {
+                            field: "available_perc",
+                            name: "Available %",
+                            minWidth: 100
+                        }
+                    ]
+                },
+                body: {
+                    options: {
+                        autoHeight: true,
+                        checkboxSelectable: false,
+                        enableAsyncPostRender: true,
+                        forceFitColumns: true,
+                        detail: {
+                            template: '',
+                            onInit: function (e, dc) {
+                                var noDataStr = "N/A";
+                                setTimeout(function () {
+                                    var detailsInfo = [
+                                        {lbl: 'UUID', value: dc['uuid']},
+                                        {lbl: 'Hostname', value: dc['host']},
+                                        {lbl: 'State', value: dc['state']},
+                                        {lbl: 'Apply Latency', value: (function () {
+                                            try {
+                                                var perf = ifNullOrEmpty(dc['fs_perf_stat']['apply_latency_ms'], noDataStr);
+                                                if (perf != noDataStr) {
+                                                    return perf + ' ms';
+                                                }
+                                                return noDataStr;
+                                            } catch (e) {
+                                                return noDataStr;
+                                            }
+                                        })},
+                                        {lbl: 'Commit Latency', value: (function () {
+                                            try {
+                                                var perf = ifNullOrEmpty(dc['fs_perf_stat']['commit_latency_ms'], noDataStr);
+                                                if (perf != noDataStr) {
+                                                    return perf + ' ms';
+                                                }
+                                                return noDataStr;
+                                            } catch (e) {
+                                                return noDataStr;
+                                            }
+                                        })}
+                                    ];
+                                    var moreLink = '#p=mon_storage_disks&q[node]=Disks:'+ dc['host'] + '&q[tab]=details:' + dc['name'];
+                                    var detailsTmpl = contrail.getTemplate4Id('disk-grid-details-template');
+                                    $(e.detailRow).html(detailsTmpl({d:detailsInfo, detailLink:moreLink}));
+                                    $("#gridOSDs").data('contrailGrid').adjustDetailRowHeight(dc.id);
+                                }, 1000);
+                            },
+                            onExpand: function (e, dc) {
 
+                            },
+                            onCollapse: function (e, dc) {
+
+                            }
+                        }
+                    },
+                    dataSource: {
+                        dataView: osdsDV
+                    },
+                    statusMessages: {
+                        loading: {
+                            text: 'Loading Disks..'
+                        },
+                        empty: {
+                            text: 'No Disks to display'
+                        },
+                        errorGettingData: {
+                            type: 'error',
+                            iconClasses: 'icon-warning',
+                            text: 'Error in getting Data.'
                         }
                     }
                 },
-                dataSource : {
-                    dataView : osdDetailsDV,
-                    events: {
-                        onUpdateDataCB: function() {
-                            var dvGrid = $('#gridOSDs').data('contrailGrid');
-                            dvGrid.removeGridLoading();
+                footer: {
+                    pager: {
+                        options: {
+                            pageSize: 5,
+                            pageSizeSelect: [ 5, 10, 50 ]
                         }
                     }
                 }
-            },
-            footer : {
-                pager : {
-                    options : {
-                        pageSize : 5,
-                        pageSizeSelect : [ 5, 10, 50 ]
-                    }
-                }
-            }
         });
 
         this.osdsTree.init();
@@ -334,48 +363,62 @@ function updateDisksChart (data) {
 
 function parseOSDsData (data) {
     var retArr = [], osdErrArr = [];
-        var osdArr = [], osdUpInArr= [], osdDownArr = [], osdUpOutArr = [];
-        var skip_osd_bubble = new Boolean();
+    var osdArr = [], osdUpInArr= [], osdDownArr = [], osdUpOutArr = [];
+    var skip_osd_bubble = new Boolean();
+    var statusTemplate = contrail.getTemplate4Id("disk-status-template");
+            
+    if(data != null){
+        var osds = data.osds;
+        $.each(osds, function(idx, osd){
+            skip_osd_bubble = false;
 
-        if(data != null){
-            var osds = data.osds;
-            $.each(osds, function(idx, osd){
-                skip_osd_bubble = false;
+            if(osd.kb){
+                osd.available_perc = calcPercent(osd.kb_avail,osd.kb);
+                osd.x = parseFloat(osd.available_perc);
+                osd.gb =  kiloByteToGB(osd.kb);
+                osd.total = formatBytes(osd.kb * 1024);
+                osd.y = parseFloat(osd.gb);
+                osd.gb_avail = kiloByteToGB(osd.kb_avail);
+                osd.gb_used = kiloByteToGB(osd.kb_used);
+                osd.color = getOSDColor(osd);
+                osd.shape = 'circle';
+                osd.size = 1;
+            }
+            else{
+                skip_osd_bubble = true;
+                osd.gb = 'Not Available';
+                osd.gb_used = 'Not Available';
+                osd.gb_avail = 'Not Available';
+                osd.available_perc = 'Not Available';
+            }
+            
+            /**
+            * osd status template UP?DOWN
+            */
+            osd.status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
+            if(osd.status == 'down')
+                osd.status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
+            /**
+            * osd cluster membership template IN?OUT
+            */
+            osd.cluster_status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
+            if(osd.cluster_status == 'out')
+                osd.cluster_status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
 
-                if(osd.kb){
-                    osd.available_perc = calcPercent(osd.kb_avail,osd.kb);
-                    osd.x = parseFloat(osd.available_perc);
-                    osd.gb =  kiloByteToGB(osd.kb);
-                    osd.total = formatBytes(osd.kb * 1024);
-                    osd.y = parseFloat(osd.gb);
-                    osd.gb_avail = kiloByteToGB(osd.kb_avail);
-                    osd.gb_used = kiloByteToGB(osd.kb_used);
-                    osd.color = getOSDColor(osd);
-                    osd.shape = 'circle';
-                    osd.size = 1;
-                }
-                else{
-                    skip_osd_bubble = true;
-                    osd.gb = 'Not Available';
-                    osd.gb_used = 'Not Available';
-                    osd.gb_avail = 'Not Available';
-                    osd.available_perc = 'Not Available';
-                }
+            // Add to OSD scatter chart data of flag is not set
+            if(!skip_osd_bubble){
+                retArr.push(osd)
+            }
+            else{
+                osdErrArr.push(osd.name);
+            }
 
-                // Add to OSD scatter chart data of flag is not set
-                if(!skip_osd_bubble){
-                    retArr.push(osd)
-                }
-                else{
-                    osdErrArr.push(osd.name);
-                }
-
-                // All OSDs data should be pushed here for List grid
-                osdArr.push(osd);
-            });
-        }
-        storInfraOSDsView.setOSDsDetailsData(osdArr);
-        storInfraOSDsView.setOSDsBubbleData(retArr);
+            // All OSDs data should be pushed here for List grid
+            osdArr.push(osd);
+        });
+    }
+    storInfraOSDsView.setOSDsDetailsData(osdArr);
+    storInfraOSDsView.setOSDsBubbleData(retArr);
 }
 
 function getOSDs(){

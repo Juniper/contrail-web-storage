@@ -159,3 +159,9 @@ function updateTenantStorageCharts(dsData, nodeType) {
         updateCharts.updateView(chartObj);
     }
 }
+
+var tenantStorageGridUtils = {
+    onDisksRowSelChange: function(currObj) {
+        layoutHandler.setURLHashParams({node:'Disks:' + currObj['host'] , tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
+    },
+}
