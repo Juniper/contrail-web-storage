@@ -46,9 +46,9 @@ function tenantStorageDashboardClass () {
     this.disksBubbleChart = disksBubbleChart;
 
     this.destroy = function () {
-        var kGrid = $('.k-grid').data('kendoGrid');
-        if(kGrid != null)
-            kGrid.destroy();
+        var cGrid = $('.contrail-grid').data('contrailGrid');
+        if(cGrid != null)
+            cGrid.destroy();
         if(this.timerId){
             clearInterval(this.timerId);
         }
@@ -393,6 +393,15 @@ function tenantStorageDashboardClass () {
             self.setCurrPage('Dashboard');
             tenantStorageDashboardView.updateClusterDashboard(hashParams);
         }
+    }
+
+    if(this.timerId){
+        clearInterval(this.timerId);
+    }
+    else{
+        this.timerId = setInterval(function() {
+            statusDataRefresh();   
+        }, refreshTimeout);
     }
 
 }
