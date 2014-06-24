@@ -25,7 +25,7 @@ cephMonitorView = function () {
         populateMonitorView();
     }
     this.destroy = function () {
-        var cGrid = $('.k-grid').data('kendoGrid');
+        var cGrid = $('.contrail-grid').data('contrailGrid');
         if(cGrid != null)
             cGrid.destroy();
     }
@@ -88,39 +88,21 @@ cephMonitorView = function () {
                                 tenantStorageMonitorView.setCurrMonitorName(dc.name);
                             }
                         },
-                        width:200
-                    },
-                    {
-                        field:"act-health",
-                        name:"Monitor Status",
-                        cssClass: 'grid-status-label',
-                        formatter:function(r,c,d,cd,dc){
-                            var health = '';
-                            if(dc['act_health'] == 'HEALTH_OK')
-                                health = 'Ok';
-                            else if(dc['act_health'] == 'HEALTH_WARN')
-                                health = 'Warn';
-                            else if(dc['act_health'] == 'HEALTH_DOWN')
-                                health = 'Down';
-                            else{}
-                            return '<span style= "text-align: center" class="grid-monitor label ' + dc['healthColor'] + '">' + health + '</span>';
-                        },
                         width:150
                     },
                     {
+                        field:"act-health",
+                        name:"Activity Status",
+                        formatter: function(r,c,v,cd,dc){
+                            return getMonitorNodeHealthStatusTmpl(dc['act_health'])
+                        },
+                        width:100
+                    },
+                    {
                         field:"health",
-                        name:"Status",
-                        cssClass: 'grid-status-label',
-                        formatter:function(r,c,d,cd,dc){
-                            var health = '';
-                            if(dc['health'] == 'HEALTH_OK')
-                                health = 'Ok';
-                            else if(dc['health'] == 'HEALTH_WARN')
-                                health = 'Warn';
-                            else if(dc['health'] == 'HEALTH_DOWN')
-                                health = 'Down';
-                            else{}
-                            return '<span class="grid-monitor label ' + dc['hostNameColor'] + '">' + health + '</span>';
+                        name:"Overall Status",
+                        formatter: function(r,c,v,cd,dc){
+                            return getMonitorNodeHealthStatusTmpl(dc['health'])
                         },
                         width:100
                     },
@@ -148,15 +130,42 @@ cephMonitorView = function () {
                     lazyLoading: true,
                     forceFitColumns: true,
                     detail: {
-                        template: '<p>Details :</p>',
+                        template: '',
                         onInit: function(e,dc) {
-                            console.log(dc);
-                            setTimeout(function(){
-                                $.each(dc, function(idx,val){console.log(idx,val)
-                                    $(e.detailRow).append('<p><span style="color: steelblue"> ' + idx +'</span> : ' + val +'</p>');
-                                });
-                                $("#gridMonitors").data('contrailGrid').adjustDetailRowHeight(dc.id);
-                            },1000);
+                            var noDataStr = 'N/A';
+                            setTimeout(function () {
+                                    var detailsInfo = [
+                                        {lbl: 'IP Address', value: dc['addr']},
+                                        {lbl: 'Hostname', value: dc['name']},
+                                        {lbl: 'Activity Health', value: getMonitorNodeHealthStatusTmpl(dc['act_health'])},
+                                        {lbl: 'Overall Health', value: getMonitorNodeHealthStatusTmpl(dc['health'])},
+                                        {lbl: 'Latency', value: (function () {
+                                            try {
+                                                var perf = ifNullOrEmpty(dc['latency'], noDataStr);
+                                                if (perf != noDataStr) {
+                                                    return perf + ' ms';
+                                                }
+                                                return noDataStr;
+                                            } catch (e) {
+                                                return noDataStr;
+                                            }
+                                        })},
+                                        {lbl: 'Clock Skew', value: (function () {
+                                            try {
+                                                var perf = ifNullOrEmpty(dc['skew'], noDataStr);
+                                                if (perf != noDataStr) {
+                                                    return perf;
+                                                }
+                                                return noDataStr;
+                                            } catch (e) {
+                                                return noDataStr;
+                                            }
+                                        })}
+                                    ];
+                                    var detailsTmpl = contrail.getTemplate4Id('monitor-grid-details-template');
+                                    $(e.detailRow).html(detailsTmpl({d:detailsInfo}));
+                                    $("#gridMonitors").data('contrailGrid').adjustDetailRowHeight(dc.id);
+                                }, 1000);
                         },
                         onExpand: function(e,dc) {
                             console.log('Detail Expand: ');
@@ -249,7 +258,6 @@ function displayMonitorDetails(monitorName){
 }
 
 function onMonitorSummaryRowSelChange(e,dc){
-    console.log('test....')
     tenantStorageMonitorView.setCurrMonitorName(dc.name);
 }
 
@@ -268,9 +276,9 @@ function getMonitorsSummary(){
         var cGrid = $(contentContainer).find('#gridMonitors').data('contrailGrid');
         if(cGrid != null)
             if(errObj['errTxt'] != null)
-                showGridMessage(cGrid, errObj['errTxt']);
+                cGrid.showGridMessage('error', errObj['errTxt']);
             else
-                showGridMessage(cGrid, 'Error in fetching Monitor Node details');
+                cGrid.showGridMessage('error', 'Error in fetching Monitor Node details');
     });
 }
 
