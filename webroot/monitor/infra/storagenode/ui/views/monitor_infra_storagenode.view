@@ -61,6 +61,8 @@
             </div>
 
             <div id="mon-infra-storage-disks-tab">
+                <div id="gridDisksDash"></div>
+                <!-- no more disks summary and details tab.
                 <div id="storage-disks-tabstrip">
                     <ul>
                         <li><a href="#storage-disks-summary-tab">Summary</a></li>
@@ -73,6 +75,7 @@
                         <div id="disk-dashboard" class="span5" style="margin-left:5px;"></div>
                     </div>
                 </div>
+                -->
             </div>
             <div id="mon-infra-storage-monitor-tab">
                 <div id="gridMonitor"></div>

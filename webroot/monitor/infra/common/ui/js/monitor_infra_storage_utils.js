@@ -158,7 +158,7 @@ var storageChartUtils = {
          layoutHandler.setURLHashParams({node: 'Storage Nodes:' + currObj['name'], tab:''}, {p:'mon_infra_storage'});
     },
     onDiskDrillDown:function(currObj) {
-         layoutHandler.setURLHashParams({node:'Storage Nodes:' + currObj['hostname'], tab:'disks:details:' + currObj['name']}, {p:'mon_infra_storage'});
+         layoutHandler.setURLHashParams({node:currObj['hostname'], tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
     },
     storageNodeTooltipFn: function(currObj) {
         var tooltipContents = [

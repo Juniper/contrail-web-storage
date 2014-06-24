@@ -17,9 +17,9 @@ cephOSDsView = function () {
     singleOSDDS = new ContrailDataView();
 
     this.destroy = function () {
-        var kGrid = $('.k-grid').data('kendoGrid');
-        if(kGrid != null)
-            kGrid.destroy();
+        var cGrid = $('.k-grid').data('contrailGrid');
+        if(cGrid != null)
+            cGrid.destroy();
         if(this.timerId){
             clearInterval(this.timerId);
         }
@@ -74,13 +74,7 @@ cephOSDsView = function () {
     }
 
     function populateOSDs() {
-        var osdNodesTemplate = Handlebars.compile($("#storage-disks-template").html());
-        $(pageContainer).html(osdNodesTemplate({}));
-
-        $('#osdsTabStrip').contrailTabs({
-            activate: onTabActivate
-        });
-       
+        
         // SVGs for Tree chart
         $("#svg-osd-tree-osd").html(svgOsd).contents();
         $("#svg-osd-tree-host").html(svgHost).contents();
@@ -231,14 +225,22 @@ cephOSDsView = function () {
                 }
         });
 
-        this.osdsTree.init();
-
         getOSDs();
+        tenantStorageChartsInitializationStatus['disks'] = true;        
+
+        this.osdsTree.init();
         getOSDsTree();
 
     }
 
     this.load = function (obj) {
+        var disksTemplate = Handlebars.compile($("#storage-disks-template").html());
+        $(pageContainer).html(disksTemplate({}));
+
+        $('#osdsTabStrip').contrailTabs({
+            activate: onTabActivate
+        });
+       
         self.updateViewByHash(layoutHandler.getURLHashParams());
     };
 
@@ -350,7 +352,12 @@ cephOSDsView = function () {
     function onTabActivate(e, ui){
         selTab = ui.newTab.context.innerText;
         if(selTab == "Scatter Plot"){
-            tenantStorageDisksView.osdsBubble.refresh(tenantStorageDisksView.osdsBubbleData);
+            if(tenantStorageChartsInitializationStatus['disks']){
+                tenantStorageDisksView.osdsBubble.refresh(tenantStorageDisksView.osdsBubbleData);    
+            } else{
+                populateOSDs();
+            }
+            
         }
     }
 
