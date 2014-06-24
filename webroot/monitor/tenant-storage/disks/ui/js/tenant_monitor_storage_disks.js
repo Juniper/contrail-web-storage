@@ -17,7 +17,7 @@ cephOSDsView = function () {
     singleOSDDS = new ContrailDataView();
 
     this.destroy = function () {
-        var cGrid = $('.k-grid').data('contrailGrid');
+        var cGrid = $('.contrail-grid').data('contrailGrid');
         if(cGrid != null)
             cGrid.destroy();
         if(this.timerId){
