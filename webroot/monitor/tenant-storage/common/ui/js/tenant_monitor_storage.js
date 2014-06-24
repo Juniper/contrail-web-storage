@@ -6,9 +6,6 @@ function tenantStorageMonitorClass () {
     var self = this,
         currPage;
 
-    //Global refresh timeout in ms
-    var refreshTimeout = 30000;
-
     this.destroy = function () {
         var kGrid = $('.k-grid').data('kendoGrid');
         if(kGrid != null)
@@ -35,7 +32,7 @@ function tenantStorageMonitorClass () {
         if (hashObj['node'].indexOf('Monitor:') == 0) {
             oneMntrView.load({name:hashObj['node'].split(':')[1], ip:hashObj['ip'],tab:hashObj['tab']});
         } else if (hashObj['node'].indexOf('Disks:') == 0) {
-            oneOSDView.load({name:hashObj['node'].split(':')[1], ip:hashObj['ip'], uuid:hashObj['uuid'], tab:hashObj['tab'], filters:hashObj['filters']});
+            oneOSDView.load({name:hashObj['node'].split(':')[1], ip:hashObj['ip'], uuid:hashObj['uuid'], tab:hashObj['tab']});
         } else if (hashObj['node'].indexOf('Placement Groups:') == 0) {
             onePgView.load({name:hashObj['node'].split(':')[1], ip:hashObj['ip'], uuid:hashObj['uuid'], tab:hashObj['tab']});
         } else {            
@@ -47,7 +44,7 @@ function tenantStorageMonitorClass () {
             else if(hashObj['node'] == 'Placement Groups')
                 storInfraPgView.load();
             else
-                tenantStorageMonitorView.load();
+                tenantStorageDashboardView.load();
         }
     }
 
@@ -62,7 +59,7 @@ function tenantStorageMonitorClass () {
             var infraDashTemplate = Handlebars.compile($("#tenant-page-template").html());
             $(contentContainer).html('');
             $(contentContainer).html(infraDashTemplate);
-            tenantStorageMonitorView.loadViewFromNode(hashParams);
+            tenantStorageDashboardView.loadViewFromNode(hashParams);
 
         } else {    //Load Dashboard
             var infraDashboardTemplate = Handlebars.compile($('#storage-dashboard').html());
@@ -77,7 +74,7 @@ function tenantStorageMonitorClass () {
     }
     else{
         this.timerId = setInterval(function() {
-            var currPage = tenantStorageMonitorView.getCurrPage();
+            var currPage = tenantStorageDashboardView.getCurrPage();
             if( currPage == 'Dashboard'){
                 statusDataRefresh();
             }
@@ -93,5 +90,5 @@ function tenantStorageMonitorClass () {
 
 }
 
-var tenantStorageMonitorView = new tenantStorageMonitorClass();
+var tenantStorageDashboardView = new tenantStorageMonitorClass();
 

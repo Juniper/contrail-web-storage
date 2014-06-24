@@ -21,7 +21,7 @@ cephMonitorView = function () {
         return currMonitor;
     }
     this.load = function (obj){
-        layoutHandler.setURLHashParams({node:'Monitor'},{merge:false,triggerHashChange:false});
+        //layoutHandler.setURLHashParams({node:'Monitor'},{merge:false,triggerHashChange:false});
         populateMonitorView();
     }
     this.destroy = function () {
@@ -85,7 +85,7 @@ cephMonitorView = function () {
                         cssClass: 'cell-hyperlink-blue',
                         events:{
                             onClick: function(e, dc){
-                                storInfraMonView.setCurrMonitorName(dc.name);
+                                tenantStorageMonitorView.setCurrMonitorName(dc.name);
                             }
                         },
                         width:200
@@ -192,10 +192,10 @@ cephMonitorView = function () {
         monitorGridDataRefresh();
     }
 }
-storInfraMonView = new cephMonitorView();
+tenantStorageMonitorView = new cephMonitorView();
 
 function displayMonitorDetails(monitorName){
-    var monitorData = storInfraMonView.getMonitorDSData().getItems();
+    var monitorData = tenantStorageMonitorView.getMonitorDSData().getItems();
     var retArr = [];
 
     var fields = ['Rank', 'Name', 'IP Address', 'Used GB', 'Available GB',
@@ -243,14 +243,14 @@ function displayMonitorDetails(monitorName){
             retArr[11]['value'] = monitorData[0]['health'];
             retArr[12]['value'] = monitorData[0]['last_updated'];
         }
-        storInfraMonView.setMonitorDetailsData(retArr);
+        tenantStorageMonitorView.setMonitorDetailsData(retArr);
         //console.log(retArr);
     }
 }
 
 function onMonitorSummaryRowSelChange(e,dc){
     console.log('test....')
-    storInfraMonView.setCurrMonitorName(dc.name);
+    tenantStorageMonitorView.setCurrMonitorName(dc.name);
 }
 
 function getMonitorsSummary(){
@@ -261,8 +261,8 @@ function getMonitorsSummary(){
         cache: false
 
     }).done(function(response){
-        var dataResponse = storInfraMonView.parseMonitorsSummary(response);
-        storInfraMonView.setMonitorsDV(dataResponse);
+        var dataResponse = tenantStorageMonitorView.parseMonitorsSummary(response);
+        tenantStorageMonitorView.setMonitorsDV(dataResponse);
 
     }).fail(function(errObj) {
         var cGrid = $(contentContainer).find('#gridMonitors').data('contrailGrid');

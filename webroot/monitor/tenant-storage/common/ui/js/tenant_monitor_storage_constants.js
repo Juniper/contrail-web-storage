@@ -7,9 +7,15 @@ var color_info = '#1F77B4',
     color_warn = '#FF7F0E',
     color_imp = '#D62728';
 
+//Global refresh timeout in ms
+var refreshTimeout = 30000;
+
 var tenantStorageChartsInitializationStatus = {
     disks   : false,
 }
+
+disksTabs = ['Scatter Plot', 'Host Tree', 'Details'];
+disksTabStrip = 'osdsTabStrip';
 
 var tenantMonitorStorageUrls = {
     CLUSTER_STATUS          : '/api/tenant/storage/cluster/status',

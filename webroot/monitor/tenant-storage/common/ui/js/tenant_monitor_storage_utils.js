@@ -86,7 +86,7 @@ function getOSDColor(d,obj){
 
 var tenantStorageChartUtils = {
     onDiskDrillDown:function(currObj) {
-         layoutHandler.setURLHashParams({node:'Disks:' + currObj['host'] , tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
+         layoutHandler.setURLHashParams({node:currObj['host'] , tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
     },
     diskTooltipFn: function(currObj) {
         var tooltipContents = [
@@ -162,6 +162,16 @@ function updateTenantStorageCharts(dsData, nodeType) {
 
 var tenantStorageGridUtils = {
     onDisksRowSelChange: function(currObj) {
-        layoutHandler.setURLHashParams({node:'Disks:' + currObj['host'] , tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
+        layoutHandler.setURLHashParams({node:currObj['host'] , tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
     },
 }
+
+function addTab(selector, newTabAnchor, newTabTitle, defaultContent){
+    var tabs = $("#"+selector).tabs();
+    var ul = tabs.find("ul");
+    $( "<li><a href='#"+ newTabAnchor + "'>" + newTabTitle + "</a></li>" ).appendTo( ul );
+    $( "<div id='" + newTabAnchor + "'><p>" + defaultContent + "</p></div>" ).appendTo( tabs );
+    tabs.tabs( "refresh" );
+}
+
+
