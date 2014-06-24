@@ -174,4 +174,16 @@ function addTab(selector, newTabAnchor, newTabTitle, defaultContent){
     tabs.tabs( "refresh" );
 }
 
+function getMonitorNodeHealthStatusTmpl(obj){
+    var statusTmpl = contrail.getTemplate4Id('storage-status-template');
+    if(obj == "HEALTH_OK")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" OK</span>";
+    else if(obj == "HEALTH_WARN")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" WARN</span>";
+    else if(obj == "HEALTH_CRIT")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" CRITICAL</span>";
+    else
+        return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" N/A</span>";
+}
+
 
