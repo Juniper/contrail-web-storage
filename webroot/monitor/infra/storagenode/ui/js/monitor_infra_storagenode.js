@@ -180,7 +180,7 @@ storageNodeView = function(){
                 activate:function (e, ui) {
                     var selTab = ui.newTab.context.innerText;
                     if (selTab == 'Disks') {
-                        populateDisksTab(storNodeInfo);
+                        populateDisksSummaryTab(storNodeInfo);
                     } else if (selTab == 'Monitor') {
                         populateMonitorTab(storNodeInfo);
                     } else if (selTab == 'Details') {
@@ -192,7 +192,7 @@ storageNodeView = function(){
         if (obj['tab'] != '' && obj['tab'] != 'details') {
             selectTab(storNodeTabStrip,storNodeTabs.indexOf(obj['tab'].split(':')[0]));
             if (obj['tab'].split(':')[0] == 'disks') {
-                populateDisksTab(obj);
+                populateDisksSummaryTab(obj);
             }
             else if (obj['tab'].split(':')[0] == 'monitor') {
                 populateMonitorTab(obj);
@@ -245,7 +245,7 @@ storageNodeView = function(){
     }
 
     function populateDisksSummaryTab(obj){
-        selectTab(storNodeDisksTabStrip,storNodeDisksTabs.indexOf('summary'));
+        //selectTab(storNodeDisksTabStrip,storNodeDisksTabs.indexOf('summary'));
         layoutHandler.setURLHashParams({tab: 'disks:summary', node: 'Storage Nodes:' + obj['name']}, {triggerHashChange: false});
         $.ajax({
             url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['name'])
@@ -285,7 +285,7 @@ storageNodeView = function(){
 
                 header: {
                     title: {
-                        text: 'Disks',
+                        text: 'Summary',
                         cssClass: 'blue',
                         icon: 'icon-list',
                         iconCssClass: 'blue'
@@ -381,7 +381,7 @@ storageNodeView = function(){
                                             }
                                         })}
                                     ];
-                                    var moreLink = '#p=mon_infra_storage&q[tab]=disks:details:'+ dc['name'] +'&q[node]=Storage+Nodes:'+ dc['hostname'];
+                                    var moreLink = '#p=mon_storage_disks&q[tab]=details:'+ dc['name'] +'&q[node]='+ dc['hostname'];
                                     var detailsTmpl = contrail.getTemplate4Id('storage-grid-details-template');
                                     $(e.detailRow).html(detailsTmpl({d:detailsInfo, detailLink:moreLink}));
                                     $("#gridDisksDash").data('contrailGrid').adjustDetailRowHeight(dc.id);
@@ -428,7 +428,7 @@ storageNodeView = function(){
         });
 
         function onDisksRowSelChange(dc) {
-            populateDisksTab({tab: 'disks:details:'+dc['name'], name: dc['hostname']});
+            layoutHandler.setURLHashParams({tab:'details:'+dc['name'], node:obj['name']}, {p:'mon_storage_disks'}, {triggerHashChange: true});
         }
 
 
