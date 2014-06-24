@@ -190,7 +190,7 @@ cephOSDsView = function () {
                                             }
                                         })}
                                     ];
-                                    var moreLink = '#p=mon_storage_disks&q[node]=Disks:'+ dc['host'] + '&q[tab]=details:' + dc['name'];
+                                    var moreLink = '#p=mon_storage_disks&q[node]='+ dc['host'] + '&q[tab]=details:' + dc['name'];
                                     var detailsTmpl = contrail.getTemplate4Id('disk-grid-details-template');
                                     $(e.detailRow).html(detailsTmpl({d:detailsInfo, detailLink:moreLink}));
                                     $("#gridOSDs").data('contrailGrid').adjustDetailRowHeight(dc.id);
@@ -239,8 +239,25 @@ cephOSDsView = function () {
     }
 
     this.load = function (obj) {
-        populateOSDs();
+        self.updateViewByHash(layoutHandler.getURLHashParams());
     };
+
+    this.updateViewByHash = function(obj) {
+        var hashParams = ifNullOrEmptyObject(obj,{tab:''});
+        
+        if(hashParams['tab'].indexOf('details:') == 0) {
+            /**
+            * show details of a single disk
+            */
+            populateDiskDetailsTab(hashParams);
+            
+        } else {    
+            /**
+            * show all OSDs
+            */
+            populateOSDs();
+        }
+    }
 
     this.parseOSDsData = function(respData){
 
@@ -571,6 +588,128 @@ function osdScatterPlot(){
                 || y2 < ny1;
         };
     }
+}
+
+function populateDiskDetailsTab(obj){
+    var deferredObj = $.Deferred();
+
+    if($("#osdsTabStrip").tabs().find("#diskDetailsTab").length == 0){
+        addTab(disksTabStrip, 'diskDetailsTab', 'Details', 'loading..');    
+    } else {
+        $("#osdsTabStrip").tabs().find("#diskDetailsTab").html("");
+    }
+
+    $('#diskDetailsTab').html('<div id="disk-dashboard" class="span5" style="margin-left:5px;"></div>');
+    
+    selectTab(disksTabStrip,disksTabs.indexOf('details'));
+
+    if (obj['tab'] == "" || obj['tab'].split(':')[0] == null) {
+        $.ajax({
+            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['node'])
+        }).done(function (response) {
+            var osds = response.host_details.osds;
+            obj['tab'] = 'details:' + osds[0].name;
+            deferredObj.resolve();
+        });
+    } else {
+        deferredObj.resolve();
+    }
+
+    deferredObj.done(function(){
+        var osdName = obj['tab'].split(':')[1];
+        var diskDashTemplate = contrail.getTemplate4Id('dashboard-template');
+        $('#disk-dashboard').html(diskDashTemplate({title: 'Disk', colCount: 2, showSettings: true, widgetBoxId: 'diskDash'}));
+        startWidgetLoading('diskDash');
+        $.ajax({
+            url: contrail.format(monitorInfraStorageUrls['DISK_DETAILS'] , osdName)
+        }).done(function (response) {
+            var diskData = response.osd_details;
+            var noDataStr = "N/A",
+                diskDashboardInfo;
+
+            diskDashboardInfo = [
+                {lbl: 'Name', value: diskData['name']},
+                {lbl: 'Hostname', value: diskData['host']},
+                {lbl: 'IP Address', value: (function () {
+                    try {
+                        var ip = ifNullOrEmpty(diskData['public_addr'], noDataStr);
+                        return ip.split(':')[0] + ', Port: ' + ip.split(':')[1];
+                    } catch (e) {
+                        return noDataStr;
+                    }
+                })()},
+                {lbl: 'Status', value: (function(){
+                    var statusTmpl = contrail.getTemplate4Id('storage-status-template');
+                    if(diskData['status'] == "up")
+                        return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
+                    else if(diskData['status'] == "down")
+                        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
+                    else
+                        return noDataStr;
+                })()},
+                {lbl: 'Cluster Membership', value: (function(){
+                    var statusTmpl = contrail.getTemplate4Id('storage-status-template');
+                    if(diskData['cluster_status'] == "in")
+                        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
+                    else if(diskData['cluster_status'] == "out")
+                        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
+                    else
+                        return noDataStr;
+                })()},
+                {lbl: 'Total Space', value: (function(){
+                    try{
+                        if(diskData['kb'])
+                            return formatBytes(diskData['kb'] * 1024);
+                    } catch (e) {
+                        return noDataStr;
+                    }
+                })()},
+                {lbl: 'Used', value: (function(){
+                    try{
+                        if(diskData['kb_used'])
+                            return formatBytes(diskData['kb_used'] * 1024);
+                    } catch (e) {
+                        return noDataStr;
+                    }
+                })()},
+                {lbl: 'Available', value: (function(){
+                    try{
+                        if(diskData['kb_avail'])
+                            return formatBytes(diskData['kb_avail'] * 1024) + ' ( ' + parseFloat(((diskData['kb_avail'] / diskData['kb']) * 100).toFixed(2)) + "% )";
+                    } catch (e) {
+                        return noDataStr;
+                    }
+                })()},
+                {lbl: 'UUID', value: diskData['uuid']},
+                {lbl: 'Apply Latency', value: (function () {
+                    try {
+                        var perf = ifNullOrEmpty(diskData['fs_perf_stat']['apply_latency_ms'], noDataStr);
+                        if (perf != noDataStr) {
+                            return perf + ' ms';
+                        }
+                        return noDataStr;
+                    } catch (e) {
+                        return noDataStr;
+                    }
+                })},
+                {lbl: 'Commit Latency', value: (function () {
+                    try {
+                        var perf = ifNullOrEmpty(diskData['fs_perf_stat']['commit_latency_ms'], noDataStr);
+                        if (perf != noDataStr) {
+                            return perf + ' ms';
+                        }
+                        return noDataStr;
+                    } catch (e) {
+                        return noDataStr;
+                    }
+                })}
+            ];
+            var dashboardBodyTemplate = Handlebars.compile($("#dashboard-body-template").html());
+            $('#dashboard-box .widget-body').html(dashboardBodyTemplate({colCount: 2, d: diskDashboardInfo, nodeData: diskData, showSettings: true}));
+            endWidgetLoading('diskDash');
+
+        });
+    });
 }
 
 function showOSDDetails(osd_name){

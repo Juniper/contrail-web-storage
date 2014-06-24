@@ -14,6 +14,9 @@ var tenantStorageChartsInitializationStatus = {
     disks   : false,
 }
 
+disksTabs = ['Scatter Plot', 'Host Tree', 'Details'];
+disksTabStrip = 'osdsTabStrip';
+
 var tenantMonitorStorageUrls = {
     CLUSTER_STATUS          : '/api/tenant/storage/cluster/status',
     MONITORS_SUMMARY        : '/api/tenant/storage/cluster/monitors/summary',
