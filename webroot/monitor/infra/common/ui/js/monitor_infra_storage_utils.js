@@ -34,6 +34,14 @@ var infraMonitorStorageUtils = {
             obj['name'] = host.name;
             obj['isPartialUveMissing'] = false;
             obj['osds'] = host.osds;
+            obj['osds_total'] = 0;
+            obj['osds_used'] = 0;
+            $.each(host.osds, function(idx,osd){
+                obj['osds_total'] += osd.kb*1024;
+                obj['osds_used'] += osd.kb_used*1024;
+            });
+            obj['osds_total'] = formatBytes(obj['osds_total']);
+            obj['osds_used'] = formatBytes(obj['osds_used']);
             obj['monitor'] = host.monitor;
             obj['status'] = host.status;
             obj['color'] = getStorageNodeColor(host, obj);
@@ -86,6 +94,16 @@ function getStorageNodeColor(d,obj) {
     if(obj['status'] == "warn")
         return d3Colors['orange'];
     return d3Colors['blue'];
+}
+
+function getStorageNodeStatusTmpl(obj){
+    var statusTmpl = contrail.getTemplate4Id('storage-status-template');
+    if(obj == "up")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" Up</span>";
+    else if(obj == "down")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" Down</span>";
+    else
+        return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" N/A</span>";
 }
 
 /**
