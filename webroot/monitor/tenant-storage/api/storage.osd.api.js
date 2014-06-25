@@ -27,8 +27,6 @@ function getStorageOSDStatus(req, res, appData){
         });     
 }
 
-
-
 function parseStorageOSDStatus(osdJSON){
     var osdMapJSON ={};    
     var num_osds= jsonPath(osdJSON, "$.output.num_osds")[0];
@@ -96,6 +94,20 @@ function appendHostToOSD(osds,hostJSON){
 
 }
 
+function getOSDVersion(req, res, appData){
+    var osdName= req.param('name'),
+        url = storageApi.url.osdVersion;
+    url = url.replace(":osdName", osdName);
+    storageRest.apiGet(url, appData, function (error, resultJSON) {
+        if(!error && (resultJSON)) {
+            // var resultJSON = parseStorageOSDStatus(resultJSON);
+            commonUtils.handleJSONResponse(null, res, resultJSON);
+        } else {
+            commonUtils.handleJSONResponse(error, res, null);
+        }
+    });
+}
+
 function getStorageOSDDetails(req, res, appData){
     var resultJSON = [];
     var osd_name = req.param('name');
@@ -131,41 +143,6 @@ function getOSDListURLs(appData){
     return dataObjArr;
 }
 
-function getStorageOSDTreeList(req, res, appData){
-    var resultJSON = [];
-    dataObjArr = getOSDListURLs(appData);
-    async.map(dataObjArr,
-                      commonUtils.getAPIServerResponse(storageRest.apiGet, true),
-                      function(err, data) {
-                resultJSON = parseStorageOSDTreeList(data);        
-                commonUtils.handleJSONResponse(err, res, resultJSON);
-            });
- 
-}
-
-function parseStorageOSDTreeList(osdJSON){
-    var emptyObj = {};  
-    var osdList={};
-    var osdPG= osdJSON[0];
-    var osdTree= osdJSON[1];
-    var osdDump= osdJSON[2];
-
-    var rootMap = jsonPath(osdTree, "$..nodes[?(@.type=='root')]");
-    var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
-    var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
-    
-    if (osds.length > 0) {
-        var osdMapJSON = new Object();
-        parseOSDFromPG(osds,osdPG);
-        parseOSDFromDump(osds,osdDump);
-        hostMap = parseHostFromOSD(hostMap,osds, true);
-        osdMapJSON["osd_tree"]= parseRootFromHost(rootMap,hostMap,true);
-        osdList= osdMapJSON;
-        return osdList;
-    }
-    return emptyObj;
-}
-
 function parseRootFromHost(rootJSON, hostJSON, treeReplace){
     var chldCnt= rootJSON[0].children.length;
    // console.log("chldCnt:"+chldCnt);
@@ -191,46 +168,47 @@ function parseRootFromHost(rootJSON, hostJSON, treeReplace){
     return rootJSON;
 }
 
-function parseHostFromOSD(hostJSON,osdsJSON, treeReplace){
-    var hstCnt= hostJSON.length;
-    for(i=0;i< hstCnt;i++){       
-        var cldCnt= hostJSON[i].children.length;
-        for(j=0;j< cldCnt; j++){
-            var chlId= hostJSON[i].children[j];
-            for(k=0;k< osdsJSON.length;k++){
-                var osdId= osdsJSON[k].id;
-                if(chlId==osdId){
-                  /*  console.log("hstCnt:"+hostJSON[i].name);
-                    console.log("hstlength:"+cldCnt);
-                    console.log("chlId:"+chlId);
-                    console.log("osdId:"+osdId);*/
+function parseHostFromOSD(hostJSON,osdsJSON, version, treeReplace) {
+    var hstCnt = hostJSON.length;
+    for (i = 0; i < hstCnt; i++) {
+        var cldCnt = hostJSON[i].children.length;
+        hostJSON[i]['build_info'] = version;
+        for (j = 0; j < cldCnt; j++) {
+            var chlId = hostJSON[i].children[j];
+            for (k = 0; k < osdsJSON.length; k++) {
+                var osdId = osdsJSON[k].id;
+                if (chlId == osdId) {
+                    /*  console.log("hstCnt:"+hostJSON[i].name);
+                     console.log("hstlength:"+cldCnt);
+                     console.log("chlId:"+chlId);
+                     console.log("osdId:"+osdId);*/
                     hostJSON[i].children[j] = osdsJSON[k];
                 }
             }
         }
     }
-    if(treeReplace){
+
+    if (treeReplace) {
         var jsonstr = JSON.stringify(hostJSON);
         var new_jsonstr = jsonstr.replace(/children/g, "osds");
         hostJSON = JSON.parse(new_jsonstr);
     }
-
     return hostJSON;
 }
 
 function getStorageOSDTree(req, res, appData){
-    var resultJSON = [];
     dataObjArr = getOSDListURLs(appData);
     async.map(dataObjArr,
                       commonUtils.getAPIServerResponse(storageRest.apiGet, true),
                       function(err, data) {
-                resultJSON = parseStorageOSDTree(data);        
-                commonUtils.handleJSONResponse(err, res, resultJSON);
+                          parseStorageOSDTree(data, function(resultJSON){
+                              commonUtils.handleJSONResponse(err, res, resultJSON);
+                          });
             });
  
 }
 
-function parseStorageOSDTree(osdJSON){
+function parseStorageOSDTree(osdJSON, callback){
     var emptyObj = {};  
     var osdList={};
     var osdPG= osdJSON[0];
@@ -240,15 +218,33 @@ function parseStorageOSDTree(osdJSON){
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
     var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     if (osds.length > 0) {
-        var osdMapJSON = new Object();
-        parseOSDFromPG(osds,osdPG);
-        parseOSDFromDump(osds,osdDump);
-        hostMap = parseHostFromOSD(hostMap,osds, false);
-        osdMapJSON["osd_tree"]= parseRootFromHost(rootMap,hostMap,false);
-        osdList= osdMapJSON;
-        return osdList;
+        parseOSDVersion(osds[0].name, function(version){
+            var osdMapJSON = new Object();
+            parseOSDFromPG(osds,osdPG);
+            parseOSDFromDump(osds,osdDump);
+            hostMap = parseHostFromOSD(hostMap,osds, version, true);
+            osdMapJSON["osd_tree"]= parseRootFromHost(rootMap,hostMap,true);
+            osdList= osdMapJSON;
+            callback(osdList);
+
+        });
     }
-    return emptyObj;
+}
+
+function parseOSDVersion(name, callback){
+    var osdVersion ;
+    if(name !== 'undefined') {
+        var url = storageApi.url.osdVersion, appData ={};
+        url = url.replace(":osdName", name);
+        storageRest.apiGet(url, appData,function(err, resultJSON) {
+            if(!err && (resultJSON)) {
+                osdVersion = jsonPath(resultJSON, "$.output.version")[0];
+                callback(osdVersion);
+            }
+
+        });
+    }
+
 }
 
 function parseOSDFromPG(osdTree, osdPG ){
@@ -403,9 +399,10 @@ function formatOsdSeriesLoadXMLData (resultJSON)
 exports.getStorageOSDSummary=getStorageOSDSummary;
 exports.getStorageOSDStatus=getStorageOSDStatus;
 exports.getStorageOSDTree=getStorageOSDTree;
-exports.getStorageOSDTreeList=getStorageOSDTreeList;
 exports.getStorageOSDDetails=getStorageOSDDetails;
+exports.getOSDVersion = getOSDVersion;
 
+exports.parseOSDVersion=parseOSDVersion;
 exports.parseOSDFromPG = parseOSDFromPG;
 exports.parseOSDFromDump= parseOSDFromDump;
 exports.parseHostFromOSD=parseHostFromOSD;
