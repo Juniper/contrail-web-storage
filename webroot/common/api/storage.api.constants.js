@@ -16,6 +16,7 @@ storage.url.pgDumpPools = "/pg/dump_pools_json";
 storage.url.osdTree = "/osd/tree";
 storage.url.osdDump = "/osd/dump";
 storage.url.osdStat = "/osd/stat";
+storage.url.osdVersion="/tell/:osdName/version";
 
 // Export this as a module.
 module.exports = storage;
