@@ -169,6 +169,14 @@
         <feature>storage</feature>
         <callback>storageOsdsApi.getStorageOSDDetails</callback>
     </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/osd/version</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getOSDVersion</callback>
+    </item>
+
     <item>
         <url>/api/tenant/storage/cluster/osds/tree</url>
         <method>get</method>

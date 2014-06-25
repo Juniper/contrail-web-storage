@@ -36,13 +36,13 @@ function getStorageTopology(req, res, appData){
     async.map(dataObjArr,
                       commonUtils.getAPIServerResponse(storageRest.apiGet, true),
                       function(err, data) {
-                resultJSON = parseStorageTopologyTree(data);        
-                commonUtils.handleJSONResponse(err, res, resultJSON);
+                          parseStorageTopologyTree(data, function(resultJSON){
+                              commonUtils.handleJSONResponse(err, res, resultJSON);
+                          });
             });
 }
 
-function parseStorageTopologyTree(osdJSON){
-    var emptyObj = {};  
+function parseStorageTopologyTree(osdJSON, callback){
     var osdList={};
     var osdPG= osdJSON[0];
     var osdTree= osdJSON[1];
@@ -54,15 +54,16 @@ function parseStorageTopologyTree(osdJSON){
     var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     var monsJSON = jsonPath(monsApi.consolidateMonitors(monStatus), "$..monitors")[0];
     if (osds.length > 0) {
-        osdApi.parseOSDFromPG(osds,osdPG);
-        osdApi.parseOSDFromDump(osds,osdDump);
-        hostMap = parseMonitorWithHost(monsJSON, hostMap);
-        hostMap = osdApi.parseHostFromOSD(hostMap,osds, true);
+        osdApi.parseOSDVersion(osds[0].name, function(version) {
+            osdApi.parseOSDFromPG(osds, osdPG);
+            osdApi.parseOSDFromDump(osds, osdDump);
+            hostMap = parseMonitorWithHost(monsJSON, hostMap);
+            hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
 
-        osdList.topology= parseRootFromHost(rootMap,hostMap)[0];
-        return osdList;
+            osdList.topology = parseRootFromHost(rootMap, hostMap)[0];
+            callback(osdList);
+        });
     }
-    return emptyObj;
 }
 
 function parseMonitorWithHost(monsJSON, hostJSON){
@@ -96,17 +97,20 @@ function getStorageTopologyDetails(req, res, appData){
     async.map(dataObjArr,
                       commonUtils.getAPIServerResponse(storageRest.apiGet, true),
                       function(err, data) {
-                resultJSON = parseStorageTopologyDetails(hostName,data);        
-                commonUtils.handleJSONResponse(err, res, resultJSON);
+                          parseStorageTopologyDetails(hostName, data, function(resultJSON){
+                              commonUtils.handleJSONResponse(err, res, resultJSON);
+                          });
             });
 }
 
-function parseStorageTopologyDetails(name, resultJSON){
-    resultJSON = parseStorageTopologyTree(resultJSON);
-    var hDetails = jsonPath(resultJSON, "$..hosts[?(@.name=='"+name+"')]")[0];
-    var hJSON = {};
+function parseStorageTopologyDetails(name, resultJSON, callback){
+
+    parseStorageTopologyTree(resultJSON, function(resultJSON){
+        var hDetails = jsonPath(resultJSON, "$..hosts[?(@.name=='"+name+"')]")[0];
+        var hJSON = {};
         hJSON['host_details'] = hDetails;
-    return hJSON;
+        callback(hJSON);
+    });
 }
 
 function parseRootFromHost(rootJSON, hostJSON){
