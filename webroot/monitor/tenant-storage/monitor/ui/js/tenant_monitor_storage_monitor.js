@@ -160,6 +160,17 @@ cephMonitorView = function () {
                                             } catch (e) {
                                                 return noDataStr;
                                             }
+                                        })},
+                                        {lbl: 'Details', value: (function(){
+                                            try {
+                                                var perf = ifNullOrEmpty(dc['details'], noDataStr);
+                                                if (perf != noDataStr) {
+                                                    return perf;
+                                                }
+                                                return noDataStr;
+                                            } catch (e) {
+                                                return noDataStr;
+                                            }
                                         })}
                                     ];
                                     var detailsTmpl = contrail.getTemplate4Id('monitor-grid-details-template');
