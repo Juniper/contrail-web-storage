@@ -86,30 +86,43 @@ storageNodesView = function(){
                             }
                         },
                         cssClass: 'cell-hyperlink-blue',
-                        minWidth:200
+                        minWidth:150
                     },
                     {
                         field:"status",
                         name:"Status",
+                        formatter: function(r,c,v,cd,dc) {
+                            return getStorageNodeStatusTmpl(dc['status'])
+                        },
                         minWidth:50
                     },
                     {
                         field:"",
                         name:"Disks",
-                        minWidth:50,
+                        minWidth:30,
                         formatter:function(r,c,v,cd,dc){
                             return dc['osds'].length;
                         }
                     },
                     {
+                        field:"osds_total",
+                        name:"Disks Space (GB)",
+                        minWidth:50,
+                    },
+                    {
+                        field:"osds_used",
+                        name:"Disks Used Space (GB)",
+                        minWidth:60,
+                    },
+                    {
                         field:"total",
-                        name:"Total Space (GB)",
-                        minWidth:110
+                        name:"Root HD Space (GB)",
+                        minWidth:60
                     },
                     {
                         field:"available_perc",
-                        name:"Available (%)",
-                        minWidth:150
+                        name:"Root HD Available (%)",
+                        minWidth:60
                     }
                 ],
             }
@@ -568,6 +581,13 @@ storageNodeView = function(){
             var noMonitor = "N/A",
                 storNodeDashboardInfo;
 
+            storNodeData['osds_total'] = 0;
+            storNodeData['osds_used'] = 0;
+            $.each(storNodeData.osds, function(idx,osd){
+                storNodeData['osds_total'] += osd.kb;
+                storNodeData['osds_used'] += osd.kb_used;
+            });
+            
             storNodeDashboardInfo = [
                 {lbl:'Hostname', value:obj['name']},
                 {lbl:'IP Address',value:(function(){
@@ -577,10 +597,14 @@ storageNodeView = function(){
                     } catch(e){return noDataStr;}
                 })()},
                 {lbl:'Status', value:storNodeData['status'] != '-' ? storNodeData['status'] : noDataStr},
-                {lbl:'Total Space', value:formatBytes(storNodeData['kb_total']*1024)},
-                {lbl:'Used', value:formatBytes(storNodeData['kb_used']*1024)},
-                {lbl:'Available', value: storNodeData['avail_percent']+"%"},
-                {lbl:'Disks', value: storNodeData['osds'].length},
+                {lbl:'Root HD', value:' '},
+                {lbl:INDENT_RIGHT+'Total Space', value:formatBytes(storNodeData['kb_total']*1024)},
+                {lbl:INDENT_RIGHT+'Used', value:formatBytes(storNodeData['kb_used']*1024)},
+                {lbl:INDENT_RIGHT+'Available', value: storNodeData['avail_percent']+"%"},
+                {lbl:'Disks', value: ' '},
+                {lbl:INDENT_RIGHT+'Total', value: storNodeData['osds'].length},
+                {lbl:INDENT_RIGHT+'Total Space', value:formatBytes(storNodeData['osds_total']*1024)},
+                {lbl:INDENT_RIGHT+'Used', value:formatBytes(storNodeData['osds_used']*1024)},
                 {lbl:'Monitor', value:(function(){
                     try{
                         var mntr = ifNullOrEmpty(storNodeData['monitor'],noDataStr);
@@ -713,7 +737,7 @@ storageNodeView = function(){
                     if (outCnt > 0)
                         content = content + '<span style="color: ' + d3Colors['red'] + ';">' + downCnt + ' down</span>';
                     else
-                        content = content + downCnt;
+                        content = content + '<span>' + downCnt + ' down</span>';
                     return content;
                 }
             );
@@ -723,7 +747,7 @@ storageNodeView = function(){
                     if (outCnt > 0)
                         content = content + '<span style="color: ' + d3Colors['orange'] + ';">' + outCnt + ' out </span>';
                     else
-                        content = content + outCnt;
+                        content = content + '<span>' + outCnt + ' out </span>';
                     return content;
                 }
             );
