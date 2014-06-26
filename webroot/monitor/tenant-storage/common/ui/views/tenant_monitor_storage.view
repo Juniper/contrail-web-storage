@@ -16,173 +16,6 @@
     </div>
 </script>
 
-<script type="text/x-handlebars-template" id="storage-dashboard">
-    <div class="row-fluid">
-        <!--
-        <div class="row-fluid">
-            <div id="topStats" class="span12 infobox-container"></div>
-        </div>
-        <hr class="hr-8"/>
-        -->
-        <div id="dashboard-charts" class="row-fluid">
-
-            <div class="dashboard-chart-item" style="float:left; width:100%;">
-                <div style="margin-left: 170px;">
-                    <div style="float:left;width: 58%;">
-                        <div id="dashPoolsBox" class="widget-box transparent">
-                            <div class="widget-header"></div>
-                            <div class="widget-body">
-                                <div class="widget-main">
-                                    <div id="poolsBarTabStrip" class="pools-bar-chart infra-stor-chart">
-                                        <ul>
-                                            <li><a href="#gbTab">GB Used</a></li>
-                                            <!--<li><a href="#objTab">Objects</a></li>-->
-                                        </ul>
-                                        <div id="gbTab"><div id="poolsBarGbChart"></div></div>
-                                        <!--<div id="objTab"><div id="poolsBarObjChart"></div></div>-->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="dashDisksBox" class="widget-box transparent">
-                            <div class="widget-header"></div>
-                            <div class="widget-body">
-                                <div class="widget-main">
-                                    <div id="disksBarChart" class="disks-bar-chart infra-stor-chart">
-                                        <div id="disksStatusBarTabStrip">
-                                            <ul><li><a href="#diskStatusTab">Status</a></li></ul>
-                                            <div id="diskStatusTab"><div id="diskStatusChart"></div></div>
-                                        </div>
-                                        <div id="disksClusterBarTabStrip">
-                                            <ul><li><a href="#clusterStatusTab">Cluster Status</a></li></ul>
-                                            <div id="clusterStatusTab"><div id="diskClusterChart"></div></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="float:left; width: 38%; margin-left: 20px;">
-                        <div id="dashActivityBox" class="widget-box transparent">
-                            <div class="widget-header"></div>
-                            <div class="widget-body">
-                                <div class="widget-main">
-                                    <!-- <span class="label label-status">
-                                        <span id="activity-status" class="status-message"></span>
-                                        <i id="activity-status-icon" class="icon-status"></i>
-                                    </span> -->
-                                    <div id="clusterActivityChart" class="cluster-activity-chart infra-stor-chart">
-                                        <div id="clusterActivityThrptTabStrip">
-                                            <ul><li><a href="#thrptTab">Throughput</a></li>
-                                            </ul>
-                                            <div id="thrptTab"><div id="clusterActivityThrptChart"></div></div>
-                                        </div>
-                                        <div id="clusterActivityIopsTabStrip">
-                                            <ul><li><a href="#iopsTab">IOPs</a></li>
-                                            </ul>
-                                            <div id="iopsTab"><div id="clusterActivityIopsChart"></div></div>
-                                        </div>
-                                        <!--
-                                        <div id="clusterActivityObjTabStrip">
-                                            <ul><li><a href="objTab">Objects</a></li></ul>
-                                            <div id="objTab"><div id="clusterActivityObjChart"></div></div>
-                                        </div>
-                                        -->
-                                        <div id="clusterActivityLatencyTabStrip">
-                                            <ul><li><a href="#latencyTab">Latency</a></li></ul>
-                                            <div id="latencyTab"><div id="clusterActivityLatencyChart"></div></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="float: left;width: 150px;margin-left: -100%;">
-                <div id="dashUsageBox" class="widget-box transparent">
-                    <div class="widget-header"></div>
-                    <div class="widget-body">
-                        <div class="widget-main">
-                            <div id="usage-dial">
-                                <div id="usage-labelbox">
-                                    <div>
-                                        <span id="df-used-perc" class="usage-perc-label"></span><br style="display: block; margin: 30px 0; line-height: 6">
-                                        <span class="df-used-label">Used: </span><span id="df-used"></span><br><br>
-                                        <span class="df-total-label">Total: </span><span id="df-total"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                 </div>
-                <div id="dashHealthBox" class="widget-box transparent">
-                    <div class="widget-header"></div>
-                    <div class="widget-body">
-                        <div class="widget-main">
-                            <div class="info-color">
-                                <ul>Cluster</ul>
-                            </div>
-                            <span class="label label-status">
-                                <span id="health-status" class="status-message"></span>
-                                <i id="health-status-icon" class="icon-status"></i>
-                            </span>
-                        </div>
-                         <div class="widget-main">
-                            <div class="info-color">
-                                <ul>Monitor</ul>
-                            </div>
-                            <span class="label label-status">
-                                <span id="monitor-status" class="status-message"></span>
-                                <i id="monitor-status-icon" class="icon-status"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- End- dashboard-charts -->
-
-        <!-- commenting out the bottom stats
-        <hr />
-
-        <div id="dashboard-stats" class="row-fluid">
-            <div class="span4">
-                <div id="logs-box" class="widget-box transparent">
-                    <div class="widget-header"></div>
-                    <div class="widget-body">
-                        <div class="widget-main padding-4">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="span4">
-                <div id="sysinfo-box" class="widget-box transparent">
-                    <div class="widget-header"></div>
-                    <div class="widget-body">
-                        <div id="system-info-stat" class="widget-main">
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="span4">
-                <div id="alerts-box" class="widget-box transparent">
-                    <div class="widget-header"></div>
-                    <div class="widget-body">
-                        <div id="alerts-box-content" class="widget-main padding-4">
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        -->
-
-    </div>
-</script>
-
-
 <script type="text/x-handlebars-template" id="storage-monitor-template">
     <div class="row-fluid">
         <div id="grid">
@@ -218,5 +51,24 @@
             </div>
         </div>
     </div>
+</script>
+
+<script type="text/x-handlebars-template" id="tree-lblval-tooltip-template">
+<div class="row-fluid chart-tooltip" style="width:250px;">
+    {{#each this}}
+        {{#IfCompare @index 0}}
+            <div class="row-fluid chart-tooltip-title">
+                <p>{{value}}</p>
+            </div>
+            <div class="row-fluid chart-tooltip-body ">
+        {{else}}
+                <div class="row-fluid chart-tooltip-row" >
+                    <span class="key span4" style="min-height:20px;">{{lbl}}:</span>
+                    <span class="value span8" style="min-height:20px;">{{{value}}}</span>
+                </div>
+        {{/IfCompare}}
+    {{/each}}
+        </div>
+</div>
 </script>
 
