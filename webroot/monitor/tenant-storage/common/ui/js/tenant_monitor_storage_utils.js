@@ -177,13 +177,44 @@ function addTab(selector, newTabAnchor, newTabTitle, defaultContent){
 function getMonitorNodeHealthStatusTmpl(obj){
     var statusTmpl = contrail.getTemplate4Id('storage-status-template');
     if(obj == "HEALTH_OK")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" OK</span>";
+        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" ok</span>";
     else if(obj == "HEALTH_WARN")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" WARN</span>";
+        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" warn</span>";
     else if(obj == "HEALTH_CRIT")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" CRITICAL</span>";
+        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" critical</span>";
     else
         return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" N/A</span>";
 }
 
+function getDiskStatusTmpl(obj) {
+    var statusTmpl = contrail.getTemplate4Id('storage-status-template');
+    if(obj == "in")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
+    else if(obj == "out")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
+    else if(obj == "down")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
+    else if(obj == "up")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
+    else
+        return "<span> N/A</span>";
+}
 
+function getHostStatusTmpl(obj) {
+    var statusTmpl = contrail.getTemplate4Id('storage-status-template');
+    if(obj == "active")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" active</span>";
+    else if(obj == "warn")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" warn</span>";
+    else if(obj == "critical")
+        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" critical</span>";
+    else
+        return "<span> N/A</span>";
+}
+
+
+function formatTreeLblValueTooltip(infoObj) {
+    var tooltipTemplateSel = 'tree-lblval-tooltip-template';
+    var tooltipTemplate = contrail.getTemplate4Id(tooltipTemplateSel);
+    return tooltipTemplate(infoObj);
+}

@@ -304,14 +304,8 @@
 #svg-osd-tree-host{
     visibility: hidden;
 }
-.tree-tip .tooltip {
-    display: block;
-    position: absolute;
-    font: 12px sans-serif;
-    background: lightsteelblue;
-    border: 0px;
-    border-radius: 8px;
-    pointer-events: none;
+.tree-tip .chart-tooltip{
+    width: 350px !important;
 }
 /*
 #usage-gauge-container {
