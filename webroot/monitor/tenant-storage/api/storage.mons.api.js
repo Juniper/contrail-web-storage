@@ -88,22 +88,16 @@ function getStorageDiskFlowSeries (req, res, appData) {
     var minsSince = req.query['minsSince'];
     var endTime = req.query['endTime'];
     var diskName= req.query['diskName'];
-
     var name = source +":"+diskName;
 
-    console.log("Name:"+name);
     var tableName, whereClause,
-        selectArr = ["T", "name"];
+        selectArr = ["T", "name", "info_stats.reads", "info_stats.writes", "info_stats.read_kbytes","info_stats.write_kbytes" ];
 
-    tableName = 'StatTable.ComputeStorageDisk.disk_stats';
-    selectArr.push("disk_stats.uuid");
-    selectArr.push("disk_stats.disk_name");
-    selectArr.push("disk_stats.reads");
-    selectArr.push("disk_stats.writes");
-    selectArr.push("disk_stats.read_kbytes");
-    selectArr.push("disk_stats.write_kbytes");
-    selectArr.push("disk_stats.iops");
-    selectArr.push("disk_stats.bw");
+    tableName = 'StatTable.ComputeStorageDisk.info_stats';
+    selectArr.push("info_stats.uuid");
+    selectArr.push("info_stats.disk_name");
+    selectArr.push("info_stats.iops");
+    selectArr.push("info_stats.bw");
     whereClause = [
         {'Source':source},
         {'name':name}
@@ -119,6 +113,7 @@ function getStorageDiskFlowSeries (req, res, appData) {
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
     stMonUtils.executeQueryString(queryJSON,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
+
             resultJSON= formatFlowSeriesForDiskStats(resultJSON, timeObj, timeGran);
             commonUtils.handleJSONResponse(err, res, resultJSON);
         }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
@@ -130,19 +125,21 @@ function formatFlowSeriesForDiskStats(storageFlowSeriesData, timeObj, timeGran)
 {
     var len = 0;
     var resultJSON = {};
-    try{
-        resultJSON['summary'] = {};
-        resultJSON['summary']['start_time'] = timeObj['start_time'];
-        resultJSON['summary']['end_time'] = timeObj['end_time'];
-        resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
-        resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
-        resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['disk_stats.uuid'];
-        resultJSON['summary']['disk_name'] = storageFlowSeriesData['value'][0]['disk_stats.disk_name'];
-        resultJSON['flow-series'] = formatDiskSeriesLoadXMLData(storageFlowSeriesData);
-        return resultJSON;
-    } catch (e) {
-        logutils.logger.error("In formatFlowSeriesForDiskStats(): JSON Parse error: " + e);
-        return null;
+    if(storageFlowSeriesData['value'].length > 0) {
+        try {
+            resultJSON['summary'] = {};
+            resultJSON['summary']['start_time'] = timeObj['start_time'];
+            resultJSON['summary']['end_time'] = timeObj['end_time'];
+            resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
+            resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
+            resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['info_stats.uuid'];
+            resultJSON['summary']['disk_name'] = storageFlowSeriesData['value'][0]['info_stats.disk_name'];
+            resultJSON['flow-series'] = formatDiskSeriesLoadXMLData(storageFlowSeriesData);
+            return resultJSON;
+        } catch (e) {
+            logutils.logger.error("In formatFlowSeriesForDiskStats(): JSON Parse error: " + e);
+            return null;
+        }
     }
 }
 
@@ -156,12 +153,12 @@ function formatDiskSeriesLoadXMLData (resultJSON)
         for (var i = 0; i < counter; i++) {
             results[i] = {};
             results[i]['MessageTS'] = resultJSON[i]['T'];
-            results[i]['reads'] = resultJSON[i]['disk_stats.reads'];
-            results[i]['writes'] = resultJSON[i]['disk_stats.writes'];
-            results[i]['reads_kbytes'] = resultJSON[i]['disk_stats.read_kbytes'];
-            results[i]['writes_kbytes'] = resultJSON[i]['disk_stats.write_kbytes'];
-            results[i]['iops'] = resultJSON[i]['disk_stats.iops'];
-            results[i]['bw'] = resultJSON[i]['disk_stats.bw'];
+            results[i]['reads'] = resultJSON[i]['info_stats.reads'];
+            results[i]['writes'] = resultJSON[i]['info_stats.writes'];
+            results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
+            results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
+            results[i]['iops'] = resultJSON[i]['info_stats.iops'];
+            results[i]['bw'] = resultJSON[i]['info_stats.bw'];
 
         }
         return results;

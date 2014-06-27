@@ -19,15 +19,22 @@ function createTimeQueryJsonObj (minsSince, endTime)
         timeObj['end_time'] = 'now';
         return timeObj;
     }
+
+    if(('now' == endTime)){
+        endTime = commonUtils.getUTCTime(new Date().getTime());
+    }
+
     if(endTime != null && endTime != '' ) {
         try {
             endTime = parseInt(endTime);
         } catch (err) {
             endTime = commonUtils.getUTCTime(new Date().getTime());
         }
-    } else {
+    }else{
         endTime = commonUtils.getUTCTime(new Date().getTime());
     }
+
+
 
     if (minsSince != -1) {
         startTime = commonUtils.getUTCTime(commonUtils.adjustDate(new Date(endTime), {'min':-minsSince}).getTime());
@@ -36,6 +43,7 @@ function createTimeQueryJsonObj (minsSince, endTime)
 
     timeObj['start_time'] = startTime * 1000;
     timeObj['end_time'] = endTime * 1000;
+
     return timeObj;
 }
 
