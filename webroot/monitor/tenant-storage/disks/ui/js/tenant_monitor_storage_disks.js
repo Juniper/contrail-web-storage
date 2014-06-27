@@ -936,6 +936,7 @@ function osdTree() {
             if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
                 var clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
                 source = selectiveCollapse(source, clickedArr);
+                tenantStorageDisksView.osdsTree.root = source;
             }
             else {
                 source.children.forEach(collapse);
@@ -943,6 +944,7 @@ function osdTree() {
             }
 
         }
+
         // Compute the new tree layout.
         nodes = tenantStorageDisksView.osdsTree.tree.nodes(tenantStorageDisksView.osdsTree.root).reverse(),
         links = tenantStorageDisksView.osdsTree.tree.links(nodes);
@@ -1056,7 +1058,7 @@ function osdTree() {
     nodeClick = function (d) {
         var clickedArr = [];
 
-        if(d.type == "host" || d.type == "root") {
+        if(d.type == "host") {
             if(self.lastClickedNode != null){
                 if (self.lastClickedNode.name != d.name){
                     self.lastClickedNode._children = self.lastClickedNode.children;
