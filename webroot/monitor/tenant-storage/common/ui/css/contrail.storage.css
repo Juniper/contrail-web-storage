@@ -304,9 +304,19 @@
 #svg-osd-tree-host{
     visibility: hidden;
 }
-.tree-tip .chart-tooltip{
+.tree-host-tip .chart-tooltip{
+    width: 150px !important;
+}
+.tree-host-tip span{
+    margin: 0px !important;
+}
+.tree-disk-tip .chart-tooltip{
     width: 350px !important;
 }
+.tree-disk-tip span{
+    margin: 0px !important;
+}
+
 /*
 #usage-gauge-container {
     background: transparent url("/img/kendo/gauge-container.png") no-repeat 50% 50%;

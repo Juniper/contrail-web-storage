@@ -75,10 +75,6 @@ cephOSDsView = function () {
 
     function populateOSDs() {
         
-        // SVGs for Tree chart
-        $("#svg-osd-tree-osd").html(svgOsd).contents();
-        $("#svg-osd-tree-host").html(svgHost).contents();
-
         $("#gridOSDs").contrailGrid({
 
             header: {
@@ -226,11 +222,7 @@ cephOSDsView = function () {
         });
 
         getOSDs();
-        tenantStorageChartsInitializationStatus['disks'] = true;        
-
-        this.osdsTree.init();
-        getOSDsTree();
-
+        tenantStorageChartsInitializationStatus['disks'] = true;
     }
 
     this.load = function (obj) {
@@ -240,6 +232,11 @@ cephOSDsView = function () {
         $('#osdsTabStrip').contrailTabs({
             activate: onTabActivate
         });
+
+        /**
+        * init host tree svg
+        */
+        tenantStorageDisksView.osdsTree.init();
        
         self.updateViewByHash(layoutHandler.getURLHashParams());
     };
@@ -357,6 +354,17 @@ cephOSDsView = function () {
                 $("#gridOSDs").data("contrailGrid").refreshView()
             } else{
                 populateOSDs();
+            }
+        } else if(selTab == 'Host Tree'){
+            if(tenantStorageChartsInitializationStatus['host_tree']){
+                if(tenantStorageDisksView.osdsTreeData == null)
+                    getOSDsTree();
+                else
+                    tenantStorageDisksView.osdsTree.update(tenantStorageDisksView.osdsTreeData, true);
+            }else{
+                if(tenantStorageDisksView.osdsTree.svgTree == '')
+                    tenantStorageDisksView.osdsTree.init();
+                getOSDsTree();
             }
         }
         /* else if(selTab == 'Joint Tree'){
@@ -860,32 +868,42 @@ function parseOSDsTreeData(data){
 }
 
 function osdTree() {
-    this.init = function () {
-        var self = this,
-            margin = {top: 20, right: 120, bottom: 20, left: 120};
-            
-        this.lastClickedNode = null;
-        this.width = 960 - margin.right - margin.left;
-        this.height = 500 - margin.top - margin.bottom;
-        this.duration = 750;
-        this.expandedNodes = []; 
+    var self = this;
+    this.margin = {top: 20, right: 120, bottom: 20, left: 120};
+    this.lastClickedNode = null;
+    this.width = 960 - self.margin.right - self.margin.left;
+    this.height = 500 - self.margin.top - self.margin.bottom;
+    this.duration = 750;
+    this.expandedNodes = [];
+    this.root = null;
+    this.svgTree = '';
 
-        this.tree = d3.layout.cluster()
-            .size([this.height, this.width]);
+    this.tree = d3.layout.cluster()
+        .size([this.height, this.width]);
 
-        this.diagonal = d3.svg.diagonal()
-            .projection(function (d) {
-                return [d.y, d.x];
-            });
+    this.diagonal = d3.svg.diagonal()
+        .projection(function (d) {
+            return [d.y, d.x];
+        });
 
-        this.infoTooltip = nv.tooltip;
+    this.infoTooltip = nv.tooltip;
 
-        this.svgTree = d3.select("#osd-tree").append("svg")
-            .attr("width", this.width + margin.right + margin.left)
-            .attr("height", this.height + margin.top + margin.bottom)
+    this.init = function(){
+        var tree = tenantStorageDisksView.osdsTree
+        d3.select("#osd-tree").html('');
+        tenantStorageDisksView.osdsTree.svgTree = d3.select("#osd-tree").append("svg")
+            .attr("width", tree.width + tree.margin.right + tree.margin.left)
+            .attr("height", tree.height + tree.margin.top + tree.margin.bottom)
             .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform", "translate(" + tree.margin.left + "," + tree.margin.top + ")");
+
+        // SVGs for Tree chart
+        $("#svg-osd-tree-osd").html(svgOsd).contents();
+        $("#svg-osd-tree-host").html(svgHost).contents();
+
+        tenantStorageChartsInitializationStatus['host_tree'] = true;
     }
+    
     function collapse(d) {
         if (d.children) {
             d._children = d.children;
@@ -909,14 +927,11 @@ function osdTree() {
     }
 
     this.update = function(source, root_flag) {
-        if(root_flag) {
-            root.x0 = this.height / 2;
-            root.y0 = 0;
+        if(root_flag && source != null) {
+            source.x0 = tenantStorageDisksView.osdsTree.height / 2;
+            source.y0 = 0;
             var duration = 750;
-            diagonal = this.diagonal;
-
-            //root.children.forEach(collapse);
-            //source = root;
+            diagonal = tenantStorageDisksView.osdsTree.diagonal;
 
             if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
                 var clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
@@ -924,19 +939,19 @@ function osdTree() {
             }
             else {
                 source.children.forEach(collapse);
-                root = source;
+                tenantStorageDisksView.osdsTree.root = source;
             }
-        }
 
+        }
         // Compute the new tree layout.
-        var nodes = this.tree.nodes(root).reverse(),
-            links = this.tree.links(nodes);
+        nodes = tenantStorageDisksView.osdsTree.tree.nodes(tenantStorageDisksView.osdsTree.root).reverse(),
+        links = tenantStorageDisksView.osdsTree.tree.links(nodes);
 
         // Normalize for fixed-depth.
         nodes.forEach(function(d) { d.y = d.depth * 180; });
-
+        
         // Update the nodes…
-        var node = this.svgTree.selectAll("g.node")
+        var node = tenantStorageDisksView.osdsTree.svgTree.selectAll("g.node")
             .data(nodes, function(d) { return d.id; });
 
         // Enter any new nodes at the parent's previous position.
@@ -1093,6 +1108,7 @@ function osdTree() {
 
         if(d.type == 'host' || d.type == 'root'){
             tooltipContents.push({lbl: 'Status', value: (function(){ return getHostStatusTmpl(d['status'])})()});
+            tooltipClass = 'tree-host-tip';
         }
 
         if (d.type == 'osd') {
@@ -1104,7 +1120,7 @@ function osdTree() {
                 tooltipContents.push({lbl: 'Apply Latency', value: d['fs_perf_stat']['apply_latency_ms'] + ' ms'});
                 tooltipContents.push({lbl: 'Commit Latency', value: d['fs_perf_stat']['commit_latency_ms'] + ' ms'});
             }
-            tooltipClass = 'tree-tip';
+            tooltipClass = 'tree-disk-tip';
         }
         var content = formatTreeLblValueTooltip(tooltipContents);
         infoTooltip.show([d3.event.pageX, d3.event.pageY], content, 'n', 10, $('#osd-tree svg')[0], tooltipClass);
