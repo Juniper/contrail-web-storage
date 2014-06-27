@@ -48,6 +48,8 @@ var infraMonitorStorageUtils = {
             obj['downNodeCnt'] = 0;
             obj['nodeAlerts'] = infraMonitorStorageAlertUtils.processStorageNodeAlerts(obj);
             obj['alerts'] = obj['nodeAlerts'].sort(dashboardUtils.sortInfraAlerts);
+            var versionArr = host['build_info'].split(" ");
+            obj['version'] = "Ceph "+ versionArr[2];
 
             if (obj['color'] == d3Colors['red']) {
                 obj['downNodeCnt']++;
