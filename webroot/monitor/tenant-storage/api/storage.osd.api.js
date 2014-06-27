@@ -322,15 +322,11 @@ function getStorageOSDFlowSeries (req, res, appData) {
     var name = source +":"+osdName;
 
     var tableName, whereClause,
-        selectArr = ["T", "name"];
+        selectArr = ["T", "name", "info_stats.reads", "info_stats.writes", "info_stats.read_kbytes","info_stats.write_kbytes" ];
 
-    tableName = 'StatTable.ComputeStorageOsd.osd_stats';
-    selectArr.push("osd_stats.uuid");
-    selectArr.push("osd_stats.osd_name");
-    selectArr.push("osd_stats.reads");
-    selectArr.push("osd_stats.writes");
-    selectArr.push("osd_stats.read_kbytes");
-    selectArr.push("osd_stats.write_kbytes");
+    tableName = 'StatTable.ComputeStorageOsd.info_stats';
+    selectArr.push("info_stats.uuid");
+    selectArr.push("info_stats.osd_name");
     whereClause = [
         {'Source':source},
         {'name':name}
@@ -357,19 +353,23 @@ function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran)
 {
     var len = 0;
     var resultJSON = {};
-    try{
-        resultJSON['summary'] = {};
-        resultJSON['summary']['start_time'] = timeObj['start_time'];
-        resultJSON['summary']['end_time'] = timeObj['end_time'];
-        resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
-        resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
-        resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['osd_stats.uuid'];
-        resultJSON['summary']['osd_name'] = storageFlowSeriesData['value'][0]['osd_stats.osd_name'];
-        resultJSON['flow-series'] = formatOsdSeriesLoadXMLData(storageFlowSeriesData);
-        return resultJSON;
-    } catch (e) {
-        logutils.logger.error("In formatFlowSeriesForOsdStats(): JSON Parse error: " + e);
-        return null;
+    console.log(timeObj);
+    console.log(storageFlowSeriesData['value']);
+    if(storageFlowSeriesData['value'].length > 0) {
+        try {
+            resultJSON['summary'] = {};
+            resultJSON['summary']['start_time'] = timeObj['start_time'];
+            resultJSON['summary']['end_time'] = timeObj['end_time'];
+            resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
+            resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
+            resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['info_stats.uuid'];
+            resultJSON['summary']['osd_name'] = storageFlowSeriesData['value'][0]['info_stats.osd_name'];
+            resultJSON['flow-series'] = formatOsdSeriesLoadXMLData(storageFlowSeriesData);
+            return resultJSON;
+        } catch (e) {
+            logutils.logger.error("In formatFlowSeriesForOsdStats(): JSON Parse error: " + e);
+            return null;
+        }
     }
 }
 
@@ -383,10 +383,10 @@ function formatOsdSeriesLoadXMLData (resultJSON)
        for (var i = 0; i < counter; i++) {
             results[i] = {};
             results[i]['MessageTS'] = resultJSON[i]['T'];
-            results[i]['reads'] = resultJSON[i]['osd_stats.reads'];
-            results[i]['writes'] = resultJSON[i]['osd_stats.writes'];
-            results[i]['reads_kbytes'] = resultJSON[i]['osd_stats.read_kbytes'];
-            results[i]['writes_kbytes'] = resultJSON[i]['osd_stats.write_kbytes'];
+            results[i]['reads'] = resultJSON[i]['info_stats.reads'];
+            results[i]['writes'] = resultJSON[i]['info_stats.writes'];
+            results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
+            results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
         }
         return results;
     } catch (e) {

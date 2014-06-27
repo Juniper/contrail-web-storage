@@ -106,14 +106,10 @@ function getStoragePoolFlowSeries (req, res, appData) {
     var name = source +":"+poolName;
 
     var tableName, whereClause,
-        selectArr = ["T", "name"];
+        selectArr = ["T", "name", "info_stats.reads", "info_stats.writes", "info_stats.read_kbytes","info_stats.write_kbytes" ];
 
-    tableName = 'StatTable.ComputeStoragePool.pool_stats';
-    selectArr.push("pool_stats.pool");
-    selectArr.push("pool_stats.reads");
-    selectArr.push("pool_stats.writes");
-    selectArr.push("pool_stats.read_kbytes");
-    selectArr.push("pool_stats.write_kbytes");
+    tableName = 'StatTable.ComputeStoragePool.info_stats';
+    selectArr.push("info_stats.pool");
     whereClause = [
         {'Source':source},
         {'name':name}
@@ -140,19 +136,21 @@ function formatFlowSeriesForPoolStats(storageFlowSeriesData, timeObj, timeGran)
 {
     var len = 0;
     var resultJSON = {};
-    try {
-        resultJSON['summary'] = {};
-        resultJSON['summary']['start_time'] = timeObj['start_time'];
-        resultJSON['summary']['end_time'] = timeObj['end_time'];
-        resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
-        resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
-        resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['uuid'];
-        resultJSON['summary']['pool_name'] = storageFlowSeriesData['value'][0]['pool_stats.pool'];
-        resultJSON['flow-series'] = formatPoolSeriesLoadXMLData(storageFlowSeriesData);
-        return resultJSON;
-    } catch (e) {
-        logutils.logger.error("In formatFlowSeriesForPoolStats(): JSON Parse error: " + e);
-        return null;
+    if(storageFlowSeriesData['value'].length > 0) {
+        try {
+            resultJSON['summary'] = {};
+            resultJSON['summary']['start_time'] = timeObj['start_time'];
+            resultJSON['summary']['end_time'] = timeObj['end_time'];
+            resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
+            resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
+            resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['uuid'];
+            resultJSON['summary']['pool_name'] = storageFlowSeriesData['value'][0]['info_stats.pool'];
+            resultJSON['flow-series'] = formatPoolSeriesLoadXMLData(storageFlowSeriesData);
+            return resultJSON;
+        } catch (e) {
+            logutils.logger.error("In formatFlowSeriesForPoolStats(): JSON Parse error: " + e);
+            return null;
+        }
     }
 }
 
@@ -166,10 +164,10 @@ function formatPoolSeriesLoadXMLData (resultJSON)
         for (var i = 0; i < counter; i++) {
             results[i] = {};
             results[i]['MessageTS'] = resultJSON[i]['T'];
-            results[i]['reads'] = resultJSON[i]['pool_stats.reads'];
-            results[i]['writes'] = resultJSON[i]['pool_stats.writes'];
-            results[i]['reads_kbytes'] = resultJSON[i]['pool_stats.read_kbytes'];
-            results[i]['writes_kbytes'] = resultJSON[i]['pool_stats.write_kbytes'];
+            results[i]['reads'] = resultJSON[i]['info_stats.reads'];
+            results[i]['writes'] = resultJSON[i]['info_stats.writes'];
+            results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
+            results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
 
         }
         return results;

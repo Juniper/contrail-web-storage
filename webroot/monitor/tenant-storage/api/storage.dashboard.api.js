@@ -3,6 +3,7 @@
  */
 var storageConfig = require('../../../common/js/storage.config.global');
 
+var storageGlobal = require('../../../common/js/storage.global');
 var storageApi= require('../../../common/api/storage.api.constants');
 
 var cacheApi = require(storageConfig.core_path +
@@ -19,9 +20,9 @@ storageDashboardApi = module.exports;
 
 function getStorageClusterStatus(req, res ){
     url = storageApi.url.status;//"/status";
-   // console.log("get data:"+url);
-    cacheApi.queueDataFromCacheOrSendRequest(req, res, global.STR_JOB_TYPE_CACHE,
-                                             global.STR_STORAGE_TYPE_CLUSTER, url,
+    console.log("get data:"+url);
+    cacheApi.queueDataFromCacheOrSendRequest(req, res, storageGlobal.STR_JOB_TYPE_CACHE,
+        storageGlobal.STR_STORAGE_TYPE_CLUSTER, url,
                                              0, 1, 0, -1, true, null);
 }
 
