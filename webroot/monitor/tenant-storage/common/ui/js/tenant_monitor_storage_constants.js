@@ -11,7 +11,8 @@ var color_info = '#1F77B4',
 var refreshTimeout = 30000;
 
 var tenantStorageChartsInitializationStatus = {
-    disks   : false,
+    disks       : false,
+    host_tree   : false
 }
 
 disksTabs = ['Scatter Plot', 'Host Tree', 'Details'];
