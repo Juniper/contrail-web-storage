@@ -1086,68 +1086,6 @@ function disksBarChart(){
     }
 }
 
-function activityLineChart(){
-    var chart;
-
-    this.init = function(chartId){
-
-        chart = nv.models.lineChart()
-            .margin({top: 30, right: 20, bottom: 20, left: 5})
-            //.useInteractiveGuideline(false)
-            //.transitionDuration(350)
-            .showLegend(false)
-            .showYAxis(false)
-            .showXAxis(true);
-
-        if(chartId == '#clusterActivityThrptChart') {
-            chart.tooltipContent(function (key, x, y, e, graph) {
-                return '<h3> ' + key + ' Throughput </h3>' +
-                    '<p>' + e.point.y + ' Mbps</p>';
-            });
-            chart.yAxis.tickFormat(d3.format('.02f'));
-        }
-        else if(chartId == '#clusterActivityIopsChart') {
-            chart.tooltipContent(function (key, x, y, e, graph) {
-                return '<h3> ' + key + ' IOPs</h3>' +
-                    '<p>' + e.point.y + ' </p>';
-            });
-        }
-        else if(chartId == '#clusterActivityObjChart') {
-            chart.tooltipContent(function (key, x, y, e, graph) {
-                return '<h3> ' + key + ' </h3>' +
-                    '<p>' + e.point.y + '</p>';
-            });
-        }
-        else if(chartId == '#clusterActivityLatencyChart') {
-            chart.tooltipContent(function (key, x, y, e, graph) {
-                return '<h3> ' + key + ' </h3>' +
-                    '<p>' + e.point.y + ' ms</p>';
-            });
-        }
-        else{
-            chart.yAxis.tickFormat(d3.format('.0f'));
-        }
-        chart.xAxis
-            .axisLabel('')
-            .tickFormat(d3.format(',.0f'));
-
-        this.chart = chart;
-        this.chartId = chartId;
-        this.d3ChartElem = d3.select(this.chartId).append('svg');
-
-    }
-    this.draw = function(){
-        nv.addGraph(function(){ return this.chart});
-    }
-    this.refresh = function(data){
-        this.d3ChartElem
-            .datum(data)
-            .call(this.chart);
-
-        //nv.utils.windowResize(function() { this.chart.update });
-    }
-}
-
 /* Disks Scatter Plot
 
  */
