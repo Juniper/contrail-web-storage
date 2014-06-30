@@ -3,8 +3,30 @@ var infraMonitorStorageAlertUtils = {
     processStorageNodeAlerts : function(obj){
         var alertsList = [];
         var infoObj = {name:obj['name'],type:'Storage Node',ip:obj['ip']};
+
+        $.each(obj['osds'], function(idx,osd){
+            if(osd['status'] == 'down'){
+                if(!obj['isDiskDown']){
+                    obj['disk_down_list'] = []
+                    obj['isDiskDown'] = true
+                }
+                obj['disk_down_list'].push(osd['name'])
+            }
+            if(osd['cluster_status'] == 'out'){
+                if(!obj['isDiskOut']){
+                    obj['disk_out_list'] = []
+                    obj['isDiskOut'] = true
+                }
+                obj['disk_out_list'].push(osd['name'])
+            }
+        });
+
         if(obj['isDiskDown'] == true)
-            alertsList.push($.extend({},{sevLevel:sevLevels['WARNING'],msg:infraAlertMsgs['DISK_DOWN']},infoObj));
+            alertsList.push($.extend({},{sevLevel:sevLevels['ERROR'],msg:(storageInfraAlertMsgs['DISK_DOWN']).format(obj['disk_down_list'].length,obj['disk_down_list'])},infoObj));
+        
+        if(obj['isDiskOut'] == true)
+            alertsList.push($.extend({},{sevLevel:sevLevels['WARNING'],msg:(storageInfraAlertMsgs['DISK_OUT']).format(obj['disk_out_list'].length,obj['disk_out_list'])},infoObj));
+            
         if(obj['errorStrings'] != null && obj['errorStrings'].length > 0){
             $.each(obj['errorStrings'],function(idx,errorString){
                 alertsList.push($.extend({},{sevLevel:sevLevels['WARNING'],msg:errorString},infoObj));
@@ -46,8 +68,12 @@ var infraMonitorStorageUtils = {
             obj['status'] = host.status;
             obj['color'] = getStorageNodeColor(host, obj);
             obj['downNodeCnt'] = 0;
+            //initialize for alerts
+            obj['isDiskDown'] = obj['isDiskOut'] = false;
             obj['nodeAlerts'] = infraMonitorStorageAlertUtils.processStorageNodeAlerts(obj);
             obj['alerts'] = obj['nodeAlerts'].sort(dashboardUtils.sortInfraAlerts);
+            //currently we are not tracking any storage process alerts.
+            obj['processAlerts'] = [];
             var versionArr = host['build_info'].split(" ");
             obj['version'] = "Ceph "+ versionArr[2];
 

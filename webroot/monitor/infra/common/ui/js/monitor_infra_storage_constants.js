@@ -24,3 +24,10 @@ var monitorInfraStorageUrls = {
 var monitorInfraUrls = {
     QUERY                       : '/api/admin/reports/query'
 }
+
+var storageInfraAlertMsgs = {
+    DISK_DOWN           : "{0:Disk;Disks} down - {1}",
+    DISK_DOWN_LIST      : "{0} down",
+    DISK_OUT            : "{0:Disk;Disks} out of cluster - {1}",
+    DISK_OUT_LIST       : "{0} out of cluster"
+}
