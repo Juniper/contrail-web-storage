@@ -2,22 +2,34 @@
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 
-storageNodesView = function(){
-    this.load = function(obj){
-        var hashParams = ifNullOrEmptyObject(obj['hashParams'],{node:''});
+storageNodesView = function() {
+    this.load = function(obj) {
+        var hashParams = ifNullOrEmptyObject(obj['hashParams'], {
+            node: ''
+        });
         if (hashParams['node'].indexOf('Storage Nodes:') == 0) {
-            storNodeView.load({name: hashParams['node'].split(':')[1], tab: hashParams['tab']});
+            storNodeView.load({
+                name: hashParams['node'].split(':')[1],
+                tab: hashParams['tab']
+            });
         } else {
-            layoutHandler.setURLHashParams({node:'Storage Nodes'},{merge:false,triggerHashChange:false});
-            populateStorageNodes();    
+            layoutHandler.setURLHashParams({
+                node: 'Storage Nodes'
+            }, {
+                merge: false,
+                triggerHashChange: false
+            });
+            populateStorageNodes();
         }
     }
 
-    this.updateViewByHash = function(hashObj,lastHashObj) {
-        this.load({hashParams:hashObj});
+    this.updateViewByHash = function(hashObj, lastHashObj) {
+        this.load({
+            hashParams: hashObj
+        });
     }
 
-    function populateStorageNodes(){
+    function populateStorageNodes() {
 
         infraMonitorStorageUtils.clearTimers();
         storageSummaryChartsInitializationStatus['storageNode'] = false;
@@ -28,22 +40,25 @@ storageNodesView = function(){
         var storageNodesDataSource = storageNodesResult['dataSource'];
         var storageDeferredObj = storageNodesResult['deferredObj'];
         //Initialize widget header
-        $('#storageNodes-header').initWidgetHeader({title:'Storage Nodes',widgetBoxId :'recent'});
-        $(storageNodeDS).on('change',function() {
-            updateStorageChartsForSummary(storageNodesDataSource.getItems(),'storageNodes');
+        $('#storageNodes-header').initWidgetHeader({
+            title: 'Storage Nodes',
+            widgetBoxId: 'recent'
+        });
+        $(storageNodeDS).on('change', function() {
+            updateStorageChartsForSummary(storageNodesDataSource.getItems(), 'storageNodes');
         });
         $('#gridStorageNodes').contrailGrid({
-            header : {
-                title : {
-                    text : 'Storage Nodes',
-                    cssClass : 'blue'
+            header: {
+                title: {
+                    text: 'Storage Nodes',
+                    cssClass: 'blue'
                 },
                 customControls: []
             },
             body: {
                 options: {
-                    rowHeight : 30,
-                    autoHeight : true,
+                    rowHeight: 30,
+                    autoHeight: true,
                     enableAsyncPostRender: true,
                     forceFitColumns: true
                 },
@@ -64,67 +79,64 @@ storageNodesView = function(){
                     }
                 }
             },
-            footer : {
-                pager : {
-                    options : {
-                        pageSize : 50,
-                        pageSizeSelect : [10, 50, 100, 200, 500 ]
+            footer: {
+                pager: {
+                    options: {
+                        pageSize: 50,
+                        pageSizeSelect: [10, 50, 100, 200, 500]
                     }
                 }
             },
             columnHeader: {
-                columns:[
-                    {
-                        field:"name",
-                        name:"Host name",
-                        formatter:function(r,c,v,cd,dc) {
-                            return cellTemplateLinks({cellText:'name',name:'name',statusBubble:true,rowData:dc});
-                        },
-                        events: {
-                            onClick: function(e,dc){
-                                onStorNodeRowSelChange(dc);
-                            }
-                        },
-                        cssClass: 'cell-hyperlink-blue',
-                        minWidth:150
+                columns: [{
+                    field: "name",
+                    name: "Host name",
+                    formatter: function(r, c, v, cd, dc) {
+                        return cellTemplateLinks({
+                            cellText: 'name',
+                            name: 'name',
+                            statusBubble: true,
+                            rowData: dc
+                        });
                     },
-                    {
-                        field:"status",
-                        name:"Status",
-                        formatter: function(r,c,v,cd,dc) {
-                            return getStorageNodeStatusTmpl(dc['status'])
-                        },
-                        minWidth:50
-                    },
-                    {
-                        field:"",
-                        name:"Disks",
-                        minWidth:30,
-                        formatter:function(r,c,v,cd,dc){
-                            return dc['osds'].length;
+                    events: {
+                        onClick: function(e, dc) {
+                            onStorNodeRowSelChange(dc);
                         }
                     },
-                    {
-                        field:"osds_total",
-                        name:"Disks Space (GB)",
-                        minWidth:50,
+                    cssClass: 'cell-hyperlink-blue',
+                    minWidth: 150
+                }, {
+                    field: "status",
+                    name: "Status",
+                    formatter: function(r, c, v, cd, dc) {
+                        return getStorageNodeStatusTmpl(dc['status'])
                     },
-                    {
-                        field:"osds_used",
-                        name:"Disks Used Space (GB)",
-                        minWidth:60,
-                    },
-                    {
-                        field:"total",
-                        name:"Root HD Space (GB)",
-                        minWidth:60
-                    },
-                    {
-                        field:"available_perc",
-                        name:"Root HD Available (%)",
-                        minWidth:60
+                    minWidth: 50
+                }, {
+                    field: "",
+                    name: "Disks",
+                    minWidth: 30,
+                    formatter: function(r, c, v, cd, dc) {
+                        return dc['osds'].length;
                     }
-                ],
+                }, {
+                    field: "osds_total",
+                    name: "Disks Space (GB)",
+                    minWidth: 50,
+                }, {
+                    field: "osds_used",
+                    name: "Disks Used Space (GB)",
+                    minWidth: 60,
+                }, {
+                    field: "total",
+                    name: "Root HD Space (GB)",
+                    minWidth: 60
+                }, {
+                    field: "available_perc",
+                    name: "Root HD Available (%)",
+                    minWidth: 60
+                }],
             }
         });
         var storNodesGrid = $('#gridStorageNodes').data('contrailGrid');
@@ -134,7 +146,7 @@ storageNodesView = function(){
         storageDeferredObj.fail(function() {
             storNodesGrid.showGridMessage('errorGettingData');
         });
-        if(storageNodesResult['lastUpdated'] != null && (storageNodesResult['error'] == null || storageNodesResult['error']['errTxt'] == 'abort')){
+        if (storageNodesResult['lastUpdated'] != null && (storageNodesResult['error'] == null || storageNodesResult['error']['errTxt'] == 'abort')) {
             triggerDatasourceEvents(storageNodeDS);
         } else {
             storNodesGrid.showGridMessage('loading');
@@ -143,26 +155,28 @@ storageNodesView = function(){
 
     function onStorNodeRowSelChange(dc) {
         var storNodesGrid = $('#gridStorageNodes').data('contrailGrid');
-        storNodeView.load({name:dc['name']});
+        storNodeView.load({
+            name: dc['name']
+        });
     }
 
 }
-storageNodeView = function(){
+storageNodeView = function() {
     var self = this;
     var storNodeTabStrip = "storage-tabstrip";
     var storNodeTabs = ['details', 'disks', 'monitor'];
     var storNodeDisksTabStrip = "storage-disks-tabstrip";
     var storNodeDisksTabs = ['summary', 'details'];
-    this.load = function(obj){
+    this.load = function(obj) {
         pushBreadcrumb([obj['name']]);
         storNodeInfo = obj;
-        if((storNodeInfo == null || storNodeInfo.name ==  null ||  storNodeInfo.name == '') && storNodeInfo.name != null){
+        if ((storNodeInfo == null || storNodeInfo.name == null || storNodeInfo.name == '') && storNodeInfo.name != null) {
             var storageNodeDeferredObj = $.Deferred();
-            self.getStorageNodeDetails(storageNodeDeferredObj,storNodeInfo);
+            self.getStorageNodeDetails(storageNodeDeferredObj, storNodeInfo);
             storageNodeDeferredObj.done(function(data) {
-                try{
+                try {
                     storNodeInfo['name'] = data.name;
-                }catch(e){}
+                } catch (e) {}
                 self.populateStorageNode(storNodeInfo);
             });
         } else {
@@ -170,27 +184,27 @@ storageNodeView = function(){
         }
     }
 
-    this.destroy = function () {
+    this.destroy = function() {
 
     }
 
-    this.getStorageNodeDetails = function(deferredObj,obj) {
+    this.getStorageNodeDetails = function(deferredObj, obj) {
         $.ajax({
-            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['name'])
+            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'], obj['name'])
         }).done(function(response) {
             deferredObj.resolve(response);
         });
     }
 
-    this.populateStorageNode = function(obj){
-        if(obj['tab'] == null)
+    this.populateStorageNode = function(obj) {
+        if (obj['tab'] == null)
             obj['tab'] = '';
         if (!isInitialized('#storage-tabstrip')) {
             var storNodeTemplate = Handlebars.compile($("#storagenode-template").html());
             $(pageContainer).html(storNodeTemplate(storNodeInfo));
 
             $("#storage-tabstrip").contrailTabs({
-                activate:function (e, ui) {
+                activate: function(e, ui) {
                     var selTab = ui.newTab.context.innerText;
                     if (selTab == 'Disks') {
                         populateDisksSummaryTab(storNodeInfo);
@@ -203,11 +217,10 @@ storageNodeView = function(){
             });
         }
         if (obj['tab'] != '' && obj['tab'] != 'details') {
-            selectTab(storNodeTabStrip,storNodeTabs.indexOf(obj['tab'].split(':')[0]));
+            selectTab(storNodeTabStrip, storNodeTabs.indexOf(obj['tab'].split(':')[0]));
             if (obj['tab'].split(':')[0] == 'disks') {
                 populateDisksSummaryTab(obj);
-            }
-            else if (obj['tab'].split(':')[0] == 'monitor') {
+            } else if (obj['tab'].split(':')[0] == 'monitor') {
                 populateMonitorTab(obj);
             }
         } else {
@@ -222,14 +235,24 @@ storageNodeView = function(){
         }
     }
 
-    this.processOSDAlerts = function(obj){
+    this.processOSDAlerts = function(obj) {
         var alertsList = [];
-        var infoObj = {name:obj['name'],type:'Storage Node',ip:obj['ip']};
-        if(obj['isDiskDown'] == true)
-            alertsList.push($.extend({},{sevLevel:sevLevels['WARNING'],msg:infraAlertMsgs['DISK_DOWN']},infoObj));
-        if(obj['errorStrings'] != null && obj['errorStrings'].length > 0){
-            $.each(obj['errorStrings'],function(idx,errorString){
-                alertsList.push($.extend({},{sevLevel:sevLevels['WARNING'],msg:errorString},infoObj));
+        var infoObj = {
+            name: obj['name'],
+            type: 'Storage Node',
+            ip: obj['ip']
+        };
+        if (obj['isDiskDown'] == true)
+            alertsList.push($.extend({}, {
+                sevLevel: sevLevels['WARNING'],
+                msg: infraAlertMsgs['DISK_DOWN']
+            }, infoObj));
+        if (obj['errorStrings'] != null && obj['errorStrings'].length > 0) {
+            $.each(obj['errorStrings'], function(idx, errorString) {
+                alertsList.push($.extend({}, {
+                    sevLevel: sevLevels['WARNING'],
+                    msg: errorString
+                }, infoObj));
             });
         }
         return alertsList.sort(dashboardUtils.sortInfraAlerts);
@@ -238,7 +261,7 @@ storageNodeView = function(){
     function populateDisksTab(obj) {
         if (!isInitialized('#storage-disks-tabstrip')) {
             $("#storage-disks-tabstrip").contrailTabs({
-                activate: function (e, ui) {
+                activate: function(e, ui) {
                     var selTab = ui.newTab.context.innerText;
                     if (selTab == 'Summary') {
                         populateDisksSummaryTab(storNodeInfo);
@@ -251,31 +274,34 @@ storageNodeView = function(){
 
         if (obj['tab'].split(':')[1] == 'summary' || obj['tab'].split(':')[1] == null) {
             populateDisksSummaryTab(obj);
-        }
-        else{
+        } else {
             populateDiskDetailsTab(obj);
         }
     }
 
-    function populateDisksSummaryTab(obj){
+    function populateDisksSummaryTab(obj) {
         //selectTab(storNodeDisksTabStrip,storNodeDisksTabs.indexOf('summary'));
-        layoutHandler.setURLHashParams({tab: 'disks:summary', node: 'Storage Nodes:' + obj['name']}, {triggerHashChange: false});
+        layoutHandler.setURLHashParams({
+            tab: 'disks:summary',
+            node: 'Storage Nodes:' + obj['name']
+        }, {
+            triggerHashChange: false
+        });
         $.ajax({
-            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['name'])
-        }).done(function (response) {
+            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'], obj['name'])
+        }).done(function(response) {
             var osds = response.host_details.osds;
             var hostname = obj['name'];
             var osdArr = [];
             var osdsDV = new ContrailDataView();
             var statusTemplate = contrail.getTemplate4Id("storage-status-template");
-            $.each(osds, function (idx, osd) {
+            $.each(osds, function(idx, osd) {
                 if (osd.kb) {
                     osd.avail_percent = parseFloat(((osd.kb_avail / osd.kb) * 100).toFixed(2));
                     osd.gb = formatBytes(osd.kb * 1024);
                     osd.gb_avail = formatBytes(osd.kb_avail * 1024);
                     osd.gb_used = formatBytes(osd.kb_used * 1024);
-                }
-                else {
+                } else {
                     osd.gb = 'N/A';
                     osd.gb_used = 'N/A';
                     osd.gb_avail = 'N/A';
@@ -283,12 +309,24 @@ storageNodeView = function(){
                 }
                 osd.hostname = hostname;
 
-                osd.status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
-                if(osd.status == 'down')
-                    osd.status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
-                osd.cluster_status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
-                if(osd.cluster_status == 'out')
-                    osd.cluster_status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
+                osd.status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['NOTICE'],
+                    sevLevels: sevLevels
+                }) + " up</span>";
+                if (osd.status == 'down')
+                    osd.status_tmpl = "<span> " + statusTemplate({
+                        sevLevel: sevLevels['ERROR'],
+                        sevLevels: sevLevels
+                    }) + " down</span>";
+                osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['INFO'],
+                    sevLevels: sevLevels
+                }) + " in</span>";
+                if (osd.cluster_status == 'out')
+                    osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                        sevLevel: sevLevels['WARNING'],
+                        sevLevels: sevLevels
+                    }) + " out</span>";
 
                 osdArr.push(osd);
             });
@@ -305,56 +343,48 @@ storageNodeView = function(){
                     }
                 },
                 columnHeader: {
-                    columns: [
-                        {
-                            field: "id",
-                            name: "ID",
-                            width: 30
+                    columns: [{
+                        field: "id",
+                        name: "ID",
+                        width: 30
+                    }, {
+                        field: "status",
+                        name: "Status",
+                        formatter: function(r, c, v, cd, dc) {
+                            return dc['status_tmpl'];
                         },
-                        {
-                            field: "status",
-                            name: "Status",
-                            formatter: function(r,c,v,cd,dc){
-                                return dc['status_tmpl'];
-                            },
-                            width: 30
+                        width: 30
+                    }, {
+                        field: "cluster_status",
+                        name: "Membership",
+                        formatter: function(r, c, v, cd, dc) {
+                            return dc['cluster_status_tmpl'];
                         },
-                        {
-                            field: "cluster_status",
-                            name: "Membership",
-                            formatter: function(r,c,v,cd,dc){
-                                return dc['cluster_status_tmpl'];
-                            },
-                            cssClass: 'grid-status-label',
-                            width: 40
+                        cssClass: 'grid-status-label',
+                        width: 40
+                    }, {
+                        field: "name",
+                        name: "OSD name",
+                        events: {
+                            onClick: function(e, dc) {
+                                onDisksRowSelChange(dc);
+                            }
                         },
-                        {
-                            field: "name",
-                            name: "OSD name",
-                            events: {
-                                onClick: function(e,dc){
-                                    onDisksRowSelChange(dc);
-                                }
-                            },
-                            cssClass: 'cell-hyperlink-blue',
-                            minWidth: 80
-                        },
-                        {
-                            field: "gb",
-                            name: "Total GB",
-                            minWidth: 100
-                        },
-                        {
-                            field: "gb_used",
-                            name: "Used GB",
-                            minWidth: 100
-                        },
-                        {
-                            field: "avail_percent",
-                            name: "Available %",
-                            minWidth: 100
-                        }
-                    ]
+                        cssClass: 'cell-hyperlink-blue',
+                        minWidth: 80
+                    }, {
+                        field: "gb",
+                        name: "Total GB",
+                        minWidth: 100
+                    }, {
+                        field: "gb_used",
+                        name: "Used GB",
+                        minWidth: 100
+                    }, {
+                        field: "avail_percent",
+                        name: "Available %",
+                        minWidth: 100
+                    }]
                 },
                 body: {
                     options: {
@@ -364,14 +394,21 @@ storageNodeView = function(){
                         forceFitColumns: true,
                         detail: {
                             template: '',
-                            onInit: function (e, dc) {
+                            onInit: function(e, dc) {
                                 var noDataStr = "N/A";
-                                setTimeout(function () {
-                                    var detailsInfo = [
-                                        {lbl: 'UUID', value: dc['uuid']},
-                                        {lbl: 'Hostname', value: dc['hostname']},
-                                        {lbl: 'State', value: dc['state']},
-                                        {lbl: 'Apply Latency', value: (function () {
+                                setTimeout(function() {
+                                    var detailsInfo = [{
+                                        lbl: 'UUID',
+                                        value: dc['uuid']
+                                    }, {
+                                        lbl: 'Hostname',
+                                        value: dc['hostname']
+                                    }, {
+                                        lbl: 'State',
+                                        value: dc['state']
+                                    }, {
+                                        lbl: 'Apply Latency',
+                                        value: (function() {
                                             try {
                                                 var perf = ifNullOrEmpty(dc['fs_perf_stat']['apply_latency_ms'], noDataStr);
                                                 if (perf != noDataStr) {
@@ -381,8 +418,10 @@ storageNodeView = function(){
                                             } catch (e) {
                                                 return noDataStr;
                                             }
-                                        })},
-                                        {lbl: 'Commit Latency', value: (function () {
+                                        })
+                                    }, {
+                                        lbl: 'Commit Latency',
+                                        value: (function() {
                                             try {
                                                 var perf = ifNullOrEmpty(dc['fs_perf_stat']['commit_latency_ms'], noDataStr);
                                                 if (perf != noDataStr) {
@@ -392,18 +431,21 @@ storageNodeView = function(){
                                             } catch (e) {
                                                 return noDataStr;
                                             }
-                                        })}
-                                    ];
-                                    var moreLink = '#p=mon_storage_disks&q[tab]=details:'+ dc['name'] +'&q[node]='+ dc['hostname'];
+                                        })
+                                    }];
+                                    var moreLink = '#p=mon_storage_disks&q[tab]=details:' + dc['name'] + '&q[node]=' + dc['hostname'];
                                     var detailsTmpl = contrail.getTemplate4Id('storage-grid-details-template');
-                                    $(e.detailRow).html(detailsTmpl({d:detailsInfo, detailLink:moreLink}));
+                                    $(e.detailRow).html(detailsTmpl({
+                                        d: detailsInfo,
+                                        detailLink: moreLink
+                                    }));
                                     $("#gridDisksDash").data('contrailGrid').adjustDetailRowHeight(dc.id);
                                 }, 1000);
                             },
-                            onExpand: function (e, dc) {
+                            onExpand: function(e, dc) {
 
                             },
-                            onCollapse: function (e, dc) {
+                            onCollapse: function(e, dc) {
 
                             }
                         }
@@ -429,32 +471,39 @@ storageNodeView = function(){
                     pager: {
                         options: {
                             pageSize: 10,
-                            pageSizeSelect: [ 5, 10, 50 ]
+                            pageSizeSelect: [5, 10, 50]
                         }
                     }
                 }
             });
             var dvGrid = $("#gridDisksDash").data('contrailGrid');
             dvGrid.removeGridLoading();
-        }).fail(function (result) {
+        }).fail(function(result) {
 
         });
 
         function onDisksRowSelChange(dc) {
-            layoutHandler.setURLHashParams({tab:'details:'+dc['name'], node:obj['name']}, {p:'mon_storage_disks'}, {triggerHashChange: true});
+            layoutHandler.setURLHashParams({
+                tab: 'details:' + dc['name'],
+                node: obj['name']
+            }, {
+                p: 'mon_storage_disks'
+            }, {
+                triggerHashChange: true
+            });
         }
 
 
     }
 
-    function populateDiskDetailsTab(obj){
+    function populateDiskDetailsTab(obj) {
         var deferredObj = $.Deferred();
-        selectTab(storNodeDisksTabStrip,storNodeDisksTabs.indexOf('details'));
+        selectTab(storNodeDisksTabStrip, storNodeDisksTabs.indexOf('details'));
 
         if (obj['tab'] == "" || obj['tab'].split(':')[0] == null) {
             $.ajax({
-                url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['name'])
-            }).done(function (response) {
+                url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'], obj['name'])
+            }).done(function(response) {
                 var osds = response.host_details.osds;
                 obj['tab'] = 'disks:details:' + osds[0].name;
                 deferredObj.resolve();
@@ -463,74 +512,115 @@ storageNodeView = function(){
             deferredObj.resolve();
         }
 
-        deferredObj.done(function(){
-            layoutHandler.setURLHashParams({tab: obj['tab'], node: 'Storage Nodes:' + obj['name']}, {triggerHashChange: false});
+        deferredObj.done(function() {
+            layoutHandler.setURLHashParams({
+                tab: obj['tab'],
+                node: 'Storage Nodes:' + obj['name']
+            }, {
+                triggerHashChange: false
+            });
             var osdName = obj['tab'].split(':')[2];
             var diskDashTemplate = contrail.getTemplate4Id('dashboard-template');
-            $('#disk-dashboard').html(diskDashTemplate({title: 'Disk', colCount: 2, showSettings: true, widgetBoxId: 'diskDash'}));
+            $('#disk-dashboard').html(diskDashTemplate({
+                title: 'Disk',
+                colCount: 2,
+                showSettings: true,
+                widgetBoxId: 'diskDash'
+            }));
             startWidgetLoading('diskDash');
             $.ajax({
-                url: contrail.format(monitorInfraStorageUrls['DISK_DETAILS'] , osdName)
-            }).done(function (response) {
+                url: contrail.format(monitorInfraStorageUrls['DISK_DETAILS'], osdName)
+            }).done(function(response) {
                 var diskData = response.osd_details;
                 var noDataStr = "N/A",
                     diskDashboardInfo;
 
-                diskDashboardInfo = [
-                    {lbl: 'Name', value: diskData['name']},
-                    {lbl: 'Hostname', value: diskData['host']},
-                    {lbl: 'IP Address', value: (function () {
+                diskDashboardInfo = [{
+                    lbl: 'Name',
+                    value: diskData['name']
+                }, {
+                    lbl: 'Hostname',
+                    value: diskData['host']
+                }, {
+                    lbl: 'IP Address',
+                    value: (function() {
                         try {
                             var ip = ifNullOrEmpty(diskData['public_addr'], noDataStr);
                             return ip.split(':')[0] + ', Port: ' + ip.split(':')[1];
                         } catch (e) {
                             return noDataStr;
                         }
-                    })()},
-                    {lbl: 'Status', value: (function(){
+                    })()
+                }, {
+                    lbl: 'Status',
+                    value: (function() {
                         var statusTmpl = contrail.getTemplate4Id('storage-status-template');
-                        if(diskData['status'] == "up")
-                            return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
-                        else if(diskData['status'] == "down")
-                            return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
+                        if (diskData['status'] == "up")
+                            return "<span> " + statusTmpl({
+                                sevLevel: sevLevels['NOTICE'],
+                                sevLevels: sevLevels
+                            }) + " up</span>";
+                        else if (diskData['status'] == "down")
+                            return "<span> " + statusTmpl({
+                                sevLevel: sevLevels['ERROR'],
+                                sevLevels: sevLevels
+                            }) + " down</span>";
                         else
                             return noDataStr;
-                    })()},
-                    {lbl: 'Cluster Membership', value: (function(){
+                    })()
+                }, {
+                    lbl: 'Cluster Membership',
+                    value: (function() {
                         var statusTmpl = contrail.getTemplate4Id('storage-status-template');
-                        if(diskData['cluster_status'] == "in")
-                            return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
-                        else if(diskData['cluster_status'] == "out")
-                            return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
+                        if (diskData['cluster_status'] == "in")
+                            return "<span> " + statusTmpl({
+                                sevLevel: sevLevels['INFO'],
+                                sevLevels: sevLevels
+                            }) + " in</span>";
+                        else if (diskData['cluster_status'] == "out")
+                            return "<span> " + statusTmpl({
+                                sevLevel: sevLevels['WARNING'],
+                                sevLevels: sevLevels
+                            }) + " out</span>";
                         else
                             return noDataStr;
-                    })()},
-                    {lbl: 'Total Space', value: (function(){
-                        try{
-                            if(diskData['kb'])
+                    })()
+                }, {
+                    lbl: 'Total Space',
+                    value: (function() {
+                        try {
+                            if (diskData['kb'])
                                 return formatBytes(diskData['kb'] * 1024);
                         } catch (e) {
                             return noDataStr;
                         }
-                    })()},
-                    {lbl: 'Used', value: (function(){
-                        try{
-                            if(diskData['kb_used'])
+                    })()
+                }, {
+                    lbl: 'Used',
+                    value: (function() {
+                        try {
+                            if (diskData['kb_used'])
                                 return formatBytes(diskData['kb_used'] * 1024);
                         } catch (e) {
                             return noDataStr;
                         }
-                    })()},
-                    {lbl: 'Available', value: (function(){
-                        try{
-                            if(diskData['kb_avail'])
+                    })()
+                }, {
+                    lbl: 'Available',
+                    value: (function() {
+                        try {
+                            if (diskData['kb_avail'])
                                 return formatBytes(diskData['kb_avail'] * 1024) + ' ( ' + parseFloat(((diskData['kb_avail'] / diskData['kb']) * 100).toFixed(2)) + "% )";
                         } catch (e) {
                             return noDataStr;
                         }
-                    })()},
-                    {lbl: 'UUID', value: diskData['uuid']},
-                    {lbl: 'Apply Latency', value: (function () {
+                    })()
+                }, {
+                    lbl: 'UUID',
+                    value: diskData['uuid']
+                }, {
+                    lbl: 'Apply Latency',
+                    value: (function() {
                         try {
                             var perf = ifNullOrEmpty(diskData['fs_perf_stat']['apply_latency_ms'], noDataStr);
                             if (perf != noDataStr) {
@@ -540,8 +630,10 @@ storageNodeView = function(){
                         } catch (e) {
                             return noDataStr;
                         }
-                    })},
-                    {lbl: 'Commit Latency', value: (function () {
+                    })
+                }, {
+                    lbl: 'Commit Latency',
+                    value: (function() {
                         try {
                             var perf = ifNullOrEmpty(diskData['fs_perf_stat']['commit_latency_ms'], noDataStr);
                             if (perf != noDataStr) {
@@ -551,10 +643,15 @@ storageNodeView = function(){
                         } catch (e) {
                             return noDataStr;
                         }
-                    })}
-                ];
+                    })
+                }];
                 var dashboardBodyTemplate = Handlebars.compile($("#dashboard-body-template").html());
-                $('#dashboard-box .widget-body').html(dashboardBodyTemplate({colCount: 2, d: diskDashboardInfo, nodeData: diskData, showSettings: true}));
+                $('#dashboard-box .widget-body').html(dashboardBodyTemplate({
+                    colCount: 2,
+                    d: diskDashboardInfo,
+                    nodeData: diskData,
+                    showSettings: true
+                }));
                 endWidgetLoading('diskDash');
 
             });
@@ -563,19 +660,37 @@ storageNodeView = function(){
 
     }
 
-    function populateMonitorTab(obj){
-        layoutHandler.setURLHashParams({tab:'Monitor', node:'Storage Nodes:' + obj['name']},{triggerHashChange:false});
+    function populateMonitorTab(obj) {
+        layoutHandler.setURLHashParams({
+            tab: 'Monitor',
+            node: 'Storage Nodes:' + obj['name']
+        }, {
+            triggerHashChange: false
+        });
     }
 
-    function populateDetailsTab(obj){
-        layoutHandler.setURLHashParams({tab:'details', node:'Storage Nodes:' + obj['name']},{triggerHashChange:false});
+    function populateDetailsTab(obj) {
+        layoutHandler.setURLHashParams({
+            tab: 'details',
+            node: 'Storage Nodes:' + obj['name']
+        }, {
+            triggerHashChange: false
+        });
         var dashboardTemplate = contrail.getTemplate4Id('dashboard-template');
-        $('#storagenode-dashboard').html(dashboardTemplate({title:'Storage Node',colCount:2, showSettings:true, widgetBoxId:'dashboard'}));
-        $('#storage-sparklines-box .widget-header').initWidgetHeader({title:'Disks',widgetBoxId :'storageSparklines'});
+        $('#storagenode-dashboard').html(dashboardTemplate({
+            title: 'Storage Node',
+            colCount: 2,
+            showSettings: true,
+            widgetBoxId: 'dashboard'
+        }));
+        $('#storage-sparklines-box .widget-header').initWidgetHeader({
+            title: 'Disks',
+            widgetBoxId: 'storageSparklines'
+        });
         startWidgetLoading('dashboard');
         $.ajax({
-            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['name'])
-        }).done(function (response) {
+            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'], obj['name'])
+        }).done(function(response) {
             var storNodeData = response.host_details;
             var noDataStr = "--";
             var noMonitor = "N/A",
@@ -583,62 +698,111 @@ storageNodeView = function(){
 
             storNodeData['osds_total'] = 0;
             storNodeData['osds_used'] = 0;
-            $.each(storNodeData.osds, function(idx,osd){
-                storNodeData['osds_total'] += osd.kb;
-                storNodeData['osds_used'] += osd.kb_used;
+            $.each(storNodeData.osds, function(idx, osd) {
+                if (osd.hasOwnProperty('kb') && osd.hasOwnProperty('kb_used')) {
+                    storNodeData['osds_total'] += osd.kb;
+                    storNodeData['osds_used'] += osd.kb_used;
+                }
             });
-            
-            storNodeDashboardInfo = [
-                {lbl:'Hostname', value:obj['name']},
-                {lbl:'IP Address',value:(function(){
-                    try{
-                        var ip = ifNullOrEmpty(storNodeData['ip'],noDataStr);
+
+            storNodeDashboardInfo = [{
+                lbl: 'Hostname',
+                value: obj['name']
+            }, {
+                lbl: 'IP Address',
+                value: (function() {
+                    try {
+                        var ip = ifNullOrEmpty(storNodeData['ip'], noDataStr);
                         return ip;
-                    } catch(e){return noDataStr;}
-                })()},
-                {lbl:'Status', value:storNodeData['status'] != '-' ? storNodeData['status'] : noDataStr},
-                {lbl:'Root HD', value:' '},
-                {lbl:INDENT_RIGHT+'Total Space', value:formatBytes(storNodeData['kb_total']*1024)},
-                {lbl:INDENT_RIGHT+'Used', value:formatBytes(storNodeData['kb_used']*1024)},
-                {lbl:INDENT_RIGHT+'Available', value: storNodeData['avail_percent']+"%"},
-                {lbl:'Disks', value: ' '},
-                {lbl:INDENT_RIGHT+'Total', value: storNodeData['osds'].length},
-                {lbl:INDENT_RIGHT+'Total Space', value:formatBytes(storNodeData['osds_total']*1024)},
-                {lbl:INDENT_RIGHT+'Used', value:formatBytes(storNodeData['osds_used']*1024)},
-                {lbl:'Monitor', value:(function(){
-                    try{
-                        var mntr = ifNullOrEmpty(storNodeData['monitor'],noDataStr);
-                        if(mntr['health']){
+                    } catch (e) {
+                        return noDataStr;
+                    }
+                })()
+            }, {
+                lbl: 'Status',
+                value: storNodeData['status'] != '-' ? storNodeData['status'] : noDataStr
+            }, {
+                lbl: 'Root HD',
+                value: ' '
+            }, {
+                lbl: INDENT_RIGHT + 'Total Space',
+                value: formatBytes(storNodeData['kb_total'] * 1024)
+            }, {
+                lbl: INDENT_RIGHT + 'Used',
+                value: formatBytes(storNodeData['kb_used'] * 1024)
+            }, {
+                lbl: INDENT_RIGHT + 'Available',
+                value: storNodeData['avail_percent'] + "%"
+            }, {
+                lbl: 'Disks',
+                value: ' '
+            }, {
+                lbl: INDENT_RIGHT + 'Total',
+                value: storNodeData['osds'].length
+            }, {
+                lbl: INDENT_RIGHT + 'Total Space',
+                value: formatBytes(storNodeData['osds_total'] * 1024)
+            }, {
+                lbl: INDENT_RIGHT + 'Used',
+                value: formatBytes(storNodeData['osds_used'] * 1024)
+            }, {
+                lbl: 'Monitor',
+                value: (function() {
+                    try {
+                        var mntr = ifNullOrEmpty(storNodeData['monitor'], noDataStr);
+                        if (mntr['health']) {
                             var monHealth = storNodeData.monitor.health;
                             var statusTmpl = contrail.getTemplate4Id('storage-status-template');
                             if (monHealth == 'HEALTH_OK')
-                                return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" ok</span>";
+                                return "<span> " + statusTmpl({
+                                    sevLevel: sevLevels['INFO'],
+                                    sevLevels: sevLevels
+                                }) + " ok</span>";
                             else if (monHealth == 'HEALTH_WARN')
-                                return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" warn</span>";
+                                return "<span> " + statusTmpl({
+                                    sevLevel: sevLevels['WARNING'],
+                                    sevLevels: sevLevels
+                                }) + " warn</span>";
                             else if (monHealth == 'HEALTH_CRIT')
-                                return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" critical</span>";
+                                return "<span> " + statusTmpl({
+                                    sevLevel: sevLevels['ERROR'],
+                                    sevLevels: sevLevels
+                                }) + " critical</span>";
                             else
                                 return 'N/A';
                         }
                         return noMonitor
-                    } catch(e){return noMonitor;}
-                })}
-            ];
+                    } catch (e) {
+                        return noMonitor;
+                    }
+                })
+            }];
             var dashboardBodyTemplate = Handlebars.compile($("#dashboard-body-template").html());
-            $('#dashboard-box .widget-body').html(dashboardBodyTemplate({colCount:2, d:storNodeDashboardInfo, nodeData:storNodeData, showSettings:true}));
+            $('#dashboard-box .widget-body').html(dashboardBodyTemplate({
+                colCount: 2,
+                d: storNodeDashboardInfo,
+                nodeData: storNodeData,
+                showSettings: true
+            }));
             endWidgetLoading('dashboard');
 
             var osds = storNodeData['osds'];
 
-            var retArr = [], xvals = [],yvals = [],
-                clusterSeries = [], statusSeries=[],
-                upCnt=0,downCnt=0,inCnt=0,outCnt=0;
+            var retArr = [],
+                xvals = [],
+                yvals = [],
+                clusterSeries = [],
+                statusSeries = [],
+                upCnt = 0,
+                downCnt = 0,
+                inCnt = 0,
+                outCnt = 0;
 
-            $.each(osds, function(idx,osd){
-                osd['x'] = parseFloat(((osd.kb_avail/osd.kb)*100).toFixed(2));
-                osd['y'] = parseFloat((osd.kb/1048576).toFixed(2));
+            $.each(osds, function(idx, osd) {
+                osd['x'] = parseFloat(((osd.kb_avail / osd.kb) * 100).toFixed(2));
+                osd['y'] = parseFloat((osd.kb / 1048576).toFixed(2));
                 osd['available_perc'] = $.isNumeric(osd['x']) ? osd['x'] : '-';
-                osd['total'] = formatBytes(osd.kb*1024);
+                osd['total'] = formatBytes(osd.kb * 1024);
                 osd['size'] = 1;
                 osd['shape'] = 'circle';
                 osd['type'] = 'disk';
@@ -650,20 +814,20 @@ storageNodeView = function(){
                 osd['downNodeCnt'] = 0;
                 osd['nodeAlerts'] = self.processOSDAlerts(osd);
                 osd['alerts'] = osd['nodeAlerts'].sort(dashboardUtils.sortInfraAlerts);
-                if(!isNaN(osd['x']))
+                if (!isNaN(osd['x']))
                     xvals.push(osd['x']);
-                if(!isNaN(osd['y']))
+                if (!isNaN(osd['y']))
                     yvals.push(osd['y']);
                 retArr.push(osd);
 
-                if(osd.status == 'up')
-                    ++upCnt;
-                else if(osd.status == 'down')
-                    ++downCnt;
-                if(osd.cluster_status == 'in')
-                    ++inCnt;
-                else if(osd.cluster_status == 'out')
-                    ++outCnt;
+                if (osd.status == 'up')
+                ++upCnt;
+                else if (osd.status == 'down')
+                ++downCnt;
+                if (osd.cluster_status == 'in')
+                ++inCnt;
+                else if (osd.cluster_status == 'out')
+                ++outCnt;
             });
             /*
              in some cases when osd is down kb info is not coming in API.
@@ -672,112 +836,140 @@ storageNodeView = function(){
              */
             var xscale = d3.extent(xvals);
             xscale[0] = xscale[0] - 0.2;
-            xscale[1] = (xscale[1] >= 95.5)? 100.00:xscale[1]+0.5;
+            xscale[1] = (xscale[1] >= 95.5) ? 100.00 : xscale[1] + 0.5;
             var yscale = d3.extent(yvals);
             yscale[0] = yscale[0] - 150;
             yscale[1] = yscale[1] + 150;
 
-            $.each(retArr, function(idx,osd){
-                if(isNaN(osd.x))
+            $.each(retArr, function(idx, osd) {
+                if (isNaN(osd.x))
                     osd.x = xscale[0];
-                if(isNaN(osd.y))
-                    osd.y= yscale[0];
+                if (isNaN(osd.y))
+                    osd.y = yscale[0];
             });
             retArr.sort(dashboardUtils.sortNodesByColor);
             initDeferred({
-                            renderFn    : 'initScatterChart',
-                            selector    : $('#disks-bubble'),
-                            parseFn     : function(response) { 
-                                            return {
-                                                title: 'Disks', xLbl: 'Available (%)', yLbl: 'Total Storage (GB)',
-                                                forceX: xscale, forceY: yscale,
-                                                chartOptions: {
-                                                    xPositive: true, tooltipFn: storageChartUtils.diskTooltipFn,
-                                                    clickFn: storageChartUtils.onDiskDrillDown, addDomainBuffer: true
-                                                },
-                                                d: [{key: 'Disks', values: retArr}]
-                                            };
-                            }
-                        });
+                renderFn: 'initScatterChart',
+                selector: $('#disks-bubble'),
+                parseFn: function(response) {
+                    return {
+                        title: 'Disks',
+                        xLbl: 'Available (%)',
+                        yLbl: 'Total Storage (GB)',
+                        forceX: xscale,
+                        forceY: yscale,
+                        chartOptions: {
+                            xPositive: true,
+                            tooltipFn: storageChartUtils.diskTooltipFn,
+                            clickFn: storageChartUtils.onDiskDrillDown,
+                            addDomainBuffer: true
+                        },
+                        d: [{
+                            key: 'Disks',
+                            values: retArr
+                        }]
+                    };
+                }
+            });
 
             var keys = [
-                [{'key': 'IN'},
-                    {'values': [
-                        {'label':'Cluster Status'},
-                        {'value': inCnt}
-                    ]}
-                ],
-                [{'key': 'OUT'},
-                    {'values': [
-                        {'label':'Cluster Status'},
-                        {'value': outCnt}
-                    ]}
-                ]
+                [{
+                    'key': 'IN'
+                }, {
+                    'values': [{
+                        'label': 'Cluster Status'
+                    }, {
+                        'value': inCnt
+                    }]
+                }],
+                [{
+                    'key': 'OUT'
+                }, {
+                    'values': [{
+                        'label': 'Cluster Status'
+                    }, {
+                        'value': outCnt
+                    }]
+                }]
             ];
             clusterSeries.push(keys);
             keys = [
-                [{'key': 'UP'},
-                    {'values': [
-                        {'label':'Status'},
-                        {'value': upCnt}
-                    ]}
-                ],
-                [{'key': 'DOWN'},
-                    {'values': [
-                        {'label':'Status'},
-                        {'value': downCnt}
-                    ]}
-                ]
+                [{
+                    'key': 'UP'
+                }, {
+                    'values': [{
+                        'label': 'Status'
+                    }, {
+                        'value': upCnt
+                    }]
+                }],
+                [{
+                    'key': 'DOWN'
+                }, {
+                    'values': [{
+                        'label': 'Status'
+                    }, {
+                        'value': downCnt
+                    }]
+                }]
             ];
             statusSeries.push(keys);
 
             $('#storDiskUpDown').html(function() {
-                    var content = '';
-                    content = content + '<span style="color: ' + d3Colors['blue'] + ';">' + upCnt + ' up </span> , ';
-                    if (outCnt > 0)
-                        content = content + '<span style="color: ' + d3Colors['red'] + ';">' + downCnt + ' down</span>';
-                    else
-                        content = content + '<span>' + downCnt + ' down</span>';
-                    return content;
-                }
-            );
+                var content = '';
+                content = content + '<span style="color: ' + d3Colors['blue'] + ';">' + upCnt + ' up </span> , ';
+                if (outCnt > 0)
+                    content = content + '<span style="color: ' + d3Colors['red'] + ';">' + downCnt + ' down</span>';
+                else
+                    content = content + '<span>' + downCnt + ' down</span>';
+                return content;
+            });
             $('#storDiskInOut').html(function() {
-                    var content = '';
-                    content = content + '<span style="color: ' + d3Colors['green'] + ';">' + inCnt + ' in </span> , ';
-                    if (outCnt > 0)
-                        content = content + '<span style="color: ' + d3Colors['orange'] + ';">' + outCnt + ' out </span>';
-                    else
-                        content = content + '<span>' + outCnt + ' out </span>';
-                    return content;
-                }
-            );
+                var content = '';
+                content = content + '<span style="color: ' + d3Colors['green'] + ';">' + inCnt + ' in </span> , ';
+                if (outCnt > 0)
+                    content = content + '<span style="color: ' + d3Colors['orange'] + ';">' + outCnt + ' out </span>';
+                else
+                    content = content + '<span>' + outCnt + ' out </span>';
+                return content;
+            });
             endWidgetLoading('storageSparklines');
         });
 
     }
-    function getOSDColor(d,obj){
-        if(d['status'] == 'up' ){
-            if(d['cluster_status'] == 'in')
+
+    function getOSDColor(d, obj) {
+        if (d['status'] == 'up') {
+            if (d['cluster_status'] == 'in')
                 return d3Colors['green'];
-            else if(d['cluster_status'] == 'out')
+            else if (d['cluster_status'] == 'out')
                 return d3Colors['orange']
             else
                 return d3Colors['blue']
-        }
-        else if (d['status'] == 'down')
+        } else if (d['status'] == 'down')
             return d3Colors['red']
-        else{}
+        else {}
     }
 
 
 }
-function drawDisksBarChart(selector, data, chart, chartOptions){
 
-    nv.addGraph(function(){
+function drawDisksBarChart(selector, data, chart, chartOptions) {
+
+    nv.addGraph(function() {
         var chart = nv.models.multiBarHorizontalChart()
-            .x(function(d) { return d.label })
-            .y(function(d) { return d.value })
-            .margin({top: 30, right: 20, bottom: 10, left: 5})
+            .x(function(d) {
+                return d.label
+            })
+            .y(function(d) {
+                return d.value
+            })
+            .margin({
+                top: 30,
+                right: 20,
+                bottom: 10,
+                left: 5
+            })
             .height(65)
             .showValues(false)
             .tooltips(true)
@@ -796,7 +988,7 @@ function drawDisksBarChart(selector, data, chart, chartOptions){
          chart.scatter.dispatch.on('elementMouseout',chartOptions['elementMouseoutFn']);
          chart.scatter.dispatch.on('elementMouseover',chartOptions['elementMouseoverFn']);
          */
-        if(!($(selector).is(':visible'))) {
+        if (!($(selector).is(':visible'))) {
             $(selector).find('svg').bind("refresh", function() {
                 d3.select($(selector)[0]).select('svg').datum(data).call(chart);
             });
@@ -805,8 +997,8 @@ function drawDisksBarChart(selector, data, chart, chartOptions){
             d3.select($(selector)[0]).select('svg').datum(data).call(chart);
         }
 
-        nv.utils.windowResize(function(){
-            updateChartOnResize(selector,chart);
+        nv.utils.windowResize(function() {
+            updateChartOnResize(selector, chart);
 
             return chart;
         });
