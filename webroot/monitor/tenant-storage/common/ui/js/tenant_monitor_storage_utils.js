@@ -126,6 +126,39 @@ var tenantStorageChartUtils = {
             });
         }
         return tooltipContents;
+    },
+    thrptActivityTooltipFn: function(key, currObj) {
+        console.log(currObj);
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: 'Throughput'
+        }, {
+            lbl: key,
+            value: currObj['y'] + ' Kbps'
+        }];
+        return tooltipContents;
+    },
+    iopsActivityTooltipFn: function(key, currObj) {
+        console.log(currObj);
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: 'IOPS'
+        }, {
+            lbl: key,
+            value: currObj['y']
+        }];
+        return tooltipContents;
+    },
+    latencyActivityTooltipFn: function(key, currObj) {
+        console.log(currObj);
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: 'Latency'
+        }, {
+            lbl: key,
+            value: currObj['y'] + ' ms'
+        }];
+        return tooltipContents;
     }
 }
 
@@ -281,3 +314,105 @@ function formatTreeLblValueTooltip(infoObj) {
     var tooltipTemplate = contrail.getTemplate4Id(tooltipTemplateSel);
     return tooltipTemplate(infoObj);
 }
+
+function isStorageChartInitialized(selector) {
+    if ($(selector + ' > svg').length > 0)
+        return true;
+    else
+        return false;
+}
+
+/**
+ * TooltipFn for storage line chart
+ */
+function lineChartTooltipFn(key, x, y, e, chart, tooltipFormatFn) {
+    var tooltipContents = [];
+    if (typeof(tooltipFormatFn) == 'function') {
+        tooltipContents = tooltipFormatFn(key, e['point']);
+    }
+    //Format the alerts to display in tooltip
+    $.each(ifNull(e['point']['alerts'], []), function(idx, obj) {
+        if (obj['tooltipAlert'] != false)
+            tooltipContents.push({
+                lbl: ifNull(obj['tooltipLbl'], 'Events'),
+                value: obj['msg']
+            });
+    });
+    return formatLblValueTooltip(tooltipContents);
+}
+
+var updateStorageCharts = {
+    updateView: function(obj) {
+        if (obj['type'] == 'storageActivityLineChart') {
+            if (obj['selector'] != null && $(obj['selector']).parent('div') != null) {
+                var chart = $(obj['selector']).parent('div').data('chart');
+                d3.select(obj['selector']).datum(obj['data']);
+                if (chart != null)
+                    chart.update();
+            }
+        }
+    }
+}
+
+(function($) {
+    $.extend($.fn, {
+        storageActivityLineChart: function(data) {
+            var selector = $(this),
+                chartOptions = ifNull(data['chartOptions'], {});
+
+            nv.addGraph(function() {
+                chart = nv.models.lineChart()
+                    .margin({
+                        top: 30,
+                        right: 20,
+                        bottom: 20,
+                        left: 20
+                    })
+                    .showLegend(false)
+                    .showYAxis(false)
+                    .showXAxis(true);
+
+                chart.xAxis
+                    .axisLabel('')
+                    .tickFormat(function(d) {
+                        return d3.time.format('%X')(new Date(d))
+                    });
+                //.tickFormat(d3.format(',.0f'));
+
+                chart.xScale(d3.time.scale());
+
+                if (chartOptions['tooltipFn'] == null) {
+                    chartOptions['tooltipFn'] = function(key, x, y, e, graph) {
+                        return '<h3> ' + key + ' </h3>' +
+                            '<p>' + e.point.y + ' ms</p>';
+                    };
+                }
+
+                var tooltipFn = chartOptions['tooltipFn'];
+                chartOptions['tooltipFn'] = function(key, x, y, e, graph) {
+                    return lineChartTooltipFn(key, x, y, e, graph, tooltipFn)
+                }
+                chart.tooltipContent(chartOptions['tooltipFn']);
+
+                $(selector).data('chart', chart);
+                $(selector).append('<svg></svg>');
+
+                d = ifNull(data['d'], []);
+
+                if (!($(selector).is(':visible'))) {
+                    $(selector).find('svg').bind("refresh", function() {
+                        d3.select($(selector)[0]).select('svg').datum(d).call(chart);
+                    });
+                } else {
+                    d3.select($(selector)[0]).select('svg').datum(d).call(chart);
+                }
+
+                nv.utils.windowResize(function() {
+                    updateChartOnResize(selector, chart);
+                });
+
+                return chart
+            });
+        }
+    })
+})(jQuery);
