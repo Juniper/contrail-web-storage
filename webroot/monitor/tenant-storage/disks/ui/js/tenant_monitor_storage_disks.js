@@ -3,7 +3,7 @@
  */
 
 
-cephOSDsView = function () {
+cephOSDsView = function() {
 
     var self = this;
     var errorMsg;
@@ -16,22 +16,26 @@ cephOSDsView = function () {
 
     singleOSDDS = new ContrailDataView();
 
-    this.destroy = function () {
+    this.currTab = null;
+
+    this.destroy = function() {
         var cGrid = $('.contrail-grid').data('contrailGrid');
-        if(cGrid != null)
+        if (cGrid != null)
             cGrid.destroy();
-        if(this.timerId){
+        if (this.timerId) {
             clearInterval(this.timerId);
         }
+        if (this.currTab)
+            this.currTab = null;
     }
 
-    this.setOSDsBubbleData = function(data){
+    this.setOSDsBubbleData = function(data) {
         this.osdsBubbleData = data;
         updateDisksChart(this.osdsBubbleData);
         //this.osdsBubble.refresh(this.osdsBubbleData);
     }
 
-    this.setOSDsTreeData = function(data){
+    this.setOSDsTreeData = function(data) {
         this.osdsTreeData = data;
         this.osdsTree.update(this.osdsTreeData, true);
         /*
@@ -44,188 +48,191 @@ cephOSDsView = function () {
          }*/
     }
 
-    this.setOSDsDetailsData = function(data){
+    this.setOSDsDetailsData = function(data) {
         osdsDV.setData(data);
         /*if( currOSD == null)
          showOSDDetails();
          */
     }
 
-    this.getOSDsDetailsData = function(){
+    this.getOSDsDetailsData = function() {
         return osdsDV.getItems();
     }
 
-    this.setSingleOSDData = function(data){
+    this.setSingleOSDData = function(data) {
         singleOSDDS.data(data);
     }
 
-    this.setCurrOSD = function(data){
+    this.setCurrOSD = function(data) {
         currOSD = data;
         showOSDDetails(currOSD);
     }
 
-    this.getCurrOSD = function(){
+    this.getCurrOSD = function() {
         return currOSD;
     }
 
-    this.setErrorMessage = function(msg){
+    this.setErrorMessage = function(msg) {
         errorMsg = msg;
         $('#scatter-log-message').text(errorMsg);
     }
 
     function populateOSDs() {
-        
+
         $("#gridOSDs").contrailGrid({
 
             header: {
-                    title: {
-                        text: 'Disks',
-                        cssClass: 'blue',
-                        icon: 'icon-list',
-                        iconCssClass: 'blue'
-                    }
-                },
-                columnHeader: {
-                    columns: [
-                        {
-                            field: "id",
-                            name: "ID",
-                            width: 30
-                        },
-                        {
-                            field: "status",
-                            name: "Status",
-                            formatter: function(r,c,v,cd,dc){
-                                return dc['status_tmpl'];
-                            },
-                            width: 30
-                        },
-                        {
-                            field: "cluster_status",
-                            name: "Membership",
-                            formatter: function(r,c,v,cd,dc){
-                                return dc['cluster_status_tmpl'];
-                            },
-                            cssClass: 'grid-status-label',
-                            width: 40
-                        },
-                        {
-                            field: "name",
-                            name: "OSD name",
-                            events: {
-                                onClick: function(e,dc){
-                                    tenantStorageGridUtils.onDisksRowSelChange(dc);
-                                }
-                            },
-                            cssClass: 'cell-hyperlink-blue',
-                            minWidth: 80
-                        },
-                        {
-                            field: "host",
-                            name: "Hostname",
-                            minWidth: 80
-                        },
-                        {
-                            field: "gb",
-                            name: "Total GB",
-                            minWidth: 100
-                        },
-                        {
-                            field: "gb_used",
-                            name: "Used GB",
-                            minWidth: 100
-                        },
-                        {
-                            field: "available_perc",
-                            name: "Available %",
-                            minWidth: 100
-                        }
-                    ]
-                },
-                body: {
-                    options: {
-                        autoHeight: true,
-                        checkboxSelectable: false,
-                        enableAsyncPostRender: true,
-                        forceFitColumns: true,
-                        detail: {
-                            template: '',
-                            onInit: function (e, dc) {
-                                var noDataStr = "N/A";
-                                setTimeout(function () {
-                                    var detailsInfo = [
-                                        {lbl: 'UUID', value: dc['uuid']},
-                                        {lbl: 'Hostname', value: dc['host']},
-                                        {lbl: 'State', value: dc['state']},
-                                        {lbl: 'Apply Latency', value: (function () {
-                                            try {
-                                                var perf = ifNullOrEmpty(dc['fs_perf_stat']['apply_latency_ms'], noDataStr);
-                                                if (perf != noDataStr) {
-                                                    return perf + ' ms';
-                                                }
-                                                return noDataStr;
-                                            } catch (e) {
-                                                return noDataStr;
-                                            }
-                                        })},
-                                        {lbl: 'Commit Latency', value: (function () {
-                                            try {
-                                                var perf = ifNullOrEmpty(dc['fs_perf_stat']['commit_latency_ms'], noDataStr);
-                                                if (perf != noDataStr) {
-                                                    return perf + ' ms';
-                                                }
-                                                return noDataStr;
-                                            } catch (e) {
-                                                return noDataStr;
-                                            }
-                                        })}
-                                    ];
-                                    var moreLink = '#p=mon_storage_disks&q[node]='+ dc['host'] + '&q[tab]=details:' + dc['name'];
-                                    var detailsTmpl = contrail.getTemplate4Id('disk-grid-details-template');
-                                    $(e.detailRow).html(detailsTmpl({d:detailsInfo, detailLink:moreLink}));
-                                    $("#gridOSDs").data('contrailGrid').adjustDetailRowHeight(dc.id);
-                                }, 1000);
-                            },
-                            onExpand: function (e, dc) {
-
-                            },
-                            onCollapse: function (e, dc) {
-
-                            }
+                title: {
+                    text: 'Disks',
+                    cssClass: 'blue',
+                    icon: 'icon-list',
+                    iconCssClass: 'blue'
+                }
+            },
+            columnHeader: {
+                columns: [{
+                    field: "id",
+                    name: "ID",
+                    width: 30
+                }, {
+                    field: "status",
+                    name: "Status",
+                    formatter: function(r, c, v, cd, dc) {
+                        return dc['status_tmpl'];
+                    },
+                    width: 30
+                }, {
+                    field: "cluster_status",
+                    name: "Membership",
+                    formatter: function(r, c, v, cd, dc) {
+                        return dc['cluster_status_tmpl'];
+                    },
+                    cssClass: 'grid-status-label',
+                    width: 40
+                }, {
+                    field: "name",
+                    name: "OSD name",
+                    events: {
+                        onClick: function(e, dc) {
+                            tenantStorageGridUtils.onDisksRowSelChange(dc);
                         }
                     },
-                    dataSource: {
-                        dataView: osdsDV
-                    },
-                    statusMessages: {
-                        loading: {
-                            text: 'Loading Disks..'
+                    cssClass: 'cell-hyperlink-blue',
+                    minWidth: 80
+                }, {
+                    field: "host",
+                    name: "Hostname",
+                    minWidth: 80
+                }, {
+                    field: "gb",
+                    name: "Total GB",
+                    minWidth: 100
+                }, {
+                    field: "gb_used",
+                    name: "Used GB",
+                    minWidth: 100
+                }, {
+                    field: "available_perc",
+                    name: "Available %",
+                    minWidth: 100
+                }]
+            },
+            body: {
+                options: {
+                    autoHeight: true,
+                    checkboxSelectable: false,
+                    enableAsyncPostRender: true,
+                    forceFitColumns: true,
+                    detail: {
+                        template: '',
+                        onInit: function(e, dc) {
+                            var noDataStr = "N/A";
+                            setTimeout(function() {
+                                var detailsInfo = [{
+                                    lbl: 'UUID',
+                                    value: dc['uuid']
+                                }, {
+                                    lbl: 'Hostname',
+                                    value: dc['host']
+                                }, {
+                                    lbl: 'State',
+                                    value: dc['state']
+                                }, {
+                                    lbl: 'Apply Latency',
+                                    value: (function() {
+                                        try {
+                                            var perf = ifNullOrEmpty(dc['fs_perf_stat']['apply_latency_ms'], noDataStr);
+                                            if (perf != noDataStr) {
+                                                return perf + ' ms';
+                                            }
+                                            return noDataStr;
+                                        } catch (e) {
+                                            return noDataStr;
+                                        }
+                                    })
+                                }, {
+                                    lbl: 'Commit Latency',
+                                    value: (function() {
+                                        try {
+                                            var perf = ifNullOrEmpty(dc['fs_perf_stat']['commit_latency_ms'], noDataStr);
+                                            if (perf != noDataStr) {
+                                                return perf + ' ms';
+                                            }
+                                            return noDataStr;
+                                        } catch (e) {
+                                            return noDataStr;
+                                        }
+                                    })
+                                }];
+                                var moreLink = '#p=mon_storage_disks&q[node]=' + dc['host'] + '&q[tab]=details:' + dc['name'];
+                                var detailsTmpl = contrail.getTemplate4Id('disk-grid-details-template');
+                                $(e.detailRow).html(detailsTmpl({
+                                    d: detailsInfo,
+                                    detailLink: moreLink
+                                }));
+                                $("#gridOSDs").data('contrailGrid').adjustDetailRowHeight(dc.id);
+                            }, 1000);
                         },
-                        empty: {
-                            text: 'No Disks to display'
+                        onExpand: function(e, dc) {
+
                         },
-                        errorGettingData: {
-                            type: 'error',
-                            iconClasses: 'icon-warning',
-                            text: 'Error in getting Data.'
+                        onCollapse: function(e, dc) {
+
                         }
                     }
                 },
-                footer: {
-                    pager: {
-                        options: {
-                            pageSize: 5,
-                            pageSizeSelect: [ 5, 10, 50 ]
-                        }
+                dataSource: {
+                    dataView: osdsDV
+                },
+                statusMessages: {
+                    loading: {
+                        text: 'Loading Disks..'
+                    },
+                    empty: {
+                        text: 'No Disks to display'
+                    },
+                    errorGettingData: {
+                        type: 'error',
+                        iconClasses: 'icon-warning',
+                        text: 'Error in getting Data.'
                     }
                 }
+            },
+            footer: {
+                pager: {
+                    options: {
+                        pageSize: 5,
+                        pageSizeSelect: [5, 10, 50]
+                    }
+                }
+            }
         });
 
         getOSDs();
         tenantStorageChartsInitializationStatus['disks'] = true;
     }
 
-    this.load = function (obj) {
+    this.load = function(obj) {
         var disksTemplate = Handlebars.compile($("#storage-disks-template").html());
         $(pageContainer).html(disksTemplate({}));
 
@@ -234,50 +241,55 @@ cephOSDsView = function () {
         });
 
         /**
-        * init host tree svg
-        */
+         * init host tree svg
+         */
         tenantStorageDisksView.osdsTree.init();
-       
+
         self.updateViewByHash(layoutHandler.getURLHashParams());
     };
 
     this.updateViewByHash = function(obj) {
-        var hashParams = ifNullOrEmptyObject(obj,{tab:''});
-        
-        if(hashParams['tab'].indexOf('details:') == 0) {
+        var hashParams = ifNullOrEmptyObject(obj, {
+            tab: ''
+        });
+
+        if (hashParams['tab'].indexOf('details:') == 0) {
             /**
-            * show details of a single disk
-            */
+             * show details of a single disk
+             */
             populateDiskDetailsTab(hashParams);
-            
-        } else {    
+
+        } else {
             /**
-            * show all OSDs
-            */
+             * show all OSDs
+             */
             populateOSDs();
         }
     }
 
-    this.parseOSDsData = function(respData){
+    this.parseOSDsData = function(respData) {
 
-        var retArr = [], osdErrArr = [];
-        var osdArr = [], osdUpInArr= [], osdDownArr = [], osdUpOutArr = [];
+        var retArr = [],
+            osdErrArr = [];
+        var osdArr = [],
+            osdUpInArr = [],
+            osdDownArr = [],
+            osdUpOutArr = [];
         var skip_osd_bubble = new Boolean();
 
-        if(respData != null){
+        if (respData != null) {
             var osds = respData.osds;
-            $.each(osds, function(idx, osd){
+            $.each(osds, function(idx, osd) {
                 skip_osd_bubble = false;
 
-                if(osd.kb){
-                    osd.available_perc = calcPercent(osd.kb_avail,osd.kb);
+                if (osd.kb) {
+                    osd.available_perc = calcPercent(osd.kb_avail, osd.kb);
                     osd.x = parseFloat(osd.available_perc);
-                    osd.gb =  kiloByteToGB(osd.kb);
+                    osd.gb = kiloByteToGB(osd.kb);
                     osd.y = parseFloat(osd.gb);
                     osd.gb_avail = kiloByteToGB(osd.kb_avail);
                     osd.gb_used = kiloByteToGB(osd.kb_used);
-                }
-                else{
+                } else {
                     skip_osd_bubble = true;
                     osd.gb = 'Not Available';
                     osd.gb_used = 'Not Available';
@@ -286,21 +298,17 @@ cephOSDsView = function () {
                 }
 
                 // Add to OSD scatter chart data of flag is not set
-                if(!skip_osd_bubble){
-                    if (osd.status == "up"){
-                        if(osd.cluster_status == "in"){
+                if (!skip_osd_bubble) {
+                    if (osd.status == "up") {
+                        if (osd.cluster_status == "in") {
                             osdUpInArr.push(osd);
-                        }
-                        else if(osd.cluster_status == "out"){
+                        } else if (osd.cluster_status == "out") {
                             osdUpOutArr.push(osd);
-                        }else{}
-                    }
-                    else if(osd.status == "down"){
+                        } else {}
+                    } else if (osd.status == "down") {
                         osdDownArr.push(osd);
-                    }
-                    else{}
-                }
-                else{
+                    } else {}
+                } else {
                     osdErrArr.push(osd.name);
                 }
 
@@ -308,7 +316,7 @@ cephOSDsView = function () {
                 osdArr.push(osd);
             });
 
-            allGroup = {}, upInGroup = {}, upOutGroup = {}, downGroup= {};
+            allGroup = {}, upInGroup = {}, upOutGroup = {}, downGroup = {};
             /*
              allGroup.key = "OSDs";
              allGroup.values = osdArr;
@@ -334,35 +342,35 @@ cephOSDsView = function () {
         this.setOSDsDetailsData(osdArr);
         this.setOSDsBubbleData(retArr);
         console.log(retArr);
-        if(osdErrArr.length != 0){
+        if (osdErrArr.length != 0) {
             var msg = ' Following OSDs were not added to Scatter Chart due to insuffient data ';
-            $.each(osdErrArr, function(idx, osd){
-                msg = msg + " " +osd + " ";
+            $.each(osdErrArr, function(idx, osd) {
+                msg = msg + " " + osd + " ";
             });
             this.setErrorMessage(msg);
-        }
-        else{
+        } else {
             this.setErrorMessage('None');
         }
     }
 
-    function onTabActivate(e, ui){
+    function onTabActivate(e, ui) {
         selTab = ui.newTab.context.innerText;
-        if(selTab == "Scatter Plot"){
-            if(tenantStorageChartsInitializationStatus['disks']){
+        tenantStorageDisksView.currTab = selTab;
+        if (selTab == "Scatter Plot") {
+            if (tenantStorageChartsInitializationStatus['disks']) {
                 updateDisksChart(tenantStorageDisksView.osdsBubbleData);
                 $("#gridOSDs").data("contrailGrid").refreshView()
-            } else{
+            } else {
                 populateOSDs();
             }
-        } else if(selTab == 'Host Tree'){
-            if(tenantStorageChartsInitializationStatus['host_tree']){
-                if(tenantStorageDisksView.osdsTreeData == null)
+        } else if (selTab == 'Host Tree') {
+            if (tenantStorageChartsInitializationStatus['host_tree']) {
+                if (tenantStorageDisksView.osdsTreeData == null)
                     getOSDsTree();
                 else
                     tenantStorageDisksView.osdsTree.update(tenantStorageDisksView.osdsTreeData, true);
-            }else{
-                if(tenantStorageDisksView.osdsTree.svgTree == '')
+            } else {
+                if (tenantStorageDisksView.osdsTree.svgTree == '')
                     tenantStorageDisksView.osdsTree.init();
                 getOSDsTree();
             }
@@ -372,55 +380,62 @@ cephOSDsView = function () {
         }*/
     }
 
-    if(this.timerId){
+    if (this.timerId) {
         clearInterval(this.timerId);
-    }
-    else{
+    } else {
         this.timerId = setInterval(function() {
-            OSDsDataRefresh();   
+            OSDsDataRefresh();
         }, refreshTimeout);
     }
 }
 
 tenantStorageDisksView = new cephOSDsView();
 
-function updateDisksChart (data) {
-    if(!isScatterChartInitialized('#osds-bubble')) {
-        var chartsData = {  title   :'Disks',
-                            xLbl    :'Available (%)', 
-                            yLbl    :'Total Storage (GB)',
-                            chartOptions: {
-                                xPositive   :true,
-                                tooltipFn   :tenantStorageChartUtils.diskTooltipFn,
-                                clickFn     :tenantStorageChartUtils.onDiskDrillDown,
-                                addDomainBuffer :true
-                            },
-                            d:[{key:'disks',values:data}]
-                        };
+function updateDisksChart(data) {
+    if (!isScatterChartInitialized('#osds-bubble')) {
+        var chartsData = {
+            title: 'Disks',
+            xLbl: 'Available (%)',
+            yLbl: 'Total Storage (GB)',
+            chartOptions: {
+                xPositive: true,
+                tooltipFn: tenantStorageChartUtils.diskTooltipFn,
+                clickFn: tenantStorageChartUtils.onDiskDrillDown,
+                addDomainBuffer: true
+            },
+            d: [{
+                key: 'disks',
+                values: data
+            }]
+        };
         $('#osds-bubble').initScatterChart(chartsData);
         tenantStorageChartsInitializationStatus['disks'] = true;
     } else {
         //update chart value
-        updateTenantStorageCharts(data,'disks');
+        updateTenantStorageCharts(data, 'disks');
     }
-            
+
 }
 
-function parseOSDsData (data) {
-    var retArr = [], osdErrArr = [];
-    var osdArr = [], osdUpInArr= [], osdDownArr = [], osdUpOutArr = [];
+function parseOSDsData(data) {
+    var retArr = [],
+        osdErrArr = [];
+    var osdArr = [],
+        osdUpInArr = [],
+        osdDownArr = [],
+        osdUpOutArr = [];
     var skip_osd_bubble = new Boolean();
     var statusTemplate = contrail.getTemplate4Id("disk-status-template");
-            
-    if(data != null){
+
+    if (data != null) {
         var osds = data.osds;
-        $.each(osds, function(idx, osd){
+        $.each(osds, function(idx, osd) {
             skip_osd_bubble = false;
 
-            if(osd.kb){
-                osd.available_perc = calcPercent(osd.kb_avail,osd.kb);
+            if (osd.kb) {
+                osd.available_perc = calcPercent(osd.kb_avail, osd.kb);
                 osd.x = parseFloat(osd.available_perc);
-                osd.gb =  kiloByteToGB(osd.kb);
+                osd.gb = kiloByteToGB(osd.kb);
                 osd.total = formatBytes(osd.kb * 1024);
                 osd.y = parseFloat(osd.gb);
                 osd.gb_avail = kiloByteToGB(osd.kb_avail);
@@ -428,33 +443,43 @@ function parseOSDsData (data) {
                 osd.color = getOSDColor(osd);
                 osd.shape = 'circle';
                 osd.size = 1;
-            }
-            else{
+            } else {
                 skip_osd_bubble = true;
                 osd.gb = 'Not Available';
                 osd.gb_used = 'Not Available';
                 osd.gb_avail = 'Not Available';
                 osd.available_perc = 'Not Available';
             }
-            
+
             /**
-            * osd status template UP?DOWN
-            */
-            osd.status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
-            if(osd.status == 'down')
-                osd.status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
+             * osd status template UP?DOWN
+             */
+            osd.status_tmpl = "<span> " + statusTemplate({
+                sevLevel: sevLevels['NOTICE'],
+                sevLevels: sevLevels
+            }) + " up</span>";
+            if (osd.status == 'down')
+                osd.status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['ERROR'],
+                    sevLevels: sevLevels
+                }) + " down</span>";
             /**
-            * osd cluster membership template IN?OUT
-            */
-            osd.cluster_status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
-            if(osd.cluster_status == 'out')
-                osd.cluster_status_tmpl = "<span> "+statusTemplate({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
+             * osd cluster membership template IN?OUT
+             */
+            osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                sevLevel: sevLevels['INFO'],
+                sevLevels: sevLevels
+            }) + " in</span>";
+            if (osd.cluster_status == 'out')
+                osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['WARNING'],
+                    sevLevels: sevLevels
+                }) + " out</span>";
 
             // Add to OSD scatter chart data of flag is not set
-            if(!skip_osd_bubble){
+            if (!skip_osd_bubble) {
                 retArr.push(osd)
-            }
-            else{
+            } else {
                 osdErrArr.push(osd.name);
             }
 
@@ -466,13 +491,13 @@ function parseOSDsData (data) {
     tenantStorageDisksView.setOSDsBubbleData(retArr);
 }
 
-function getOSDs(){
+function getOSDs() {
     $.ajax({
         url: tenantMonitorStorageUrls['DISKS_SUMMARY'],
         dataType: "json",
         cache: false
 
-    }).done(function(response){
+    }).done(function(response) {
         parseOSDsData(response);
 
     }).fail(function(result) {
@@ -481,51 +506,67 @@ function getOSDs(){
 
 }
 
-function osdScatterPlot(){
+function osdScatterPlot() {
     var self = this;
     var chart;
 
-    this.init = function(){
+    this.init = function() {
         var chart = nv.models.scatterChart()
-            .margin({top: 20, right: 20, bottom: 50, left: 80})
+            .margin({
+                top: 20,
+                right: 20,
+                bottom: 50,
+                left: 80
+            })
             .showDistX(true)
             .showDistY(true)
             .showLegend(true)
             .tooltips(true)
             //.transitionDuration(350)
-            .size(25).sizeRange([200,200])
+            .size(25).sizeRange([200, 200])
             .shape("circle")
-            .x(function(d){return d.available_perc})
-            .y(function(d){return d.gb})
-            .tooltipContent(function(key, x, y, e, graph){
+            .x(function(d) {
+                return d.available_perc
+            })
+            .y(function(d) {
+                return d.gb
+            })
+            .tooltipContent(function(key, x, y, e, graph) {
                 return '<h3>' + e.point.name + '</h3>' +
                     '<p> Status: ' + e.point.status + '</p>' +
                     '<p> Host: ' + e.point.host + '</p>' +
-                    '<p> GB Avail: ' + e.point.gb_avail+ '</p>';})
-            .color(function(d){return d.color});
+                    '<p> GB Avail: ' + e.point.gb_avail + '</p>';
+            })
+            .color(function(d) {
+                return d.color
+            });
 
         //Axis settings
         chart.xAxis
             .tickFormat(d3.format('.02f'))
             .axisLabel('Available Percentage');
-            //.axisLabelDistance(5);
+        //.axisLabelDistance(5);
 
         chart.yAxis
             .tickFormat(d3.format('.02f'))
             .axisLabel('Total space (GB)')
 
-        chart.scatter.dispatch.on('elementClick', function(e){ showOSDDetails(e.point.name);});
+        chart.scatter.dispatch.on('elementClick', function(e) {
+            showOSDDetails(e.point.name);
+        });
         //chart.scatter.dispatch.on('elementMouseover', function(){ /*console.log(d3.select(this).attr());*/});
 
         this.chart = chart;
 
     }
 
-    this.draw = function(){
-        nv.addGraph(function() { return this.chart});
+    this.draw = function() {
+        nv.addGraph(function() {
+            return this.chart
+        });
     }
 
-    this.refresh = function(data){
+    this.refresh = function(data) {
 
         /*var q = d3.geom.quadtree(nodes),
          i = 0,
@@ -549,8 +590,8 @@ function osdScatterPlot(){
          */
 
         var yvals = [];
-        $.each(data, function(idx,grp){
-            $.each(grp.values, function(i,osd){
+        $.each(data, function(idx, grp) {
+            $.each(grp.values, function(i, osd) {
                 yvals.push(parseFloat(osd.gb));
             });
         });
@@ -560,14 +601,14 @@ function osdScatterPlot(){
         yscale[1] = yscale[1] + 150;
 
         var xvals = [];
-        $.each(data, function(idx,grp){
-            $.each(grp.values, function(i,osd){
+        $.each(data, function(idx, grp) {
+            $.each(grp.values, function(i, osd) {
                 xvals.push(parseFloat(osd.available_perc));
             });
         });
         var xscale = d3.extent(xvals);
         xscale[0] = xscale[0] - 0.2;
-        xscale[1] = (xscale[1] >= 95.5)? 100.00:xscale[1]+0.5;
+        xscale[1] = (xscale[1] >= 95.5) ? 100.00 : xscale[1] + 0.5;
 
         this.chart.forceX(xscale)
             .forceY(yscale)
@@ -577,9 +618,10 @@ function osdScatterPlot(){
             .call(this.chart);
 
         nv.utils.windowResize(this.chart.update);
-        
+
 
     }
+
     function collide(node) {
         var r = node.radius + 16,
             nx1 = node.x - r,
@@ -600,31 +642,28 @@ function osdScatterPlot(){
                     quad.point.y += y;
                 }
             }
-            return x1 > nx2
-                || x2 < nx1
-                || y1 > ny2
-                || y2 < ny1;
+            return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
         };
     }
 }
 
-function populateDiskDetailsTab(obj){
+function populateDiskDetailsTab(obj) {
     var deferredObj = $.Deferred();
 
-    if($("#osdsTabStrip").tabs().find("#diskDetailsTab").length == 0){
-        addTab(disksTabStrip, 'diskDetailsTab', 'Details', 'loading..');    
+    if ($("#osdsTabStrip").tabs().find("#diskDetailsTab").length == 0) {
+        addTab(disksTabStrip, 'diskDetailsTab', 'Details', 'loading..');
     } else {
         $("#osdsTabStrip").tabs().find("#diskDetailsTab").html("");
     }
 
-    $('#diskDetailsTab').html('<div id="disk-dashboard" class="span5" style="margin-left:5px;"></div>');
-    
-    selectTab(disksTabStrip,disksTabs.indexOf('details'));
+    $('#diskDetailsTab').html(contrail.getTemplate4Id('disk-details-template'));
+
+    selectTab(disksTabStrip, disksTabs.indexOf('details'));
 
     if (obj['tab'] == "" || obj['tab'].split(':')[0] == null) {
         $.ajax({
-            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'] , obj['node'])
-        }).done(function (response) {
+            url: contrail.format(monitorInfraStorageUrls['STORAGENODE_DETAILS'], obj['node'])
+        }).done(function(response) {
             var osds = response.host_details.osds;
             obj['tab'] = 'details:' + osds[0].name;
             deferredObj.resolve();
@@ -633,73 +672,109 @@ function populateDiskDetailsTab(obj){
         deferredObj.resolve();
     }
 
-    deferredObj.done(function(){
+    deferredObj.done(function() {
         var osdName = obj['tab'].split(':')[1];
         var diskDashTemplate = contrail.getTemplate4Id('dashboard-template');
-        $('#disk-dashboard').html(diskDashTemplate({title: 'Disk', colCount: 2, showSettings: true, widgetBoxId: 'diskDash'}));
+        $('#disk-dashboard').html(diskDashTemplate({
+            title: 'Disk',
+            colCount: 2,
+            showSettings: true,
+            widgetBoxId: 'diskDash'
+        }));
         startWidgetLoading('diskDash');
         $.ajax({
-            url: contrail.format(monitorInfraStorageUrls['DISK_DETAILS'] , osdName)
-        }).done(function (response) {
+            url: contrail.format(monitorInfraStorageUrls['DISK_DETAILS'], osdName)
+        }).done(function(response) {
             var diskData = response.osd_details;
             var noDataStr = "N/A",
                 diskDashboardInfo;
 
-            diskDashboardInfo = [
-                {lbl: 'Name', value: diskData['name']},
-                {lbl: 'Hostname', value: diskData['host']},
-                {lbl: 'IP Address', value: (function () {
+            diskDashboardInfo = [{
+                lbl: 'Name',
+                value: diskData['name']
+            }, {
+                lbl: 'Hostname',
+                value: diskData['host']
+            }, {
+                lbl: 'IP Address',
+                value: (function() {
                     try {
                         var ip = ifNullOrEmpty(diskData['public_addr'], noDataStr);
                         return ip.split(':')[0] + ', Port: ' + ip.split(':')[1];
                     } catch (e) {
                         return noDataStr;
                     }
-                })()},
-                {lbl: 'Status', value: (function(){
+                })()
+            }, {
+                lbl: 'Status',
+                value: (function() {
                     var statusTmpl = contrail.getTemplate4Id('storage-status-template');
-                    if(diskData['status'] == "up")
-                        return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
-                    else if(diskData['status'] == "down")
-                        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
+                    if (diskData['status'] == "up")
+                        return "<span> " + statusTmpl({
+                            sevLevel: sevLevels['NOTICE'],
+                            sevLevels: sevLevels
+                        }) + " up</span>";
+                    else if (diskData['status'] == "down")
+                        return "<span> " + statusTmpl({
+                            sevLevel: sevLevels['ERROR'],
+                            sevLevels: sevLevels
+                        }) + " down</span>";
                     else
                         return noDataStr;
-                })()},
-                {lbl: 'Cluster Membership', value: (function(){
+                })()
+            }, {
+                lbl: 'Cluster Membership',
+                value: (function() {
                     var statusTmpl = contrail.getTemplate4Id('storage-status-template');
-                    if(diskData['cluster_status'] == "in")
-                        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
-                    else if(diskData['cluster_status'] == "out")
-                        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
+                    if (diskData['cluster_status'] == "in")
+                        return "<span> " + statusTmpl({
+                            sevLevel: sevLevels['INFO'],
+                            sevLevels: sevLevels
+                        }) + " in</span>";
+                    else if (diskData['cluster_status'] == "out")
+                        return "<span> " + statusTmpl({
+                            sevLevel: sevLevels['WARNING'],
+                            sevLevels: sevLevels
+                        }) + " out</span>";
                     else
                         return noDataStr;
-                })()},
-                {lbl: 'Total Space', value: (function(){
-                    try{
-                        if(diskData['kb'])
+                })()
+            }, {
+                lbl: 'Total Space',
+                value: (function() {
+                    try {
+                        if (diskData['kb'])
                             return formatBytes(diskData['kb'] * 1024);
                     } catch (e) {
                         return noDataStr;
                     }
-                })()},
-                {lbl: 'Used', value: (function(){
-                    try{
-                        if(diskData['kb_used'])
+                })()
+            }, {
+                lbl: 'Used',
+                value: (function() {
+                    try {
+                        if (diskData['kb_used'])
                             return formatBytes(diskData['kb_used'] * 1024);
                     } catch (e) {
                         return noDataStr;
                     }
-                })()},
-                {lbl: 'Available', value: (function(){
-                    try{
-                        if(diskData['kb_avail'])
+                })()
+            }, {
+                lbl: 'Available',
+                value: (function() {
+                    try {
+                        if (diskData['kb_avail'])
                             return formatBytes(diskData['kb_avail'] * 1024) + ' ( ' + parseFloat(((diskData['kb_avail'] / diskData['kb']) * 100).toFixed(2)) + "% )";
                     } catch (e) {
                         return noDataStr;
                     }
-                })()},
-                {lbl: 'UUID', value: diskData['uuid']},
-                {lbl: 'Apply Latency', value: (function () {
+                })()
+            }, {
+                lbl: 'UUID',
+                value: diskData['uuid']
+            }, {
+                lbl: 'Apply Latency',
+                value: (function() {
                     try {
                         var perf = ifNullOrEmpty(diskData['fs_perf_stat']['apply_latency_ms'], noDataStr);
                         if (perf != noDataStr) {
@@ -709,8 +784,10 @@ function populateDiskDetailsTab(obj){
                     } catch (e) {
                         return noDataStr;
                     }
-                })},
-                {lbl: 'Commit Latency', value: (function () {
+                })
+            }, {
+                lbl: 'Commit Latency',
+                value: (function() {
                     try {
                         var perf = ifNullOrEmpty(diskData['fs_perf_stat']['commit_latency_ms'], noDataStr);
                         if (perf != noDataStr) {
@@ -720,38 +797,44 @@ function populateDiskDetailsTab(obj){
                     } catch (e) {
                         return noDataStr;
                     }
-                })}
-            ];
+                })
+            }];
             var dashboardBodyTemplate = Handlebars.compile($("#dashboard-body-template").html());
-            $('#dashboard-box .widget-body').html(dashboardBodyTemplate({colCount: 2, d: diskDashboardInfo, nodeData: diskData, showSettings: true}));
+            $('#dashboard-box .widget-body').html(dashboardBodyTemplate({
+                colCount: 2,
+                d: diskDashboardInfo,
+                nodeData: diskData,
+                showSettings: true
+            }));
             endWidgetLoading('diskDash');
 
         });
     });
 }
 
-function showOSDDetails(osd_name){
+function showOSDDetails(osd_name) {
     var retArr = [];
 
     osds = tenantStorageDisksView.getOSDsDetailsData();
 
     var fields = ['Name', 'Host', 'UUID', 'Public Address', 'Reweight', 'Crush Weight', 'Depth',
-        'Total GB', 'Available GB', 'Used GB', 'Apply Latency ms', 'Commit Latency ms', 'Down Stamp','Cluster Status', 'Status'];
+        'Total GB', 'Available GB', 'Used GB', 'Apply Latency ms', 'Commit Latency ms', 'Down Stamp', 'Cluster Status', 'Status'
+    ];
 
-    $.each(fields, function(idx,val){
+    $.each(fields, function(idx, val) {
         var obj = {};
         obj['field'] = val;
         obj['value'] = '';
         retArr.push(obj);
     });
 
-    if(osd_name == null){
+    if (osd_name == null) {
         osd_name = 'osd.0';
     }
 
-    if(osds != null){
-        $.each(osds, function(idx, osd){
-            if(osd.name == osd_name){
+    if (osds != null) {
+        $.each(osds, function(idx, osd) {
+            if (osd.name == osd_name) {
                 retArr[0]['value'] = osd.name;
                 retArr[1]['value'] = osd.host;
                 retArr[2]['value'] = osd.uuid;
@@ -776,13 +859,13 @@ function showOSDDetails(osd_name){
     return retArr;
 }
 
-function getOSDsTree(){
+function getOSDsTree() {
     $.ajax({
         url: tenantMonitorStorageUrls['DISKS_TREE'],
         dataType: "json",
         cache: false
 
-    }).done(function(response){
+    }).done(function(response) {
         parseOSDsTreeData(response);
 
     }).fail(function(result) {
@@ -791,54 +874,46 @@ function getOSDsTree(){
 
 }
 
-function getHostColor(osdColorArr){
+function getHostColor(osdColorArr) {
     var host_color = color_info;
-    $.each(osdColorArr, function(idx, color){
-        if(color == color_imp){
+    $.each(osdColorArr, function(idx, color) {
+        if (color == color_imp) {
             host_color = color_imp;
             return;
-        }
-        else if(color == color_warn && host_color != color_warn && host_color != color_imp){
+        } else if (color == color_warn && host_color != color_warn && host_color != color_imp) {
             host_color = color_warn;
-        }
-        else if(color == color_success && host_color != color_warn && host_color != color_imp){
+        } else if (color == color_success && host_color != color_warn && host_color != color_imp) {
             host_color = color_success;
-        }
-        else {}
+        } else {}
     });
     return host_color;
 }
 
-function getHostStatus(statusArr){
+function getHostStatus(statusArr) {
     var host_status = 'up';
-    $.each(statusArr, function(idx, status){
+    $.each(statusArr, function(idx, status) {
         // Following checks for OSD status [in, out, down]
-        if(status == 'down'){
+        if (status == 'down') {
             host_status = 'critical';
             return;
-        }
-        else if(status == 'out' && host_status != 'critical'){
+        } else if (status == 'out' && host_status != 'critical') {
             host_status = 'warn';
-        }
-        else if(status == 'in' && host_status != 'warn' && host_status != 'critical'){
+        } else if (status == 'in' && host_status != 'warn' && host_status != 'critical') {
             host_status = 'active';
         }
         // Following checks for Host status itself [critical, warn, active]
-        else if(status == 'critical'){
+        else if (status == 'critical') {
             host_status = 'critical';
-        }
-        else if(status == 'warn' && host_status != 'critical'){
+        } else if (status == 'warn' && host_status != 'critical') {
             host_status = 'warn';
-        }
-        else if(status == 'active' && host_status != 'warn' && host_status != 'critical'){
+        } else if (status == 'active' && host_status != 'warn' && host_status != 'critical') {
             host_status = 'active';
-        }
-        else {}
+        } else {}
     });
     return host_status;
 }
 
-function parseOSDsTreeData(data){
+function parseOSDsTreeData(data) {
     root = data.osd_tree[0];
     var osdColorArr, osdStatusArr,
         hostColorArr = []
@@ -846,12 +921,12 @@ function parseOSDsTreeData(data){
 
     root.children = root.hosts;
 
-    $.each(root.children, function(idx, host){
+    $.each(root.children, function(idx, host) {
         osdColorArr = [];
         osdStatusArr = [];
         host.children = host.osds;
-        $.each(host.children, function(idx, osd){
-            osd.color =  getOSDColor(osd);
+        $.each(host.children, function(idx, osd) {
+            osd.color = getOSDColor(osd);
             osdColorArr.push(osd.color);
             osdStatusArr.push(osd.status);
             osdStatusArr.push(osd.cluster_status);
@@ -869,7 +944,12 @@ function parseOSDsTreeData(data){
 
 function osdTree() {
     var self = this;
-    this.margin = {top: 20, right: 120, bottom: 20, left: 120};
+    this.margin = {
+        top: 20,
+        right: 120,
+        bottom: 20,
+        left: 120
+    };
     this.lastClickedNode = null;
     this.width = 960 - self.margin.right - self.margin.left;
     this.height = 500 - self.margin.top - self.margin.bottom;
@@ -882,13 +962,13 @@ function osdTree() {
         .size([this.height, this.width]);
 
     this.diagonal = d3.svg.diagonal()
-        .projection(function (d) {
+        .projection(function(d) {
             return [d.y, d.x];
         });
 
     this.infoTooltip = nv.tooltip;
 
-    this.init = function(){
+    this.init = function() {
         var tree = tenantStorageDisksView.osdsTree
         d3.select("#osd-tree").html('');
         tenantStorageDisksView.osdsTree.svgTree = d3.select("#osd-tree").append("svg")
@@ -903,7 +983,7 @@ function osdTree() {
 
         tenantStorageChartsInitializationStatus['host_tree'] = true;
     }
-    
+
     function collapse(d) {
         if (d.children) {
             d._children = d.children;
@@ -912,10 +992,10 @@ function osdTree() {
         }
     }
 
-    function selectiveCollapse(d, expansionArr){
-        $.each(d.children, function(idx, host){
+    function selectiveCollapse(d, expansionArr) {
+        $.each(d.children, function(idx, host) {
             var found = $.inArray(host.name, expansionArr);
-            if(found < 0 ){
+            if (found < 0) {
                 if (host.children) {
                     host._children = host.children;
                     host._children.forEach(collapse);
@@ -927,7 +1007,7 @@ function osdTree() {
     }
 
     this.update = function(source, root_flag) {
-        if(root_flag && source != null) {
+        if (root_flag && source != null) {
             source.x0 = tenantStorageDisksView.osdsTree.height / 2;
             source.y0 = 0;
             var duration = 750;
@@ -937,8 +1017,7 @@ function osdTree() {
                 var clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
                 source = selectiveCollapse(source, clickedArr);
                 tenantStorageDisksView.osdsTree.root = source;
-            }
-            else {
+            } else {
                 source.children.forEach(collapse);
                 tenantStorageDisksView.osdsTree.root = source;
             }
@@ -950,16 +1029,22 @@ function osdTree() {
         links = tenantStorageDisksView.osdsTree.tree.links(nodes);
 
         // Normalize for fixed-depth.
-        nodes.forEach(function(d) { d.y = d.depth * 180; });
-        
+        nodes.forEach(function(d) {
+            d.y = d.depth * 180;
+        });
+
         // Update the nodes…
         var node = tenantStorageDisksView.osdsTree.svgTree.selectAll("g.node")
-            .data(nodes, function(d) { return d.id; });
+            .data(nodes, function(d) {
+                return d.id;
+            });
 
         // Enter any new nodes at the parent's previous position.
         var nodeEnter = node.enter().append("g")
             .attr("class", "node")
-            .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; });
+            .attr("transform", function(d) {
+                return "translate(" + source.y0 + "," + source.x0 + ")";
+            });
 
         /*
          nodeEnter.append("circle")
@@ -967,21 +1052,17 @@ function osdTree() {
          .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
          */
         nodeEnter.append("use")
-            .attr("xlink:href", function (d) {
+            .attr("xlink:href", function(d) {
                 if (d.type == 'osd') {
                     if (d.status == 'up')
                         return "#" + d.type + "-" + d.cluster_status;
                     else
                         return "#" + d.type + "-" + d.status;
-                }
-                else if (d.type == 'host') {
+                } else if (d.type == 'host') {
                     return "#" + d.type + "-" + d.status;
-                }
-                else if (d.type == 'root') {
+                } else if (d.type == 'root') {
                     return "#host" + "-" + d.status;
-                }
-                else {
-                }
+                } else {}
             })
             .attr("transform", "translate(0,-10)")
             .style("opacity", 0.9)
@@ -990,19 +1071,29 @@ function osdTree() {
             .on("mouseout", nodeMouseout);
 
         nodeEnter.append("text")
-            .attr("x", function(d) { return d.children || d._children ? -24 : 35; })
+            .attr("x", function(d) {
+                return d.children || d._children ? -24 : 35;
+            })
             .attr("dy", ".35em")
-            .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-            .text(function(d) { return d.name; })
+            .attr("text-anchor", function(d) {
+                return d.children || d._children ? "end" : "start";
+            })
+            .text(function(d) {
+                return d.name;
+            })
             .style("fill-opacity", 1e-6);
 
         // Transition nodes to their new position.
         var nodeUpdate = node.transition()
             .duration(duration)
-            .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+            .attr("transform", function(d) {
+                return "translate(" + d.y + "," + d.x + ")";
+            });
 
         nodeUpdate.select("use")
-            .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+            .style("fill", function(d) {
+                return d._children ? "lightsteelblue" : "#fff";
+            });
 
         nodeUpdate.select("text")
             .style("fill-opacity", 1);
@@ -1010,7 +1101,9 @@ function osdTree() {
         // Transition exiting nodes to the parent's new position.
         var nodeExit = node.exit().transition()
             .duration(duration)
-            .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+            .attr("transform", function(d) {
+                return "translate(" + source.y + "," + source.x + ")";
+            })
             .remove();
 
         nodeExit.select("use")
@@ -1021,17 +1114,25 @@ function osdTree() {
 
         // Update the links…
         var link = this.svgTree.selectAll("path.link")
-            .data(links, function(d) { return d.target.id; });
+            .data(links, function(d) {
+                return d.target.id;
+            });
 
         // Enter any new links at the parent's previous position.
         link.enter().insert("path", "g")
             .attr("class", "link")
-            .style("stroke", function (d) {
+            .style("stroke", function(d) {
                 return d.target.color;
             })
             .attr("d", function(d) {
-                var o = {x: source.x0, y: source.y0};
-                return diagonal({source: o, target: o});
+                var o = {
+                    x: source.x0,
+                    y: source.y0
+                };
+                return diagonal({
+                    source: o,
+                    target: o
+                });
             });
 
         // Transition links to their new position.
@@ -1043,8 +1144,14 @@ function osdTree() {
         link.exit().transition()
             .duration(duration)
             .attr("d", function(d) {
-                var o = {x: source.x, y: source.y};
-                return diagonal({source: o, target: o});
+                var o = {
+                    x: source.x,
+                    y: source.y
+                };
+                return diagonal({
+                    source: o,
+                    target: o
+                });
             })
             .remove();
 
@@ -1055,12 +1162,12 @@ function osdTree() {
         });
 
     }
-    nodeClick = function (d) {
+    nodeClick = function(d) {
         var clickedArr = [];
 
-        if(d.type == "host") {
-            if(self.lastClickedNode != null){
-                if (self.lastClickedNode.name != d.name){
+        if (d.type == "host") {
+            if (self.lastClickedNode != null) {
+                if (self.lastClickedNode.name != d.name) {
                     self.lastClickedNode._children = self.lastClickedNode.children;
                     self.lastClickedNode.children = null;
                     tenantStorageDisksView.osdsTree.update(self.lastClickedNode, false);
@@ -1089,38 +1196,65 @@ function osdTree() {
             /*if (clickedArr.length != 0) {
                 tenantStorageDisksView.osdsTree.expandedNodes = clickedArr.slice(0);
             }*/
-            if (self.lastClickedNode != null){
+            if (self.lastClickedNode != null) {
                 tenantStorageDisksView.osdsTree.expandedNodes = [];
                 tenantStorageDisksView.osdsTree.expandedNodes.push(self.lastClickedNode.name);
-            }
-            else {
+            } else {
                 tenantStorageDisksView.osdsTree.expandedNodes = [];
             }
             tenantStorageDisksView.osdsTree.update(d, false);
         }
 
     }
-    nodeMouseover = function(d){
+    nodeMouseover = function(d) {
         var infoTooltip = tenantStorageDisksView.osdsTree.infoTooltip;
         var tooltipClass;
 
-        var tooltipContents = [
-            {lbl: 'Name', value: d['name']}    
-        ];
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: d['name']
+        }];
 
-        if(d.type == 'host' || d.type == 'root'){
-            tooltipContents.push({lbl: 'Status', value: (function(){ return getHostStatusTmpl(d['status'])})()});
+        if (d.type == 'host' || d.type == 'root') {
+            tooltipContents.push({
+                lbl: 'Status',
+                value: (function() {
+                    return getHostStatusTmpl(d['status'])
+                })()
+            });
             tooltipClass = 'tree-host-tip';
         }
 
         if (d.type == 'osd') {
-            tooltipContents.push({lbl: 'Status', value: (function(){ return getDiskStatusTmpl(d['status'])})()});
-            tooltipContents.push({lbl: 'Cluster Membership', value: (function(){ return getDiskStatusTmpl(d['cluster_status'])})()});
-            tooltipContents.push({lbl: 'IP Address', value: d['cluster_addr']});
-            tooltipContents.push({lbl: 'UUID', value: d['uuid']});
-            if(d['status'] != 'down') {
-                tooltipContents.push({lbl: 'Apply Latency', value: d['fs_perf_stat']['apply_latency_ms'] + ' ms'});
-                tooltipContents.push({lbl: 'Commit Latency', value: d['fs_perf_stat']['commit_latency_ms'] + ' ms'});
+            tooltipContents.push({
+                lbl: 'Status',
+                value: (function() {
+                    return getDiskStatusTmpl(d['status'])
+                })()
+            });
+            tooltipContents.push({
+                lbl: 'Cluster Membership',
+                value: (function() {
+                    return getDiskStatusTmpl(d['cluster_status'])
+                })()
+            });
+            tooltipContents.push({
+                lbl: 'IP Address',
+                value: d['cluster_addr']
+            });
+            tooltipContents.push({
+                lbl: 'UUID',
+                value: d['uuid']
+            });
+            if (d['status'] != 'down') {
+                tooltipContents.push({
+                    lbl: 'Apply Latency',
+                    value: d['fs_perf_stat']['apply_latency_ms'] + ' ms'
+                });
+                tooltipContents.push({
+                    lbl: 'Commit Latency',
+                    value: d['fs_perf_stat']['commit_latency_ms'] + ' ms'
+                });
             }
             tooltipClass = 'tree-disk-tip';
         }
@@ -1128,7 +1262,7 @@ function osdTree() {
         infoTooltip.show([d3.event.pageX, d3.event.pageY], content, 'n', 10, $('#osd-tree svg')[0], tooltipClass);
 
     }
-    nodeMouseout = function(d){
+    nodeMouseout = function(d) {
         var infoTooltip = tenantStorageDisksView.osdsTree.infoTooltip;
         infoTooltip.cleanup();
     }
@@ -1164,9 +1298,14 @@ function jointTree () {
 }*/
 
 
-function OSDsDataRefresh(){
-    getOSDs();
-    getOSDsTree();
+function OSDsDataRefresh() {
+    if (tenantStorageDisksView.currTab == 'Scatter Plot') {
+        getOSDs();
+    } else if (tenantStorageDisksView.currTab = 'Host Tree') {
+        getOSDsTree();
+    } else {
+
+    }
 }
 
 // Following SVG elemets are used int the tree plot. [osd-in, osd-out, osd-down] [host-active, host-warn, host-critical, host-up]
