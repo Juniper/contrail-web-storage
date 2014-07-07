@@ -353,8 +353,6 @@ function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran)
 {
     var len = 0;
     var resultJSON = {};
-    console.log(timeObj);
-    console.log(storageFlowSeriesData['value']);
     if(storageFlowSeriesData['value'].length > 0) {
         try {
             resultJSON['summary'] = {};
@@ -376,12 +374,14 @@ function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran)
 function formatOsdSeriesLoadXMLData (resultJSON)
 {
     var results = [];
-    var counter = 0;
+    var counter = 0,secTime;
     try {
         resultJSON = resultJSON['value'];
         counter = resultJSON.length;
        for (var i = 0; i < counter; i++) {
             results[i] = {};
+            secTime = Math.floor(resultJSON[i]['T'] / 1000);
+            results[i]['date']= new Date(secTime);
             results[i]['MessageTS'] = resultJSON[i]['T'];
             results[i]['reads'] = resultJSON[i]['info_stats.reads'];
             results[i]['writes'] = resultJSON[i]['info_stats.writes'];
