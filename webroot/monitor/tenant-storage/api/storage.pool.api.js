@@ -157,12 +157,14 @@ function formatFlowSeriesForPoolStats(storageFlowSeriesData, timeObj, timeGran)
 function formatPoolSeriesLoadXMLData (resultJSON)
 {
     var results = [];
-    var counter = 0;
+    var counter = 0, secTime;
     try {
         resultJSON = resultJSON['value'];
         counter = resultJSON.length;
         for (var i = 0; i < counter; i++) {
             results[i] = {};
+            secTime = Math.floor(resultJSON[i]['T'] / 1000);
+            results[i]['date']= new Date(secTime);
             results[i]['MessageTS'] = resultJSON[i]['T'];
             results[i]['reads'] = resultJSON[i]['info_stats.reads'];
             results[i]['writes'] = resultJSON[i]['info_stats.writes'];
