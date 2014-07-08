@@ -300,9 +300,13 @@
 
 #svg-osd-tree-osd{
     visibility: hidden;
+    width: 0px;
+    height: 0px;
 }
 #svg-osd-tree-host{
     visibility: hidden;
+    width: 0px;
+    height: 0px;
 }
 .tree-host-tip .chart-tooltip{
     width: 150px !important;
@@ -315,6 +319,29 @@
 }
 .tree-disk-tip span{
     margin: 0px !important;
+}
+
+.disk-activity-chart {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+.disk-activity-chart .ui-tabs-nav {
+    height: 0px;
+    padding: 0px 0px 0px 10px !important;
+    font-size: 13px;
+    border-bottom: 0px !important;
+    background-color: #ffffff !important;
+}
+.disk-activity-chart .ui-tabs-panel {
+    padding-bottom: 16px;
+}
+.disk-activity-chart .chart-content {
+    padding: 0 10px;
+}
+.disk-activity-chart svg {
+    height: 101px;
+    width: 100%;
+    margin-top: 10px;
 }
 
 /*

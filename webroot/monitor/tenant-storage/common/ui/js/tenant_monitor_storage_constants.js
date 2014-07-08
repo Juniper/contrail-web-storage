@@ -11,21 +11,24 @@ var color_info = '#1F77B4',
 var refreshTimeout = 30000;
 
 var tenantStorageChartsInitializationStatus = {
-    disks       : false,
-    host_tree   : false
+    disks: false,
+    host_tree: false,
+    thrptChart: false,
+    iopsChart: false
 }
 
 disksTabs = ['Scatter Plot', 'Host Tree', 'Details'];
 disksTabStrip = 'osdsTabStrip';
 
 var tenantMonitorStorageUrls = {
-    CLUSTER_STATUS          : '/api/tenant/storage/cluster/status',
-    MONITORS_SUMMARY        : '/api/tenant/storage/cluster/monitors/summary',
-    DF_STATUS               : '/api/tenant/storage/cluster/df/status',
-    POOLS_SUMMARY           : '/api/tenant/storage/cluster/pools/summary',
-    DISK_STATUS             : '/api/tenant/storage/cluster/osd/status',
-    DISKS_SUMMARY           : '/api/tenant/storage/cluster/osds/summary',
-    DISKS_TREE              : '/api/tenant/storage/cluster/osds/tree',
-    THROUGHPUT_SUMMARY      : '/api/tenant/storage/cluster/throughput/summary',
-    CLUSTER_LATENCY         : '/api/tenant/storage/cluster/latency',
+    CLUSTER_STATUS: '/api/tenant/storage/cluster/status',
+    MONITORS_SUMMARY: '/api/tenant/storage/cluster/monitors/summary',
+    DF_STATUS: '/api/tenant/storage/cluster/df/status',
+    POOLS_SUMMARY: '/api/tenant/storage/cluster/pools/summary',
+    DISK_STATUS: '/api/tenant/storage/cluster/osd/status',
+    DISKS_SUMMARY: '/api/tenant/storage/cluster/osds/summary',
+    DISKS_TREE: '/api/tenant/storage/cluster/osds/tree',
+    THROUGHPUT_SUMMARY: '/api/tenant/storage/cluster/throughput/summary',
+    CLUSTER_LATENCY: '/api/tenant/storage/cluster/latency',
+    DISK_ACTIVITY_NOW: '/api/tenant/storage/cluster/osd/flow-series?osdName={0}&minsSince=10&sampleCnt=10&hostName={1}&endTime=now'
 }

@@ -22,9 +22,10 @@ cephOSDsView = function() {
         var cGrid = $('.contrail-grid').data('contrailGrid');
         if (cGrid != null)
             cGrid.destroy();
-        if (this.timerId) {
+        if (this.timerId)
             clearInterval(this.timerId);
-        }
+        if (this.diskTimerId)
+            clearInterval(this.diskTimerId);
         if (this.currTab)
             this.currTab = null;
     }
@@ -374,10 +375,12 @@ cephOSDsView = function() {
                     tenantStorageDisksView.osdsTree.init();
                 getOSDsTree();
             }
+        } else if (selTab == 'Details') {
+            if(tenantStorageChartsInitializationStatus['thrptChart'])
+                updateStorageCharts.refreshView('#diskActivityThrptChart');
+            if(tenantStorageChartsInitializationStatus['iopsChart'])
+                updateStorageCharts.refreshView('#diskActivityIopsChart');
         }
-        /* else if(selTab == 'Joint Tree'){
-            jointTree();
-        }*/
     }
 
     if (this.timerId) {
@@ -401,7 +404,7 @@ function updateDisksChart(data) {
                 xPositive: true,
                 tooltipFn: tenantStorageChartUtils.diskTooltipFn,
                 clickFn: tenantStorageChartUtils.onDiskDrillDown,
-                addDomainBuffer: true
+                addDomainBuffer: true,
             },
             d: [{
                 key: 'disks',
@@ -414,7 +417,6 @@ function updateDisksChart(data) {
         //update chart value
         updateTenantStorageCharts(data, 'disks');
     }
-
 }
 
 function parseOSDsData(data) {
@@ -647,6 +649,155 @@ function osdScatterPlot() {
     }
 }
 
+function populateDiskActivityClass() {
+
+    var self = this;
+    this.deferredObj = $.Deferred();
+    this.thrptData = this.iopsData = this.latData = null;
+    this.diskName = null;
+
+    this.init = function() {
+
+        $('#diskActivityStats .widget-header').initWidgetHeader({
+            title: 'Activity Statistics',
+            widgetBoxId: 'diskActivity'
+        });
+
+        //disk activity chart tabs
+        $('#diskActivityThrptTabStrip').contrailTabs({});
+        $('#diskActivityIopsTabStrip').contrailTabs({});
+        $('#diskActivityLatencyTabStrip').contrailTabs({});
+        //End of disk Activity Chart tabs
+    }
+
+    this.setThrptData = function(data) {
+        self.thrptData = data;
+        self.updateLineCharts(data, 'thrptChart')
+    }
+
+    this.setIopsData = function(data) {
+        self.iopsData = data;
+        self.updateLineCharts(data, 'iopsChart');
+    }
+
+    this.parseDiskStats = function(data) {
+        var retThrptData = [], retIopsData = [];
+        var dataThrptRead = [], dataThrptWrite = [];
+        var dataIopsRead = [], dataIopsWrite = [];
+
+        $.each(data['flow-series'], function(idx, sample) {
+            var readObj = {}, writeObj = {};
+            readObj['x'] = writeObj['x'] = sample['MessageTS'];
+            readObj['dt'] = d3.time.format("%c")(new Date(readObj['x']));
+
+            //Throughput Data
+            readObj['y'] = sample['reads_kbytes'];
+            writeObj['y'] = sample['writes_kbytes'];
+            dataThrptRead.push(readObj);
+            dataThrptWrite.push(writeObj);
+
+            //IOPS Data
+            readObj['y'] = sample['reads'];
+            writeObj['y'] = sample['writes'];
+            dataIopsRead.push(readObj);
+            dataIopsWrite.push(writeObj);
+        });
+
+        retThrptData = [{
+            values: dataThrptRead,
+            key: 'Read',
+            color: 'steelblue',
+            area: true
+        }, {
+            values: dataThrptWrite,
+            key: 'Write',
+            color: '#2ca02c',
+            area: true
+        }];
+
+        retIopsData = [{
+            values: dataIopsRead,
+            key: 'Read',
+            color: 'steelblue',
+            area: true
+        }, {
+            values: dataIopsWrite,
+            key: 'Write',
+            color: '#2ca02c',
+            area: true
+        }];
+
+        return [retThrptData, retIopsData];
+    }
+
+    this.startFetchAndUpdateStats = function(obj) {
+        self.fetchDiskStats(obj);
+        self.diskName = obj['name'];
+
+        if (tenantStorageDisksView.diskTimerId) {
+            clearInterval(tenantStorageDisksView.diskTimerId);
+        } else {
+            tenantStorageDisksView.diskTimerId = setInterval(function() {
+                self.fetchDiskStats(obj);
+            }, refreshTimeout);
+        }
+    }
+
+    this.fetchDiskStats = function(obj) {
+        startWidgetLoading('diskActivity');
+        $.ajax({
+            url: contrail.format(tenantMonitorStorageUrls['DISK_ACTIVITY_NOW'], obj['name'], obj['node'])
+        }).done(function(response) {
+            parsedResp = self.parseDiskStats(response);
+            self.setThrptData(parsedResp[0]);
+            self.setIopsData(parsedResp[1]);
+            endWidgetLoading('diskActivity');
+        });
+    }
+
+    this.updateLineCharts = function(data, chartId) {
+        var chartObj = {},
+            selector;
+        if (chartId == 'thrptChart') {
+            var chartsData = {
+                title: 'Disk Throughput',
+                d: data,
+                chartOptions: {
+                    tooltipFn: tenantStorageChartUtils.thrptActivityTooltipFn
+                }
+            };
+            selector = '#diskActivityThrptChart';
+
+        } else if (chartId == 'iopsChart') {
+            var chartsData = {
+                title: 'Disk IOPS',
+                d: data,
+                chartOptions: {
+                    tooltipFn: tenantStorageChartUtils.iopsActivityTooltipFn
+                }
+            };
+            selector = '#diskActivityIopsChart'
+
+        } else if (chartId == 'latencyChart') {
+
+        } else {
+
+        }
+
+        if (!isStorageChartInitialized(selector)) {
+            $(selector).storageActivityLineChart(chartsData);
+            tenantStorageChartsInitializationStatus[chartId] = true;
+        } else {
+            chartObj['selector'] = $('#content-container').find(selector + ' > svg').first()[0];
+            chartObj['data'] = data;
+            chartObj['type'] = 'storageActivityLineChart';
+            updateStorageCharts.updateView(chartObj);
+        }
+    }
+
+}
+var diskActivity = new populateDiskActivityClass();
+
 function populateDiskDetailsTab(obj) {
     var deferredObj = $.Deferred();
 
@@ -682,6 +833,17 @@ function populateDiskDetailsTab(obj) {
             widgetBoxId: 'diskDash'
         }));
         startWidgetLoading('diskDash');
+
+        /**
+         * since deferedObj is resolved we have the Disk name.
+         * now start populating the acitivity charts.
+         */
+        diskActivity.init();
+        diskActivity.startFetchAndUpdateStats({
+            name: osdName,
+            node: obj['node']
+        });
+
         $.ajax({
             url: contrail.format(monitorInfraStorageUrls['DISK_DETAILS'], osdName)
         }).done(function(response) {
@@ -1025,7 +1187,7 @@ function osdTree() {
         }
 
         // Compute the new tree layout.
-        nodes = tenantStorageDisksView.osdsTree.tree.nodes(tenantStorageDisksView.osdsTree.root).reverse(),
+        nodes = tenantStorageDisksView.osdsTree.tree.nodes(tenantStorageDisksView.osdsTree.root).reverse();
         links = tenantStorageDisksView.osdsTree.tree.links(nodes);
 
         // Normalize for fixed-depth.
@@ -1301,7 +1463,7 @@ function jointTree () {
 function OSDsDataRefresh() {
     if (tenantStorageDisksView.currTab == 'Scatter Plot') {
         getOSDs();
-    } else if (tenantStorageDisksView.currTab = 'Host Tree') {
+    } else if (tenantStorageDisksView.currTab == 'Host Tree') {
         getOSDsTree();
     } else {
 

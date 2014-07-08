@@ -128,35 +128,41 @@ var tenantStorageChartUtils = {
         return tooltipContents;
     },
     thrptActivityTooltipFn: function(key, currObj) {
-        console.log(currObj);
         var tooltipContents = [{
             lbl: 'Name',
             value: 'Throughput'
         }, {
             lbl: key,
             value: currObj['y'] + ' Kbps'
+        }, {
+            lbl: 'Date',
+            value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
         }];
         return tooltipContents;
     },
     iopsActivityTooltipFn: function(key, currObj) {
-        console.log(currObj);
         var tooltipContents = [{
             lbl: 'Name',
             value: 'IOPS'
         }, {
             lbl: key,
             value: currObj['y']
+        }, {
+            lbl: 'Date',
+            value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
         }];
         return tooltipContents;
     },
     latencyActivityTooltipFn: function(key, currObj) {
-        console.log(currObj);
         var tooltipContents = [{
             lbl: 'Name',
             value: 'Latency'
         }, {
             lbl: key,
             value: currObj['y'] + ' ms'
+        }, {
+            lbl: 'Date',
+            value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
         }];
         return tooltipContents;
     }
@@ -351,8 +357,14 @@ var updateStorageCharts = {
                     chart.update();
             }
         }
+    },
+    refreshView: function(selector) {
+        if (selector != null){
+            selector = $('#content-container').find(selector + ' > svg').first()[0];
+            $(selector).parent('div').data('chart').update();
+        }
     }
-}
+};
 
 (function($) {
     $.extend($.fn, {
@@ -366,20 +378,21 @@ var updateStorageCharts = {
                         top: 30,
                         right: 20,
                         bottom: 20,
-                        left: 20
+                        left: 30
                     })
-                    .showLegend(false)
-                    .showYAxis(false)
+                    .showLegend(true)
+                    .showYAxis(true)
                     .showXAxis(true);
 
-                chart.xAxis
-                    .axisLabel('')
-                    .tickFormat(function(d) {
-                        return d3.time.format('%X')(new Date(d))
-                    });
-                //.tickFormat(d3.format(',.0f'));
 
-                chart.xScale(d3.time.scale());
+                chart.xAxis.tickFormat(function(d) {
+                    return d3.time.format('%H:%M:%S')(new Date(d / 1000));
+                });
+
+                chart.yAxis.tickFormat(function(d) {
+                    return d3.format(',.02f')(d);
+                });
+                chart.lines.forceY([0]);
 
                 if (chartOptions['tooltipFn'] == null) {
                     chartOptions['tooltipFn'] = function(key, x, y, e, graph) {
