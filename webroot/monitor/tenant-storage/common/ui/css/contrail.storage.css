@@ -341,6 +341,7 @@
 .disk-activity-chart svg {
     height: 101px;
     width: 100%;
+    display: inline;
     margin-top: 10px;
 }
 
