@@ -72,8 +72,10 @@ var infraMonitorStorageUtils = {
             obj['osds_total'] = 0;
             obj['osds_used'] = 0;
             $.each(host.osds, function(idx, osd) {
-                obj['osds_total'] += osd.kb * 1024;
-                obj['osds_used'] += osd.kb_used * 1024;
+                if (osd.hasOwnProperty('kb') && osd.hasOwnProperty('kb_used')) {
+                    obj['osds_total'] += osd.kb * 1024;
+                    obj['osds_used'] += osd.kb_used * 1024;
+                }
             });
             obj['osds_total'] = formatBytes(obj['osds_total']);
             obj['osds_used'] = formatBytes(obj['osds_used']);
