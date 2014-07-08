@@ -1,32 +1,31 @@
-
-function decideColor(origClass,color){
-    if(color == 'red' || color == "#d62728"){
+function decideColor(origClass, color) {
+    if (color == 'red' || color == "#d62728") {
         return 'cell-hyperlink-text-error';
     } else {
         return 'cell-hyperlink';
     }
 }
 
-function cephIpDisplay (ip){
+function cephIpDisplay(ip) {
     //TODO just get the IP not port
-    return '<span title="'+ ip +'">' + ip + '</span>';
+    return '<span title="' + ip + '">' + ip + '</span>';
 }
 
-function byteToGB(bytes){
-    var gb = (bytes/1073741824).toFixed(2);
+function byteToGB(bytes) {
+    var gb = (bytes / 1073741824).toFixed(2);
     return gb;
 }
 
-function kiloByteToGB(kbytes){
-    var gb = (kbytes/1048576).toFixed(2);
+function kiloByteToGB(kbytes) {
+    var gb = (kbytes / 1048576).toFixed(2);
     return gb;
 }
 
-function calcPercent(val1, val2){
-    return ((val1/val2)*100).toFixed(2);
+function calcPercent(val1, val2) {
+    return ((val1 / val2) * 100).toFixed(2);
 }
 
-function getLabelClass(status){
+function getLabelClass(status) {
     var labelClass;
     if (status == 'OK')
         labelClass = "label-success";
@@ -40,7 +39,7 @@ function getLabelClass(status){
     return labelClass;
 }
 
-function getIconClass(status){
+function getIconClass(status) {
     var labelClass;
     if (status == 'OK')
         labelClass = "icon-arrow-up";
@@ -56,7 +55,7 @@ function getIconClass(status){
     return labelClass;
 }
 
-function getIconColorClass(status){
+function getIconColorClass(status) {
     var labelClass;
     if (status == 'OK')
         labelClass = "success-color";
@@ -70,91 +69,156 @@ function getIconColorClass(status){
     return labelClass;
 }
 
-function getOSDColor(d,obj){
-    if(d['status'] == 'up' ){
-        if(d['cluster_status'] == 'in')
+function getOSDColor(d, obj) {
+    if (d['status'] == 'up') {
+        if (d['cluster_status'] == 'in')
             return d3Colors['green'];
-        else if(d['cluster_status'] == 'out')
+        else if (d['cluster_status'] == 'out')
             return d3Colors['orange']
         else
             return d3Colors['blue']
-    }
-    else if (d['status'] == 'down')
+    } else if (d['status'] == 'down')
         return d3Colors['red']
-    else{}
+    else {}
 }
 
 var tenantStorageChartUtils = {
-    onDiskDrillDown:function(currObj) {
-         layoutHandler.setURLHashParams({node:currObj['host'] , tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
+    onDiskDrillDown: function(currObj) {
+        layoutHandler.setURLHashParams({
+            node: currObj['host'],
+            tab: 'details:' + currObj['name']
+        }, {
+            p: 'mon_storage_disks'
+        });
     },
     diskTooltipFn: function(currObj) {
-        var tooltipContents = [
-            {lbl: 'Status', value: currObj['status'] + '&' + currObj['cluster_status']}
-        ];
+        var tooltipContents = [{
+            lbl: 'Status',
+            value: currObj['status'] + '&' + currObj['cluster_status']
+        }];
         return getStorageNodeTooltipContents(currObj).concat(tooltipContents);
     },
-    getTooltipContents: function (e) {
+    getTooltipContents: function(e) {
         //Get the count of overlapping bubbles
         var series = e['series'];
         var processDetails = e['point']['processDetails'];
-        var tooltipContents = [
-            {lbl: 'Host Name', value: e['point']['name']},
-            {lbl: 'Total Space', value: e['point']['total']},
-            {lbl: 'Available', value: $.isNumeric(e['point']['available_perc']) ? e['point']['available_perc'] + '%' : e['point']['available_perc']}
-        ];
+        var tooltipContents = [{
+            lbl: 'Host Name',
+            value: e['point']['name']
+        }, {
+            lbl: 'Total Space',
+            value: e['point']['total']
+        }, {
+            lbl: 'Available',
+            value: $.isNumeric(e['point']['available_perc']) ? e['point']['available_perc'] + '%' : e['point']['available_perc']
+        }];
         if (e['point']['type'] == 'disk') {
-            tooltipContents.push(
-                {lbl: 'Status', value: e['point']['status'] + '&' + e['point']['cluster_status']}
-            );
-            $.each(e['point']['alerts'], function (idx, obj) {
+            tooltipContents.push({
+                lbl: 'Status',
+                value: e['point']['status'] + '&' + e['point']['cluster_status']
+            });
+            $.each(e['point']['alerts'], function(idx, obj) {
                 if (obj['tooltipAlert'] != false)
-                    tooltipContents.push({lbl: ifNull(obj['tooltipLbl'], 'Events'), value: obj['msg']});
+                    tooltipContents.push({
+                        lbl: ifNull(obj['tooltipLbl'], 'Events'),
+                        value: obj['msg']
+                    });
             });
         }
         return tooltipContents;
     },
-
+    thrptActivityTooltipFn: function(key, currObj) {
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: 'Throughput'
+        }, {
+            lbl: key,
+            value: currObj['y'] + ' Kbps'
+        }, {
+            lbl: 'Date',
+            value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
+        }];
+        return tooltipContents;
+    },
+    iopsActivityTooltipFn: function(key, currObj) {
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: 'IOPS'
+        }, {
+            lbl: key,
+            value: currObj['y']
+        }, {
+            lbl: 'Date',
+            value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
+        }];
+        return tooltipContents;
+    },
+    latencyActivityTooltipFn: function(key, currObj) {
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: 'Latency'
+        }, {
+            lbl: key,
+            value: currObj['y'] + ' ms'
+        }, {
+            lbl: 'Date',
+            value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
+        }];
+        return tooltipContents;
+    }
 }
 
 function updateTenantStorageCharts(dsData, nodeType) {
-    var title,key,chartId,isChartInitialized = false,tooltipFn;
+    var title, key, chartId, isChartInitialized = false,
+        tooltipFn;
     var nodeData = dsData;
     var data = [];
-    if(nodeData != null){
-        data = updateCharts.setUpdateParams($.extend(true,[],nodeData));
+    if (nodeData != null) {
+        data = updateCharts.setUpdateParams($.extend(true, [], nodeData));
     }
-    if(nodeType == 'disks'){
+    if (nodeType == 'disks') {
         title = 'Disks';
         key = 'disks';
         chartId = 'osds-bubble';
         tooltipFn = tenantStorageChartUtils.diskTooltipFn;
         clickFn = tenantStorageChartUtils.onDiskDrillDown;
-        linkHash = {p:'mon_storage_disks',q:{node:'Disks'}};
+        linkHash = {
+            p: 'mon_storage_disks',
+            q: {
+                node: 'Disks'
+            }
+        };
     }
     var chartsData = [{
-                        title: title,
-                        d:[{key:key,values:data}],
-                        xLbl: 'Available (%)',
-                        yLbl: 'Total Storage (GB)',
-                        chartOptions:{
-                            tooltipFn: tooltipFn,
-                            clickFn: clickFn,
-                            xPositive: true,
-                            addDomainBuffer: true
-                        },
-                        link:{
-                            hashParams: linkHash
-                        },
-                        widgetBoxId:'recent'
-                    }];
-    var chartObj = {},nwObj = {};
-    if(!tenantStorageChartsInitializationStatus[key]){
+        title: title,
+        d: [{
+            key: key,
+            values: data
+        }],
+        xLbl: 'Available (%)',
+        yLbl: 'Total Storage (GB)',
+        chartOptions: {
+            tooltipFn: tooltipFn,
+            clickFn: clickFn,
+            xPositive: true,
+            addDomainBuffer: true
+        },
+        link: {
+            hashParams: linkHash
+        },
+        widgetBoxId: 'recent'
+    }];
+    var chartObj = {},
+        nwObj = {};
+    if (!tenantStorageChartsInitializationStatus[key]) {
         $('#' + chartId).initScatterChart(chartsData[0]);
         tenantStorageChartsInitializationStatus[key] = true;
-    }  else {
+    } else {
         chartObj['selector'] = $('#content-container').find('#' + chartId + ' > svg').first()[0];
-        chartObj['data'] = [{key:key,values:data}];
+        chartObj['data'] = [{
+            key: key,
+            values: data
+        }];
         chartObj['type'] = 'infrabubblechart';
         updateCharts.updateView(chartObj);
     }
@@ -162,52 +226,90 @@ function updateTenantStorageCharts(dsData, nodeType) {
 
 var tenantStorageGridUtils = {
     onDisksRowSelChange: function(currObj) {
-        layoutHandler.setURLHashParams({node:currObj['host'] , tab:'details:' + currObj['name']}, {p:'mon_storage_disks'});
+        layoutHandler.setURLHashParams({
+            node: currObj['host'],
+            tab: 'details:' + currObj['name']
+        }, {
+            p: 'mon_storage_disks'
+        });
     },
 }
 
-function addTab(selector, newTabAnchor, newTabTitle, defaultContent){
-    var tabs = $("#"+selector).tabs();
+function addTab(selector, newTabAnchor, newTabTitle, defaultContent) {
+    var tabs = $("#" + selector).tabs();
     var ul = tabs.find("ul");
-    $( "<li><a href='#"+ newTabAnchor + "'>" + newTabTitle + "</a></li>" ).appendTo( ul );
-    $( "<div id='" + newTabAnchor + "'><p>" + defaultContent + "</p></div>" ).appendTo( tabs );
-    tabs.tabs( "refresh" );
+    $("<li><a href='#" + newTabAnchor + "'>" + newTabTitle + "</a></li>").appendTo(ul);
+    $("<div id='" + newTabAnchor + "'><p>" + defaultContent + "</p></div>").appendTo(tabs);
+    tabs.tabs("refresh");
 }
 
-function getMonitorNodeHealthStatusTmpl(obj){
+function getMonitorNodeHealthStatusTmpl(obj) {
     var statusTmpl = contrail.getTemplate4Id('storage-status-template');
-    if(obj == "HEALTH_OK")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" ok</span>";
-    else if(obj == "HEALTH_WARN")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" warn</span>";
-    else if(obj == "HEALTH_CRIT")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" critical</span>";
+    if (obj == "HEALTH_OK")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['INFO'],
+            sevLevels: sevLevels
+        }) + " ok</span>";
+    else if (obj == "HEALTH_WARN")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['WARNING'],
+            sevLevels: sevLevels
+        }) + " warn</span>";
+    else if (obj == "HEALTH_CRIT")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['ERROR'],
+            sevLevels: sevLevels
+        }) + " critical</span>";
     else
-        return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" N/A</span>";
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['NOTICE'],
+            sevLevels: sevLevels
+        }) + " N/A</span>";
 }
 
 function getDiskStatusTmpl(obj) {
     var statusTmpl = contrail.getTemplate4Id('storage-status-template');
-    if(obj == "in")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" in</span>";
-    else if(obj == "out")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" out</span>";
-    else if(obj == "down")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" down</span>";
-    else if(obj == "up")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['NOTICE'],sevLevels:sevLevels})+" up</span>";
+    if (obj == "in")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['INFO'],
+            sevLevels: sevLevels
+        }) + " in</span>";
+    else if (obj == "out")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['WARNING'],
+            sevLevels: sevLevels
+        }) + " out</span>";
+    else if (obj == "down")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['ERROR'],
+            sevLevels: sevLevels
+        }) + " down</span>";
+    else if (obj == "up")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['NOTICE'],
+            sevLevels: sevLevels
+        }) + " up</span>";
     else
         return "<span> N/A</span>";
 }
 
 function getHostStatusTmpl(obj) {
     var statusTmpl = contrail.getTemplate4Id('storage-status-template');
-    if(obj == "active")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['INFO'],sevLevels:sevLevels})+" active</span>";
-    else if(obj == "warn")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['WARNING'],sevLevels:sevLevels})+" warn</span>";
-    else if(obj == "critical")
-        return "<span> "+statusTmpl({sevLevel:sevLevels['ERROR'],sevLevels:sevLevels})+" critical</span>";
+    if (obj == "active")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['INFO'],
+            sevLevels: sevLevels
+        }) + " active</span>";
+    else if (obj == "warn")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['WARNING'],
+            sevLevels: sevLevels
+        }) + " warn</span>";
+    else if (obj == "critical")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['ERROR'],
+            sevLevels: sevLevels
+        }) + " critical</span>";
     else
         return "<span> N/A</span>";
 }
@@ -219,64 +321,111 @@ function formatTreeLblValueTooltip(infoObj) {
     return tooltipTemplate(infoObj);
 }
 
-function activityLineChart(){
-    var chart;
-
-    this.init = function(chartId){
-
-        chart = nv.models.lineChart()
-            .margin({top: 30, right: 20, bottom: 20, left: 5})
-            //.useInteractiveGuideline(false)
-            //.transitionDuration(350)
-            .showLegend(false)
-            .showYAxis(false)
-            .showXAxis(true);
-
-        if(chartId == '#clusterActivityThrptChart') {
-            chart.tooltipContent(function (key, x, y, e, graph) {
-                return '<h3> ' + key + ' Throughput </h3>' +
-                    '<p>' + e.point.y + ' Mbps</p>';
-            });
-            chart.yAxis.tickFormat(d3.format('.02f'));
-        }
-        else if(chartId == '#clusterActivityIopsChart') {
-            chart.tooltipContent(function (key, x, y, e, graph) {
-                return '<h3> ' + key + ' IOPs</h3>' +
-                    '<p>' + e.point.y + ' </p>';
-            });
-        }
-        else if(chartId == '#clusterActivityObjChart') {
-            chart.tooltipContent(function (key, x, y, e, graph) {
-                return '<h3> ' + key + ' </h3>' +
-                    '<p>' + e.point.y + '</p>';
-            });
-        }
-        else if(chartId == '#clusterActivityLatencyChart') {
-            chart.tooltipContent(function (key, x, y, e, graph) {
-                return '<h3> ' + key + ' </h3>' +
-                    '<p>' + e.point.y + ' ms</p>';
-            });
-        }
-        else{
-            chart.yAxis.tickFormat(d3.format('.0f'));
-        }
-        chart.xAxis
-            .axisLabel('')
-            .tickFormat(d3.format(',.0f'));
-
-        this.chart = chart;
-        this.chartId = chartId;
-        this.d3ChartElem = d3.select(this.chartId).append('svg');
-
-    }
-    this.draw = function(){
-        nv.addGraph(function(){ return this.chart});
-    }
-    this.refresh = function(data){
-        this.d3ChartElem
-            .datum(data)
-            .call(this.chart);
-
-        //nv.utils.windowResize(function() { this.chart.update });
-    }
+function isStorageChartInitialized(selector) {
+    if ($(selector + ' > svg').length > 0)
+        return true;
+    else
+        return false;
 }
+
+/**
+ * TooltipFn for storage line chart
+ */
+function lineChartTooltipFn(key, x, y, e, chart, tooltipFormatFn) {
+    var tooltipContents = [];
+    if (typeof(tooltipFormatFn) == 'function') {
+        tooltipContents = tooltipFormatFn(key, e['point']);
+    }
+    //Format the alerts to display in tooltip
+    $.each(ifNull(e['point']['alerts'], []), function(idx, obj) {
+        if (obj['tooltipAlert'] != false)
+            tooltipContents.push({
+                lbl: ifNull(obj['tooltipLbl'], 'Events'),
+                value: obj['msg']
+            });
+    });
+    return formatLblValueTooltip(tooltipContents);
+}
+
+var updateStorageCharts = {
+    updateView: function(obj) {
+        if (obj['type'] == 'storageActivityLineChart') {
+            if (obj['selector'] != null && $(obj['selector']).parent('div') != null) {
+                var chart = $(obj['selector']).parent('div').data('chart');
+                d3.select(obj['selector']).datum(obj['data']);
+                if (chart != null)
+                    chart.update();
+            }
+        }
+    },
+    refreshView: function(selector) {
+        if (selector != null){
+            selector = $('#content-container').find(selector + ' > svg').first()[0];
+            $(selector).parent('div').data('chart').update();
+        }
+    }
+};
+
+(function($) {
+    $.extend($.fn, {
+        storageActivityLineChart: function(data) {
+            var selector = $(this),
+                chartOptions = ifNull(data['chartOptions'], {});
+
+            nv.addGraph(function() {
+                chart = nv.models.lineChart()
+                    .margin({
+                        top: 30,
+                        right: 20,
+                        bottom: 20,
+                        left: 30
+                    })
+                    .showLegend(true)
+                    .showYAxis(true)
+                    .showXAxis(true);
+
+
+                chart.xAxis.tickFormat(function(d) {
+                    return d3.time.format('%H:%M:%S')(new Date(d / 1000));
+                });
+
+                chart.yAxis.tickFormat(function(d) {
+                    return d3.format(',.02f')(d);
+                });
+                chart.lines.forceY([0]);
+
+                if (chartOptions['tooltipFn'] == null) {
+                    chartOptions['tooltipFn'] = function(key, x, y, e, graph) {
+                        return '<h3> ' + key + ' </h3>' +
+                            '<p>' + e.point.y + ' ms</p>';
+                    };
+                }
+
+                var tooltipFn = chartOptions['tooltipFn'];
+                chartOptions['tooltipFn'] = function(key, x, y, e, graph) {
+                    return lineChartTooltipFn(key, x, y, e, graph, tooltipFn)
+                }
+                chart.tooltipContent(chartOptions['tooltipFn']);
+
+                $(selector).data('chart', chart);
+                $(selector).append('<svg></svg>');
+
+                d = ifNull(data['d'], []);
+
+                if (!($(selector).is(':visible'))) {
+                    $(selector).find('svg').bind("refresh", function() {
+                        d3.select($(selector)[0]).select('svg').datum(d).call(chart);
+                    });
+                } else {
+                    d3.select($(selector)[0]).select('svg').datum(d).call(chart);
+                }
+
+                nv.utils.windowResize(function() {
+                    updateChartOnResize(selector, chart);
+                });
+
+                return chart
+            });
+        }
+    })
+})(jQuery);
