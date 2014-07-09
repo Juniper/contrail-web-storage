@@ -751,7 +751,6 @@ function populateDiskActivityClass() {
             parsedResp = self.parseDiskStats(response);
             self.setThrptData(parsedResp[0]);
             self.setIopsData(parsedResp[1]);
-            endWidgetLoading('diskActivity');
         });
     }
 
@@ -1328,20 +1327,27 @@ function osdTree() {
         var clickedArr = [];
 
         if (d.type == "host") {
+            if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
+                clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
+            }
             if (self.lastClickedNode != null) {
                 if (self.lastClickedNode.name != d.name) {
                     self.lastClickedNode._children = self.lastClickedNode.children;
                     self.lastClickedNode.children = null;
                     tenantStorageDisksView.osdsTree.update(self.lastClickedNode, false);
-                    self.lastClickedNode = d;
+                    clickedArr = []; //we are only expanding one node at a time
+                    clickedArr.push(d.name);
+                } else {
+                    if(clickedArr.length !=0) {
+                        clickedArr = []; //already in list; so empty it out.
+                    }
+                    else {
+                        clickedArr.push(d.name)
+                    }
                 }
-            } else {
-                self.lastClickedNode = d;
+                tenantStorageDisksView.osdsTree.expandedNodes = clickedArr.slice(0);
             }
-
-            if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
-                clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
-            }
+            self.lastClickedNode = d;
             if (d.children) {
                 d._children = d.children;
                 d.children = null;
@@ -1353,20 +1359,9 @@ function osdTree() {
                 d.children = d._children;
                 d._children = null;
                 clickedArr.push(d.name);
-
-            }
-            /*if (clickedArr.length != 0) {
-                tenantStorageDisksView.osdsTree.expandedNodes = clickedArr.slice(0);
-            }*/
-            if (self.lastClickedNode != null) {
-                tenantStorageDisksView.osdsTree.expandedNodes = [];
-                tenantStorageDisksView.osdsTree.expandedNodes.push(self.lastClickedNode.name);
-            } else {
-                tenantStorageDisksView.osdsTree.expandedNodes = [];
             }
             tenantStorageDisksView.osdsTree.update(d, false);
         }
-
     }
     nodeMouseover = function(d) {
         var infoTooltip = tenantStorageDisksView.osdsTree.infoTooltip;
