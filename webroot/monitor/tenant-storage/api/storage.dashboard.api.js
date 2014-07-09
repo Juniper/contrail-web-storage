@@ -8,8 +8,10 @@ var storageApi= require('../../../common/api/storage.api.constants');
 
 var cacheApi = require(storageConfig.core_path +
                     '/src/serverroot/web/core/cache.api'),
-    global = require(storageConfig.core_path + 
-                        '/src/serverroot/common/global'),
+    logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
+    global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+    logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
+    stMonUtils= require('../../../common/api/utils/storage.utils'),
     commonUtils = require(storageConfig.core_path +
                         '/src/serverroot/utils/common.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
@@ -20,7 +22,7 @@ storageDashboardApi = module.exports;
 
 function getStorageClusterStatus(req, res ){
     url = storageApi.url.status;//"/status";
-    console.log("get data:"+url);
+    logutils.logger.debug("get data:"+url);
     cacheApi.queueDataFromCacheOrSendRequest(req, res, storageGlobal.STR_JOB_TYPE_CACHE,
         storageGlobal.STR_STORAGE_TYPE_CLUSTER, url,
                                              0, 1, 0, -1, true, null);
@@ -55,23 +57,6 @@ function parseStorageHealthStatusData(resultJSON){
             return healthJSON;
         }
         return emptyObj;
-}
-
-
-function getStorageClusterActivity(req, res,appData){
-    url = storageApi.url.status;
-    storageRest.apiGet(url, appData,url, function (error, resultJSON) {
-        if(!error && (resultJSON)) {
-            var resultJSON = parseStorageClusterActivityData(resultJSON);
-            commonUtils.handleJSONResponse(null, res, resultJSON);
-        } else {
-            commonUtils.handleJSONResponse(error, res, null);
-        }
-    });  
-}
-
-function parseStorageClusterActivityData(activityJSON){
-   return activityJSON;
 }
 
 function getStorageClusterUsageData(req, res, appData){
@@ -110,97 +95,267 @@ function parseStorageDFData(dfDataJSON){
     return dfJSON;
 }
 
-function getStorageClusterThroughput(req, res, appData){
-    url = storageApi.url.pgDumpSummary;//"/pg/dump?dumpcontents=summary";
-    storageRest.apiGet(url, appData, function (error, resultJSON) {
-            if(!error && (resultJSON)) {
-                var resultJSON = parseStorageClusterThroughput(resultJSON);
-                commonUtils.handleJSONResponse(null, res, resultJSON);
-            } else {
-                commonUtils.handleJSONResponse(error, res, null);
-            }
-        });
+function splitString2Array(strValue, delimiter)
+{
+    var strArray = strValue.split(delimiter),
+        count = strArray.length;
+    for (var i = 0; i < count; i++) {
+        strArray[i] = strArray[i].trim();
+    }
+    return strArray;
+};
+
+function createClause(fieldName, fieldValue, operator)
+{
+    var whereClause = {};
+    if (fieldValue != null) {
+        whereClause = {};
+        whereClause.name = fieldName;
+        whereClause.value = fieldValue;
+        whereClause.op = operator;
+    }
+    return whereClause;
+};
+
+function getStorageClusterOSDActivity(req, res,appData){
+    var source = req.query['source'];
+    var selectArray = splitString2Array(source, ',');
+    var sampleCnt = req.query['sampleCnt'];
+    var minsSince = req.query['minsSince'];
+    var endTime = req.query['endTime'];
+
+    var tableName, whereClause=[],
+        selectArr = ["T=60", "SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)","SUM(info_stats.write_kbytes)",
+            "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)"];
+
+    tableName = 'StatTable.ComputeStorageOsd.info_stats';
+
+    var count = selectArray.length;
+    for (i = 0; i < count; i += 1) {
+        var whereClauseArray=[];
+        whereClauseArray.push(createClause('Source', selectArray[i], 1));
+        whereClause.push(whereClauseArray);
+    }
+
+    var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+    var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+    var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+    delete queryJSON['limit'];
+    delete queryJSON['dir'];
+    var selectEleCnt = queryJSON['select_fields'].length;
+    queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+    stMonUtils.executeQueryString(queryJSON,
+        commonUtils.doEnsureExecution(function(err, resultJSON)  {
+            resultJSON= parseStorageClusterOSDActivityData(resultJSON, timeObj, timeGran);
+            commonUtils.handleJSONResponse(err, res, resultJSON);
+        }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
 
 }
 
-function parseStorageClusterThroughput(tPutJSON){
+function parseStorageClusterOSDActivityData(activityJSON, timeObj, timeGran){
+    var len = 0;
     var resultJSON = {};
-   
-    var tPutMapSumJSON = new Object();
-        var tempTPUT = new Object();
-        tempTPUT["num_read"] = jsonPath(tPutJSON, "$.output.pg_stats_sum.stat_sum.num_read")[0];
-        tempTPUT["num_write"] = jsonPath(tPutJSON, "$.output.pg_stats_sum.stat_sum.num_write")[0];
-        tempTPUT["num_read_kb"] = jsonPath(tPutJSON, "$.output.pg_stats_sum.stat_sum.num_read_kb")[0];
-        tempTPUT["num_write_kb"] = jsonPath(tPutJSON, "$.output.pg_stats_sum.stat_sum.num_write_kb")[0];
-       
-    tPutMapSumJSON = tempTPUT;
-
- var tPutMapDeltaJSON = new Object();
-        var tempTPUT = new Object();
-        tempTPUT["num_read"] = jsonPath(tPutJSON, "$.output.pg_stats_delta.stat_sum.num_read")[0];
-        tempTPUT["num_write"] = jsonPath(tPutJSON, "$.output.pg_stats_delta.stat_sum.num_write")[0];
-        tempTPUT["num_read_kb"] = jsonPath(tPutJSON, "$.output.pg_stats_delta.stat_sum.num_read_kb")[0];
-        tempTPUT["num_write_kb"] = jsonPath(tPutJSON, "$.output.pg_stats_delta.stat_sum.num_write_kb")[0];
-       
-    tPutMapDeltaJSON = tempTPUT;
-
-
-    var objMapSumJSON = new Object();   
-        var tempTPUT = new Object();
-        tempTPUT["num_objects"] = jsonPath(tPutJSON, "$.output.pg_stats_sum.stat_sum.num_objects")[0];
-    objMapSumJSON = tempTPUT;
-
-    var objMapDeltaJSON = new Object();   
-        var tempTPUT = new Object();
-        tempTPUT["num_objects"] = jsonPath(tPutJSON, "$.output.pg_stats_delta.stat_sum.num_objects")[0];
-    objMapDeltaJSON = tempTPUT;
-
-    var tempJSON = new Object();
-    tempJSON['stamp'] =jsonPath(tPutJSON, "$.output.stamp")[0];
-    tempJSON['throughput_sum']= tPutMapSumJSON;
-    tempJSON['throughput_delta']= tPutMapDeltaJSON;
-    tempJSON['object_sum']= objMapSumJSON;
-    tempJSON['object_delta']= objMapDeltaJSON;
- 
- resultJSON['cluster_io'] = tempJSON;
-    
-    return resultJSON;
-}
-
-function getStorageClusterLatency(req, res, appData){
-    url = storageApi.url.pgDumpSummary;
-    storageRest.apiGet(url, appData, function (error, resultJSON) {
-            if(!error && (resultJSON)) {
-                var resultJSON = parseStorageClusterLatency(resultJSON);
-                commonUtils.handleJSONResponse(null, res, resultJSON);
-            } else {
-                commonUtils.handleJSONResponse(error, res, null);
+    if(activityJSON['value'].length > 0) {
+       try {
+           resultJSON['summary'] = {};
+           resultJSON['summary']['start_time'] = timeObj['start_time'];
+           resultJSON['summary']['end_time'] = timeObj['end_time'];
+           resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
+           resultJSON['summary']['aggregation_slot']='60 Seconds';
+              resultJSON['flow-series'] = formatOsdSeriesLoadXMLData(activityJSON);
+              return resultJSON;
+            } catch (e) {
+                logutils.logger.error("In parseStorageClusterOSDActivityData(): JSON Parse error: " + e);
+                return null;
             }
-        });
-    
+       }
 }
 
-function parseStorageClusterLatency(latJSON){
-    var resultJSON = {};
-    var latMapJSON = new Object();
-        var tempLat = new Object();
-        tempLat["apply_latency_ms"] = jsonPath(latJSON, "$.output.osd_stats_sum.fs_perf_stat.apply_latency_ms")[0];
-        tempLat["commit_latency_ms"] = jsonPath(latJSON, "$.output.osd_stats_sum.fs_perf_stat.commit_latency_ms")[0];   
-    latMapJSON['stamp'] =jsonPath(latJSON, "$.output.stamp")[0];
-    latMapJSON['osd_sum_latency'] = tempLat
-    resultJSON['cluster_latency'] =  latMapJSON;
+function formatOsdSeriesLoadXMLData(resultJSON){
+    var results = [];
+    var counter = 0,secTime;
+    try {
+        resultJSON = resultJSON['value'];
+        counter = resultJSON.length;
+        for (var i = 0; i < counter; i++) {
+            results[i] = {};
+            secTime = Math.floor(resultJSON[i]['T='] / 1000);
+            results[i]['Date']= new Date(secTime);
+            results[i]['MessageTS'] = resultJSON[i]['T'];
+            results[i]['total_reads'] = resultJSON[i]['SUM(info_stats.reads)'];
+            results[i]['total_writes'] = resultJSON[i]['SUM(info_stats.writes)'];
+            results[i]['total_reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
+            results[i]['total_writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
+            results[i]['total_op_r_latency'] = resultJSON[i]['SUM(info_stats.op_r_latency)'];
+            results[i]['total_op_w_latency'] = resultJSON[i]['SUM(info_stats.op_w_latency)'];
+        }
+        return results;
+    } catch (e) {
+        logutils.logger.error("In formatOsdSeriesLoadXMLData(): JSON Parse error: " + e);
+        return null;
+    }
+}
 
-    return resultJSON;
+function getStorageClusterPoolActivity(req, res,appData){
+    var source = req.query['source'];
+    var selectArray = splitString2Array(source, ',');
+    var sampleCnt = req.query['sampleCnt'];
+    var minsSince = req.query['minsSince'];
+    var endTime = req.query['endTime'];
+
+
+    var tableName, whereClause=[],
+        selectArr = ["T=60", "SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)","SUM(info_stats.write_kbytes)" ];
+
+    tableName = 'StatTable.ComputeStoragePool.info_stats';
+
+    var count = selectArray.length;
+    for (i = 0; i < count; i += 1) {
+        var whereClauseArray=[];
+        whereClauseArray.push(createClause('Source', selectArray[i], 1));
+        whereClause.push(whereClauseArray);
+    }
+
+    var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+    var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+    var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+    delete queryJSON['limit'];
+    delete queryJSON['dir'];
+    var selectEleCnt = queryJSON['select_fields'].length;
+    queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+    stMonUtils.executeQueryString(queryJSON,
+        commonUtils.doEnsureExecution(function(err, resultJSON)  {
+            resultJSON= parseStorageClusterPoolActivityData(resultJSON, timeObj, timeGran);
+            commonUtils.handleJSONResponse(err, res, resultJSON);
+        }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+
+}
+
+function parseStorageClusterPoolActivityData(activityJSON, timeObj, timeGran){
+    var len = 0;
+    var resultJSON = {};
+    if(activityJSON['value'].length > 0) {
+        try {
+            resultJSON['summary'] = {};
+            resultJSON['summary']['start_time'] = timeObj['start_time'];
+            resultJSON['summary']['end_time'] = timeObj['end_time'];
+            resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
+            resultJSON['summary']['aggregation_slot']='60 Seconds';
+            resultJSON['flow-series'] = formatPoolSeriesLoadXMLData(activityJSON);
+            return resultJSON;
+        } catch (e) {
+            logutils.logger.error("In parseStorageClusterPoolActivityData(): JSON Parse error: " + e);
+            return null;
+        }
+    }
+}
+
+function formatPoolSeriesLoadXMLData(resultJSON){
+    var results = [];
+    var counter = 0,secTime;
+    try {
+        resultJSON = resultJSON['value'];
+        counter = resultJSON.length;
+        for (var i = 0; i < counter; i++) {
+            results[i] = {};
+            secTime = Math.floor(resultJSON[i]['T='] / 1000);
+            results[i]['Date']= new Date(secTime);
+            results[i]['MessageTS'] = resultJSON[i]['T'];
+            results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
+            results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
+            results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
+            results[i]['writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
+        }
+        return results;
+    } catch (e) {
+        logutils.logger.error("In formatPoolSeriesLoadXMLData(): JSON Parse error: " + e);
+        return null;
+    }
+}
+function getStorageClusterDiskActivity(req, res,appData){
+    var source = req.query['source'];
+    var selectArray = splitString2Array(source, ',');
+    var sampleCnt = req.query['sampleCnt'];
+    var minsSince = req.query['minsSince'];
+    var endTime = req.query['endTime'];
+
+    var tableName, whereClause=[],
+        selectArr = ["T=60", "SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
+            "SUM(info_stats.write_kbytes)", "SUM(info_stats.iops)","SUM(info_stats.bw)" ];
+
+    tableName = 'StatTable.ComputeStorageDisk.info_stats';
+
+    var count = selectArray.length;
+    for (i = 0; i < count; i += 1) {
+        var whereClauseArray=[];
+        whereClauseArray.push(createClause('Source', selectArray[i], 1));
+        whereClause.push(whereClauseArray);
+    }
+
+    var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+    var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+    var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+    delete queryJSON['limit'];
+    delete queryJSON['dir'];
+    var selectEleCnt = queryJSON['select_fields'].length;
+    queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+    stMonUtils.executeQueryString(queryJSON,
+        commonUtils.doEnsureExecution(function(err, resultJSON)  {
+            resultJSON= parseStorageClusterDiskActivityData(resultJSON, timeObj, timeGran);
+            commonUtils.handleJSONResponse(err, res, resultJSON);
+        }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+
+}
+
+function parseStorageClusterDiskActivityData(activityJSON, timeObj, timeGran){
+    var len = 0;
+    var resultJSON = {};
+    if(activityJSON['value'].length > 0) {
+        try {
+            resultJSON['summary'] = {};
+            resultJSON['summary']['start_time'] = timeObj['start_time'];
+            resultJSON['summary']['end_time'] = timeObj['end_time'];
+            resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
+            resultJSON['summary']['aggregation_slot']='60 Seconds';
+            resultJSON['flow-series'] = formatDiskSeriesLoadXMLData(activityJSON);
+            return resultJSON;
+        } catch (e) {
+            logutils.logger.error("In parseStorageClusterDiskActivityData(): JSON Parse error: " + e);
+            return null;
+        }
+    }
+}
+
+function formatDiskSeriesLoadXMLData(resultJSON){
+    var results = [];
+    var counter = 0,secTime;
+    try {
+        resultJSON = resultJSON['value'];
+        counter = resultJSON.length;
+        for (var i = 0; i < counter; i++) {
+            results[i] = {};
+            secTime = Math.floor(resultJSON[i]['T='] / 1000);
+            results[i]['Date']= new Date(secTime);
+            results[i]['MessageTS'] = resultJSON[i]['T='];
+            results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
+            results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
+            results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
+            results[i]['writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
+            results[i]['iops'] = resultJSON[i]['SUM(info_stats.iops)'];
+            results[i]['bw'] = resultJSON[i]['SUM(info_stats.bw)'];
+        }
+        return results;
+    } catch (e) {
+        logutils.logger.error("In formatDiskSeriesLoadXMLData(): JSON Parse error: " + e);
+        return null;
+    }
 }
 
 /* List all public functions */
 exports.getStorageClusterStatus = getStorageClusterStatus;
-exports.getStorageClusterDFStatus = getStorageClusterDFStatus
+exports.getStorageClusterDFStatus = getStorageClusterDFStatus;
 exports.getStorageClusterHealthStatus = getStorageClusterHealthStatus;
-exports.getStorageClusterActivity = getStorageClusterActivity;
+exports.getStorageClusterOSDActivity = getStorageClusterOSDActivity;
+exports.getStorageClusterPoolActivity = getStorageClusterPoolActivity;
+exports.getStorageClusterDiskActivity = getStorageClusterDiskActivity;
 exports.getStorageClusterUsageData = getStorageClusterUsageData;
-exports.getStorageClusterThroughput =  getStorageClusterThroughput;
-exports.getStorageClusterLatency = getStorageClusterLatency;
-
-
-

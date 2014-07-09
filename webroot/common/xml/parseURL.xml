@@ -123,19 +123,25 @@
     </item>
 
     <item>
-        <url>/api/tenant/storage/cluster/throughput/summary</url>
+        <url>/api/tenant/storage/cluster/osd/activity</url>
         <method>get</method>
         <feature>storage</feature>
-        <callback>storageDashboardApi.getStorageClusterThroughput</callback>
+        <callback>storageDashboardApi.getStorageClusterOSDActivity</callback>
     </item>
 
     <item>
-        <url>/api/tenant/storage/cluster/latency</url>
+        <url>/api/tenant/storage/cluster/pool/activity</url>
         <method>get</method>
         <feature>storage</feature>
-        <callback>storageDashboardApi.getStorageClusterLatency</callback>
+        <callback>storageDashboardApi.getStorageClusterPoolActivity</callback>
     </item>
-    
+    <item>
+        <url>/api/tenant/storage/cluster/disk/activity</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterDiskActivity</callback>
+    </item>
+
     <item>
         <url>/api/tenant/storage/cluster/osd/status</url>
         <method>get</method>

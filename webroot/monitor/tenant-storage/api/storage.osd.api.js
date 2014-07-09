@@ -322,11 +322,13 @@ function getStorageOSDFlowSeries (req, res, appData) {
     var name = source +":"+osdName;
 
     var tableName, whereClause,
-        selectArr = ["T", "name", "info_stats.reads", "info_stats.writes", "info_stats.read_kbytes","info_stats.write_kbytes" ];
+        selectArr = ["T", "name", "info_stats.reads", "info_stats.writes", "info_stats.read_kbytes","info_stats.write_kbytes"];
 
     tableName = 'StatTable.ComputeStorageOsd.info_stats';
-    selectArr.push("info_stats.uuid");
-    selectArr.push("info_stats.osd_name");
+    selectArr.push("UUID");
+    selectArr.push("info_stats.op_r_latency");
+    selectArr.push("info_stats.op_w_latency");
+
     whereClause = [
         {'Source':source},
         {'name':name}
@@ -342,26 +344,26 @@ function getStorageOSDFlowSeries (req, res, appData) {
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
     stMonUtils.executeQueryString(queryJSON,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
-            resultJSON= formatFlowSeriesForOsdStats(resultJSON, timeObj, timeGran);
+            resultJSON= formatFlowSeriesForOsdStats(resultJSON, timeObj, timeGran,osdName);
             commonUtils.handleJSONResponse(err, res, resultJSON);
         }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
 
 }
 
 
-function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran)
+function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran,osdName)
 {
     var len = 0;
     var resultJSON = {};
-    if(storageFlowSeriesData['value'].length > 0) {
+    if(storageFlowSeriesData != undefined && storageFlowSeriesData['value']!= undefined && storageFlowSeriesData['value'].length > 0) {
         try {
             resultJSON['summary'] = {};
             resultJSON['summary']['start_time'] = timeObj['start_time'];
             resultJSON['summary']['end_time'] = timeObj['end_time'];
             resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
             resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
-            resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['info_stats.uuid'];
-            resultJSON['summary']['osd_name'] = storageFlowSeriesData['value'][0]['info_stats.osd_name'];
+            resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['UUID'];
+            resultJSON['summary']['osd_name'] = osdName;
             resultJSON['flow-series'] = formatOsdSeriesLoadXMLData(storageFlowSeriesData);
             return resultJSON;
         } catch (e) {
@@ -387,6 +389,8 @@ function formatOsdSeriesLoadXMLData (resultJSON)
             results[i]['writes'] = resultJSON[i]['info_stats.writes'];
             results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
             results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
+           results[i]['op_r_latency'] = resultJSON[i]['info_stats.op_r_latency'];
+           results[i]['op_w_latency'] = resultJSON[i]['info_stats.op_w_latency'];
         }
         return results;
     } catch (e) {
