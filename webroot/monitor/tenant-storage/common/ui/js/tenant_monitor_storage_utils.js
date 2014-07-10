@@ -168,59 +168,44 @@ var tenantStorageChartUtils = {
     }
 }
 
-function updateTenantStorageCharts(dsData, nodeType) {
-    var title, key, chartId, isChartInitialized = false,
-        tooltipFn;
-    var nodeData = dsData;
-    var data = [];
+function updateTenantStorageCharts(data, nodeType) {
+    var chartsData = ifNull(data, {});
+    var nodeData = data['d'];
+    var d = [];
+    var chartOptions = ifNull(data['chartOptions'], {});
     if (nodeData != null) {
-        data = updateCharts.setUpdateParams($.extend(true, [], nodeData));
+        d = updateCharts.setUpdateParams($.extend(true, [], nodeData));
     }
     if (nodeType == 'disks') {
-        title = 'Disks';
-        key = 'disks';
-        chartId = 'osds-bubble';
-        tooltipFn = tenantStorageChartUtils.diskTooltipFn;
-        clickFn = tenantStorageChartUtils.onDiskDrillDown;
-        linkHash = {
+        chartsData['title'] = ifNull(data['title'], 'Disks');
+        chartsData['key'] = ifNull(data['key'], 'disks');
+        chartsData['chartId'] = ifNull(data['chartId'], 'osds-bubble');
+        chartOptions['tooltipFn'] = ifNull(data['chartOptions']['tooltipFn'], tenantStorageChartUtils.diskTooltipFn);
+        chartOptions['clickFn'] = ifNull(data['chartOptions']['clickFn'], tenantStorageChartUtils.onDiskDrillDown);
+        chartOptions['xPositive'] = ifNull(data['chartOptions']['xPositive'], true);
+        chartOptions['addDomainBuffer'] = ifNull(data['chartOptions']['addDomainBuffer'], true);
+        chartsData['d'] = d;
+        chartsData['link'] = ifNull(data['link'], {});
+        chartsData['link']['hashParams'] = {
             p: 'mon_storage_disks',
             q: {
                 node: 'Disks'
             }
         };
+        chartsData['type'] = 'storageBubbleChart';
     }
-    var chartsData = [{
-        title: title,
-        d: [{
-            key: key,
-            values: data
-        }],
-        xLbl: 'Available (%)',
-        yLbl: 'Total Storage (GB)',
-        chartOptions: {
-            tooltipFn: tooltipFn,
-            clickFn: clickFn,
-            xPositive: true,
-            addDomainBuffer: true
-        },
-        link: {
-            hashParams: linkHash
-        },
-        widgetBoxId: 'recent'
-    }];
-    var chartObj = {},
-        nwObj = {};
-    if (!tenantStorageChartsInitializationStatus[key]) {
-        $('#' + chartId).initScatterChart(chartsData[0]);
-        tenantStorageChartsInitializationStatus[key] = true;
+    chartsData['chartOptions'] = chartOptions;
+    chartsData['widgetBoxId'] = 'recent';
+    var chartObj = {};
+    console.log(chartsData);
+    if (!tenantStorageChartsInitializationStatus[chartsData['key']]) {
+        $('#' + chartsData['chartId']).initScatterChart(chartsData);
+        tenantStorageChartsInitializationStatus[chartsData['key']] = true;
     } else {
-        chartObj['selector'] = $('#content-container').find('#' + chartId + ' > svg').first()[0];
-        chartObj['data'] = [{
-            key: key,
-            values: data
-        }];
-        chartObj['type'] = 'infrabubblechart';
-        updateCharts.updateView(chartObj);
+        chartObj['selector'] = $('#content-container').find('#' + chartsData['chartId'] + ' > svg').first()[0];
+        chartObj['data'] = chartsData['d'];
+        chartObj['type'] = chartsData['type'];
+        updateStorageCharts.updateView(chartObj);
     }
 }
 
