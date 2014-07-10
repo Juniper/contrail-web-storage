@@ -15,10 +15,11 @@ var tenantStorageChartsInitializationStatus = {
     host_tree: false,
     thrptChart: false,
     iopsChart: false
-}
+};
 
-disksTabs = ['Scatter Plot', 'Host Tree', 'Details'];
-disksTabStrip = 'osdsTabStrip';
+var disksTabs = ['Scatter Plot', 'Host Tree', 'Details'];
+var disksTabStrip = 'osdsTabStrip';
+var storageTreeChartExpandedNodes = [];
 
 var tenantMonitorStorageUrls = {
     CLUSTER_STATUS: '/api/tenant/storage/cluster/status',
@@ -31,4 +32,4 @@ var tenantMonitorStorageUrls = {
     THROUGHPUT_SUMMARY: '/api/tenant/storage/cluster/throughput/summary',
     CLUSTER_LATENCY: '/api/tenant/storage/cluster/latency',
     DISK_ACTIVITY_NOW: '/api/tenant/storage/cluster/osd/flow-series?osdName={0}&minsSince=10&sampleCnt=10&hostName={1}&endTime=now'
-}
+};

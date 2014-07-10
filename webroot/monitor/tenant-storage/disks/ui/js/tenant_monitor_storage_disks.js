@@ -1174,15 +1174,13 @@ function osdTree() {
             var duration = 750;
             diagonal = tenantStorageDisksView.osdsTree.diagonal;
 
-            if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
-                var clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
+            if (storageTreeChartExpandedNodes.length != 0) {
+                var clickedArr = storageTreeChartExpandedNodes.slice(0);
                 source = selectiveCollapse(source, clickedArr);
-                tenantStorageDisksView.osdsTree.root = source;
             } else {
                 source.children.forEach(collapse);
-                tenantStorageDisksView.osdsTree.root = source;
             }
-
+            tenantStorageDisksView.osdsTree.root = source;
         }
 
         // Compute the new tree layout.
@@ -1327,10 +1325,8 @@ function osdTree() {
         var clickedArr = [];
 
         if (d.type == "host") {
-            if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
-                clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
-            }
             if (self.lastClickedNode != null) {
+                clickedArr = storageTreeChartExpandedNodes.slice(0);
                 if (self.lastClickedNode.name != d.name) {
                     self.lastClickedNode._children = self.lastClickedNode.children;
                     self.lastClickedNode.children = null;
@@ -1338,15 +1334,12 @@ function osdTree() {
                     clickedArr = []; //we are only expanding one node at a time
                     clickedArr.push(d.name);
                 } else {
-                    if(clickedArr.length !=0) {
-                        clickedArr = []; //already in list; so empty it out.
-                    }
-                    else {
-                        clickedArr.push(d.name)
-                    }
+                    clickedArr = []; //already in list; so empty it out.
                 }
-                tenantStorageDisksView.osdsTree.expandedNodes = clickedArr.slice(0);
+            } else {
+                clickedArr.push(d.name);
             }
+            storageTreeChartExpandedNodes = clickedArr.slice(0);
             self.lastClickedNode = d;
             if (d.children) {
                 d._children = d.children;
@@ -1361,6 +1354,11 @@ function osdTree() {
                 clickedArr.push(d.name);
             }
             tenantStorageDisksView.osdsTree.update(d, false);
+        } else if(d.type == 'osd') {
+            var currObj = {};
+            currObj['name'] = d.name;
+            currObj['host'] = d.parent.name;
+            tenantStorageChartUtils.onDiskDrillDown(currObj);
         }
     }
     nodeMouseover = function(d) {
