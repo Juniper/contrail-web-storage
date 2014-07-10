@@ -268,92 +268,6 @@ cephOSDsView = function() {
         }
     }
 
-    this.parseOSDsData = function(respData) {
-
-        var retArr = [],
-            osdErrArr = [];
-        var osdArr = [],
-            osdUpInArr = [],
-            osdDownArr = [],
-            osdUpOutArr = [];
-        var skip_osd_bubble = new Boolean();
-
-        if (respData != null) {
-            var osds = respData.osds;
-            $.each(osds, function(idx, osd) {
-                skip_osd_bubble = false;
-
-                if (osd.kb) {
-                    osd.available_perc = calcPercent(osd.kb_avail, osd.kb);
-                    osd.x = parseFloat(osd.available_perc);
-                    osd.gb = kiloByteToGB(osd.kb);
-                    osd.y = parseFloat(osd.gb);
-                    osd.gb_avail = kiloByteToGB(osd.kb_avail);
-                    osd.gb_used = kiloByteToGB(osd.kb_used);
-                } else {
-                    skip_osd_bubble = true;
-                    osd.gb = 'Not Available';
-                    osd.gb_used = 'Not Available';
-                    osd.gb_avail = 'Not Available';
-                    osd.available_perc = 'Not Available';
-                }
-
-                // Add to OSD scatter chart data of flag is not set
-                if (!skip_osd_bubble) {
-                    if (osd.status == "up") {
-                        if (osd.cluster_status == "in") {
-                            osdUpInArr.push(osd);
-                        } else if (osd.cluster_status == "out") {
-                            osdUpOutArr.push(osd);
-                        } else {}
-                    } else if (osd.status == "down") {
-                        osdDownArr.push(osd);
-                    } else {}
-                } else {
-                    osdErrArr.push(osd.name);
-                }
-
-                // All OSDs data should be pushed here for List grid
-                osdArr.push(osd);
-            });
-
-            allGroup = {}, upInGroup = {}, upOutGroup = {}, downGroup = {};
-            /*
-             allGroup.key = "OSDs";
-             allGroup.values = osdArr;
-             retArr.push(allGroup);
-             */
-
-            //UP & IN OSDs
-            upInGroup.key = "UP & IN ";
-            upInGroup.values = osdUpInArr;
-            upInGroup.color = color_success;
-            retArr.push(upInGroup);
-            //UP & OUT OSDs
-            upOutGroup.key = "UP & OUT";
-            upOutGroup.values = osdUpOutArr;
-            upOutGroup.color = color_warn;
-            retArr.push(upOutGroup);
-            //Down OSDs
-            downGroup.key = "Down";
-            downGroup.values = osdDownArr;
-            downGroup.color = color_imp;
-            retArr.push(downGroup);
-        }
-        this.setOSDsDetailsData(osdArr);
-        this.setOSDsBubbleData(retArr);
-        console.log(retArr);
-        if (osdErrArr.length != 0) {
-            var msg = ' Following OSDs were not added to Scatter Chart due to insuffient data ';
-            $.each(osdErrArr, function(idx, osd) {
-                msg = msg + " " + osd + " ";
-            });
-            this.setErrorMessage(msg);
-        } else {
-            this.setErrorMessage('None');
-        }
-    }
-
     function onTabActivate(e, ui) {
         selTab = ui.newTab.context.innerText;
         tenantStorageDisksView.currTab = selTab;
@@ -395,31 +309,54 @@ cephOSDsView = function() {
 tenantStorageDisksView = new cephOSDsView();
 
 function updateDisksChart(data) {
+    var chartsData = {
+        title: 'Disks',
+        xLbl: 'Available (%)',
+        yLbl: 'Total Storage (GB)',
+        chartOptions: {
+            xPositive: true,
+            tooltipFn: tenantStorageChartUtils.diskTooltipFn,
+            clickFn: tenantStorageChartUtils.onDiskDrillDown,
+            addDomainBuffer: true,
+        },
+        d: data
+    };
+    var yvals = [];
+    $.each(data, function(idx, grp) {
+        $.each(grp.values, function(i, osd) {
+            yvals.push(parseFloat(osd.y));
+        });
+    });
+    var yscale = d3.extent(yvals);
+
+    yscale[0] = yscale[0] - 150;
+    yscale[1] = yscale[1] + 150;
+
+    var xvals = [];
+    $.each(data, function(idx, grp) {
+        $.each(grp.values, function(i, osd) {
+            xvals.push(parseFloat(osd.x));
+        });
+    });
+    var xscale = d3.extent(xvals);
+    //xscale[0] = parseFloat((xscale[0] - 5).toFixed(2));
+    //xscale[1] = (xscale[1] >= 95.5) ? 100.00 : parseFloat((xscale[1] + 0.5).toFixed(2));
+    if(xscale[1] >= 95){
+        xscale[1] = 100.00;
+        xscale[0] = parseFloat((xscale[0] - 5).toFixed(2));
+    }
+    chartsData['forceX'] = xscale;
+    chartsData['forceY'] = yscale;
+
     if (!isScatterChartInitialized('#osds-bubble')) {
-        var chartsData = {
-            title: 'Disks',
-            xLbl: 'Available (%)',
-            yLbl: 'Total Storage (GB)',
-            chartOptions: {
-                xPositive: true,
-                tooltipFn: tenantStorageChartUtils.diskTooltipFn,
-                clickFn: tenantStorageChartUtils.onDiskDrillDown,
-                addDomainBuffer: true,
-            },
-            d: [{
-                key: 'disks',
-                values: data
-            }]
-        };
         $('#osds-bubble').initScatterChart(chartsData);
         tenantStorageChartsInitializationStatus['disks'] = true;
     } else {
-        //update chart value
-        updateTenantStorageCharts(data, 'disks');
+        updateTenantStorageCharts(chartsData, 'disks');
     }
 }
 
-function parseOSDsData(data) {
+function parseOSDsDataSingleSeries(data) {
     var retArr = [],
         osdErrArr = [];
     var osdArr = [],
@@ -491,6 +428,112 @@ function parseOSDsData(data) {
     }
     tenantStorageDisksView.setOSDsDetailsData(osdArr);
     tenantStorageDisksView.setOSDsBubbleData(retArr);
+}
+
+function parseOSDsData(data) {
+    var retArr = [],
+        osdErrArr = [];
+    var osdArr = [],
+        osdUpInArr = [],
+        osdDownArr = [],
+        osdUpOutArr = [];
+    var skip_osd_bubble = new Boolean();
+    var statusTemplate = contrail.getTemplate4Id("disk-status-template");
+
+    if (data != null) {
+        var osds = data.osds;
+        $.each(osds, function(idx, osd) {
+            skip_osd_bubble = false;
+
+            if (osd.kb) {
+                osd.available_perc = calcPercent(osd.kb_avail, osd.kb);
+                osd.x = parseFloat(osd.available_perc);
+                osd.gb = kiloByteToGB(osd.kb);
+                osd.total = formatBytes(osd.kb * 1024);
+                osd.y = parseFloat(osd.gb);
+                osd.gb_avail = kiloByteToGB(osd.kb_avail);
+                osd.gb_used = kiloByteToGB(osd.kb_used);
+                osd.color = getOSDColor(osd);
+                osd.shape = 'circle';
+                osd.size = 1;
+            } else {
+                skip_osd_bubble = true;
+                osd.gb = 'Not Available';
+                osd.gb_used = 'Not Available';
+                osd.gb_avail = 'Not Available';
+                osd.available_perc = 'Not Available';
+            }
+            /**
+             * osd status template UP?DOWN
+             */
+            osd.status_tmpl = "<span> " + statusTemplate({
+                sevLevel: sevLevels['NOTICE'],
+                sevLevels: sevLevels
+            }) + " up</span>";
+            if (osd.status == 'down')
+                osd.status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['ERROR'],
+                    sevLevels: sevLevels
+                }) + " down</span>";
+            /**
+             * osd cluster membership template IN?OUT
+             */
+            osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                sevLevel: sevLevels['INFO'],
+                sevLevels: sevLevels
+            }) + " in</span>";
+            if (osd.cluster_status == 'out')
+                osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['WARNING'],
+                    sevLevels: sevLevels
+                }) + " out</span>";
+
+            // Add to OSD scatter chart data of flag is not set
+            if (!skip_osd_bubble) {
+                if (osd.status == "up") {
+                    if (osd.cluster_status == "in") {
+                        osdUpInArr.push(osd);
+                    } else if (osd.cluster_status == "out") {
+                        osdUpOutArr.push(osd);
+                    } else {}
+                } else if (osd.status == "down") {
+                    osdDownArr.push(osd);
+                } else {}
+            } else {
+                osdErrArr.push(osd.name);
+            }
+            // All OSDs data should be pushed here for List grid
+            osdArr.push(osd);
+        });
+
+        upInGroup = {}, upOutGroup = {}, downGroup = {};
+        //UP & IN OSDs
+        upInGroup.key = "UP & IN ";
+        upInGroup.values = osdUpInArr;
+        upInGroup.color = color_success;
+        retArr.push(upInGroup);
+        //UP & OUT OSDs
+        upOutGroup.key = "UP & OUT";
+        upOutGroup.values = osdUpOutArr;
+        upOutGroup.color = color_warn;
+        retArr.push(upOutGroup);
+        //Down OSDs
+        downGroup.key = "Down";
+        downGroup.values = osdDownArr;
+        downGroup.color = color_imp;
+        retArr.push(downGroup);
+    }
+    tenantStorageDisksView.setOSDsDetailsData(osdArr);
+    tenantStorageDisksView.setOSDsBubbleData(retArr);
+    if (osdErrArr.length != 0) {
+        var msg = ' Following OSDs were not added to Scatter Chart due to insufficient data ';
+        $.each(osdErrArr, function(idx, osd) {
+            msg = msg + " " + osd + " ";
+        });
+        tenantStorageDisksView.setErrorMessage(msg);
+    } else {
+        tenantStorageDisksView.setErrorMessage('None');
+    }
 }
 
 function getOSDs() {
