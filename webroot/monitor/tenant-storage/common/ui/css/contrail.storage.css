@@ -267,9 +267,10 @@
 .grid-monitor{
     font-weight: normal;    
 }
+/*
 .slick-row .grid-status-label{
     text-align: center;
-}
+}*/
 
 #osds-bubble{
     height: 290px;

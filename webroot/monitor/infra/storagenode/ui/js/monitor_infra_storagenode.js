@@ -116,21 +116,21 @@ storageNodesView = function() {
                 }, {
                     field: "",
                     name: "Disks",
-                    minWidth: 30,
+                    minWidth: 20,
                     formatter: function(r, c, v, cd, dc) {
                         return dc['osds'].length;
                     }
                 }, {
                     field: "osds_total",
-                    name: "Disks Space (GB)",
-                    minWidth: 50,
+                    name: "Disks Space",
+                    minWidth: 60,
                 }, {
                     field: "osds_used",
-                    name: "Disks Used Space (GB)",
+                    name: "Disks Used Space",
                     minWidth: 60,
                 }, {
                     field: "total",
-                    name: "Root HD Space (GB)",
+                    name: "Root HD Space",
                     minWidth: 60
                 }, {
                     field: "available_perc",
@@ -346,14 +346,14 @@ storageNodeView = function() {
                     columns: [{
                         field: "id",
                         name: "ID",
-                        width: 30
+                        width: 20
                     }, {
                         field: "status",
                         name: "Status",
                         formatter: function(r, c, v, cd, dc) {
                             return dc['status_tmpl'];
                         },
-                        width: 30
+                        minWidth: 30
                     }, {
                         field: "cluster_status",
                         name: "Membership",
@@ -361,24 +361,24 @@ storageNodeView = function() {
                             return dc['cluster_status_tmpl'];
                         },
                         cssClass: 'grid-status-label',
-                        width: 40
+                        minWidth: 40
                     }, {
                         field: "name",
-                        name: "OSD name",
+                        name: "Disk name",
                         events: {
                             onClick: function(e, dc) {
                                 onDisksRowSelChange(dc);
                             }
                         },
                         cssClass: 'cell-hyperlink-blue',
-                        minWidth: 80
+                        minWidth: 40
                     }, {
                         field: "gb",
-                        name: "Total GB",
+                        name: "Total",
                         minWidth: 100
                     }, {
                         field: "gb_used",
-                        name: "Used GB",
+                        name: "Used",
                         minWidth: 100
                     }, {
                         field: "avail_percent",
@@ -725,7 +725,7 @@ storageNodeView = function() {
                 lbl: 'Root HD',
                 value: ' '
             }, {
-                lbl: INDENT_RIGHT + 'Total Space',
+                lbl: INDENT_RIGHT + 'Total',
                 value: formatBytes(storNodeData['kb_total'] * 1024)
             }, {
                 lbl: INDENT_RIGHT + 'Used',

@@ -107,19 +107,9 @@ cephMonitorView = function () {
                         width:100
                     },
                     {
-                        field:"gb_total",
-                        name:"Total GB",
-                        width:110
-                    },
-                    {
-                        field:"gb_used",
-                        name:"Used GB",
-                        width:110
-                    },
-                    {
-                        field:"avail_percent",
-                        name:"Available %",
-                        width:110
+                        field:"addr",
+                        name:"IP Address",
+                        width:150
                     }
                 ]
             },
@@ -137,6 +127,19 @@ cephMonitorView = function () {
                                     var detailsInfo = [
                                         {lbl: 'IP Address', value: dc['addr']},
                                         {lbl: 'Hostname', value: dc['name']},
+                                        {
+                                            lbl: 'Root HD',
+                                            value: ' '
+                                        }, {
+                                            lbl: INDENT_RIGHT + 'Total',
+                                            value: formatBytes(dc['kb_total'] * 1024)
+                                        }, {
+                                            lbl: INDENT_RIGHT + 'Used',
+                                            value: formatBytes(dc['kb_used'] * 1024)
+                                        }, {
+                                            lbl: INDENT_RIGHT + 'Available',
+                                            value: dc['avail_percent'] + "%"
+                                        },
                                         {lbl: 'Activity Health', value: getMonitorNodeHealthStatusTmpl(dc['act_health'])},
                                         {lbl: 'Overall Health', value: getMonitorNodeHealthStatusTmpl(dc['health'])},
                                         {lbl: 'Latency', value: (function () {

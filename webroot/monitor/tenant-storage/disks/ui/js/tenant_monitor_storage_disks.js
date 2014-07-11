@@ -94,14 +94,14 @@ cephOSDsView = function() {
                 columns: [{
                     field: "id",
                     name: "ID",
-                    width: 30
+                    width: 20
                 }, {
                     field: "status",
                     name: "Status",
                     formatter: function(r, c, v, cd, dc) {
                         return dc['status_tmpl'];
                     },
-                    width: 30
+                    minWidth: 30
                 }, {
                     field: "cluster_status",
                     name: "Membership",
@@ -109,28 +109,28 @@ cephOSDsView = function() {
                         return dc['cluster_status_tmpl'];
                     },
                     cssClass: 'grid-status-label',
-                    width: 40
+                    minWidth: 40
                 }, {
                     field: "name",
-                    name: "OSD name",
+                    name: "Disk name",
                     events: {
                         onClick: function(e, dc) {
                             tenantStorageGridUtils.onDisksRowSelChange(dc);
                         }
                     },
                     cssClass: 'cell-hyperlink-blue',
-                    minWidth: 80
+                    minWidth: 30
                 }, {
                     field: "host",
                     name: "Hostname",
-                    minWidth: 80
+                    minWidth: 150
                 }, {
-                    field: "gb",
-                    name: "Total GB",
+                    field: "total",
+                    name: "Total",
                     minWidth: 100
                 }, {
-                    field: "gb_used",
-                    name: "Used GB",
+                    field: "used",
+                    name: "Used",
                     minWidth: 100
                 }, {
                     field: "available_perc",
@@ -449,8 +449,9 @@ function parseOSDsData(data) {
                 osd.available_perc = calcPercent(osd.kb_avail, osd.kb);
                 osd.x = parseFloat(osd.available_perc);
                 osd.gb = kiloByteToGB(osd.kb);
-                osd.total = formatBytes(osd.kb * 1024);
                 osd.y = parseFloat(osd.gb);
+                osd.total = formatBytes(osd.kb * 1024);
+                osd.used = formatBytes(osd.kb_used * 1024);
                 osd.gb_avail = kiloByteToGB(osd.kb_avail);
                 osd.gb_used = kiloByteToGB(osd.kb_used);
                 osd.color = getOSDColor(osd);
@@ -458,10 +459,12 @@ function parseOSDsData(data) {
                 osd.size = 1;
             } else {
                 skip_osd_bubble = true;
-                osd.gb = 'Not Available';
-                osd.gb_used = 'Not Available';
-                osd.gb_avail = 'Not Available';
-                osd.available_perc = 'Not Available';
+                osd.gb = 'N/A';
+                osd.total = 'N/A';
+                osd.used = 'N/A';
+                osd.gb_used = 'N/A';
+                osd.gb_avail = 'N/A';
+                osd.available_perc = 'N/A';
             }
             /**
              * osd status template UP?DOWN
