@@ -47,9 +47,7 @@
         <path>request-timeout</path>
     </require>
 
-
     <!--  Contrail Storage API  -->
-
     <require>
         <define>storageInfraApi</define>
         <path>../../monitor/infra/storagenode/api/storage.infra.api</path>
@@ -100,8 +98,16 @@
         <feature>storage</feature>
         <callback>storageInfraApi.getStorageTopologyDetails</callback>
     </item>
-    
-     <item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/hosts</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getSources</callback>
+    </item>
+
+
+    <item>
         <url>/api/tenant/storage/cluster/health/status</url>
         <method>get</method>
         <feature>storage</feature>

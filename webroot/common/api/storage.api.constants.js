@@ -3,6 +3,8 @@ var storage = {};
 storage.rest={};
 storage.rest.serverVersion = "/api/v0.1";
 
+storage.expireTimeSecs= 25;
+
 storage.url={};
 storage.url.health = "/health";
 storage.url.status = "/status";

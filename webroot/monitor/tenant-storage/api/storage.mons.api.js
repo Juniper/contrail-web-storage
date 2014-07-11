@@ -9,6 +9,7 @@ var storageApi= require('../../../common/api/storage.api.constants');
 var   commonUtils = require(storageConfig.core_path +
                     '/src/serverroot/utils/common.utils'),
     global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+    config = require(storageConfig.core_path + '/config/config.global.js'),
     logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
     stMonUtils= require('../../../common/api/utils/storage.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
@@ -16,19 +17,34 @@ var   commonUtils = require(storageConfig.core_path +
     async = require('async'),
     jsonPath = require('JSONPath').eval,
     util = require('util'),
+    expireTime= storageApi.expireTimeSecs,
     storageMonsApi = module.exports;
 
+var redis = require("redis"),
+    redisServerPort = (config.redis_server_port) ? config.redis_server_port : global.DFLT_REDIS_SERVER_PORT,
+    redisServerIP = (config.redis_server_ip) ? config.redis_server_ip : global.DFLT_REDIS_SERVER_IP,
+    redisClient = redis.createClient(redisServerPort, redisServerIP);
 
 function getMonitorSummary(req, res, appData){
-     url = storageApi.url.status;
-     storageRest.apiGet(url, appData,function (error, resultJSON) {
-            if(!error && (resultJSON)) {
-                var resultJSON = parseMonitorSummary(resultJSON);
-                commonUtils.handleJSONResponse(null, res, resultJSON);
-            } else {
-                commonUtils.handleJSONResponse(error, res, null);
-            }
-        });   
+     urlMonStatus = storageApi.url.status;
+    redisClient.get(urlMonStatus, function(error, cachedJSONStr) {
+        if (error || cachedJSONStr == null) {
+            storageRest.apiGet(urlMonStatus, appData, function (error, resultJSON) {
+                if(!error && (resultJSON)) {
+                    var resultJSON = parseMonitorSummary(resultJSON);
+                    if(!resultJSON) {
+                        resultJSON = [];
+                    }
+                    redisClient.setex(urlMonStatus+"/monitor/summary", expireTime, JSON.stringify(resultJSON));
+                    commonUtils.handleJSONResponse(null, res, resultJSON);
+                } else {
+                    commonUtils.handleJSONResponse(error, res, null);
+                }
+            });
+        } else {
+            commonUtils.handleJSONResponse(null, res, JSON.parse(cachedJSONStr));
+        }
+    });
 }
 
 function parseMonitorSummary(resultJSON){
@@ -83,10 +99,26 @@ function consolidateMonitors(resultJSON){
 }
 
 function getStorageDiskFlowSeries (req, res, appData) {
-    var source = req.query['hostName'];
     var sampleCnt = req.query['sampleCnt'];
+    if(typeof sampleCnt == "undefined"){
+        sampleCnt =10;
+    }else if(isNaN(sampleCnt)){
+        sampleCnt =10;
+    }
+
     var minsSince = req.query['minsSince'];
+    if(typeof minsSince == "undefined"){
+        minsSince =30;
+    }else if(isNaN(minsSince)){
+        minsSince =30;
+    }
+
     var endTime = req.query['endTime'];
+    if(typeof endTime == "undefined"){
+        endTime ='now';
+    }
+
+    var source = req.query['hostName'];
     var diskName= req.query['diskName'];
     var name = source +":"+diskName;
 
@@ -123,13 +155,16 @@ function getStorageDiskFlowSeries (req, res, appData) {
 
 function formatFlowSeriesForDiskStats(storageFlowSeriesData, timeObj, timeGran)
 {
-    var len = 0;
+    var len = 0, secTime;
     var resultJSON = {};
     if(storageFlowSeriesData['value'].length > 0) {
         try {
             resultJSON['summary'] = {};
-            resultJSON['summary']['start_time'] = timeObj['start_time'];
-            resultJSON['summary']['end_time'] = timeObj['end_time'];
+            secTime = Math.floor(timeObj['start_time'] / 1000);
+            resultJSON['summary']['start_time'] = new Date(secTime);
+
+            secTime = Math.floor(timeObj['end_time'] / 1000);
+            resultJSON['summary']['end_time'] = new Date(secTime);
             resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
             resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
             resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['info_stats.uuid'];

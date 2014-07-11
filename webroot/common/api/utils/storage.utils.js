@@ -6,12 +6,11 @@ var commonUtils = require(storageConfig.core_path + '/src/serverroot/utils/commo
     global = require(storageConfig.core_path + '/src/serverroot/common/global'),
     rest = require(storageConfig.core_path + '/src/serverroot/common/rest.api');
 
-opServer = rest.getAPIServer({apiName:global.label.OPS_API_SERVER,
-    server:config.analytics.server_ip,
-    port:config.analytics.server_port });
+    opServer = rest.getAPIServer({apiName:global.label.OPS_API_SERVER,
+        server:config.analytics.server_ip,
+        port:config.analytics.server_port });
 
-function createTimeQueryJsonObj (minsSince, endTime)
-{
+function createTimeQueryJsonObj (minsSince, endTime){
     var startTime = 0, timeObj = {};
 
     if ((null != minsSince) && ((null == endTime) || ('' == endTime))) {
@@ -48,8 +47,7 @@ function createTimeQueryJsonObj (minsSince, endTime)
 }
 
 
-function getQueryJSON4Table(tableName, autoSort, autoLimit)
-{
+function getQueryJSON4Table(tableName, autoSort, autoLimit){
     var queryJSON;
     if(tableName.indexOf('StatTable.') != -1) {
         queryJSON = {"table": tableName, "start_time": "", "end_time": "", "select_fields": [], "filter": [], "limit": 150000};
@@ -59,8 +57,7 @@ function getQueryJSON4Table(tableName, autoSort, autoLimit)
     return queryJSON;
 }
 
-function formatAndClause (objArr)
-{
+function formatAndClause (objArr){
     var result = [];
     var len = objArr.length;
     result[0] = [];
@@ -72,8 +69,7 @@ function formatAndClause (objArr)
     return result;
 }
 
-function getTimeGranByTimeSlice (timeObj, sampleCnt)
-{
+function getTimeGranByTimeSlice (timeObj, sampleCnt){
     var startTime = timeObj['start_time'];
     var endTime = timeObj['end_time'];
     if (true == isNaN(startTime)) {
@@ -97,8 +93,7 @@ function getTimeGranByTimeSlice (timeObj, sampleCnt)
     }
     return Math.floor(timeGran);
 }
-function formatQueryStringWithWhereClause (table, whereClause, selectFieldObjArr, timeObj, noSortReqd, limit, dir)
-{
+function formatQueryStringWithWhereClause (table, whereClause, selectFieldObjArr, timeObj, noSortReqd, limit, dir){
     var queryJSON = getQueryJSON4Table(table),
         selectLen = selectFieldObjArr.length;
     queryJSON['select_fields'] = [];
@@ -125,8 +120,7 @@ function formatQueryStringWithWhereClause (table, whereClause, selectFieldObjArr
     return commonUtils.cloneObj(queryJSON);
 }
 
-function executeQueryString (queryJSON, callback)
-{
+function executeQueryString (queryJSON, callback){
     var resultData, startTime = (new Date()).getTime(), endTime;
     opServer.authorize(function () {
         opServer.api.post(global.RUN_QUERY_URL, queryJSON, function (error, jsonData) {
