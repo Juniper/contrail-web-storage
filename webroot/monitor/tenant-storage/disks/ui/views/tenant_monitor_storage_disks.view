@@ -48,14 +48,12 @@
                                         <div id="diskIopsTab"><div id="diskActivityIopsChart" class="chart-content"></div></div>
                                     </div>
                                 </div>
-                                <!--
                                 <div class="disk-activity-chart">
                                     <div id="diskActivityLatencyTabStrip">
                                         <ul><li><a href="#diskLatencyTab">Latency</a></li></ul>
-                                        <div id="diskLatencyTab"><div id="diskActivityLatencyChart"></div></div>
+                                        <div id="diskLatencyTab"><div id="diskActivityLatencyChart" class="chart-content"></div></div>
                                     </div>
                                 </div>
-                                -->
                             </div>
                         </div>
                     </div>
