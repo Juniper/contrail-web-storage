@@ -146,12 +146,12 @@ function getStorageNodeStatusTmpl(obj) {
         return "<span> " + statusTmpl({
             sevLevel: sevLevels['INFO'],
             sevLevels: sevLevels
-        }) + " Up</span>";
+        }) + " up</span>";
     else if (obj == "down")
         return "<span> " + statusTmpl({
             sevLevel: sevLevels['ERROR'],
             sevLevels: sevLevels
-        }) + " Down</span>";
+        }) + " down</span>";
     else
         return "<span> " + statusTmpl({
             sevLevel: sevLevels['NOTICE'],
