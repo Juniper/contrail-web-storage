@@ -219,7 +219,7 @@ function getStorageClusterOSDActivity(req, res,appData){
 function parseStorageClusterOSDActivityData(activityJSON, timeObj, timeGran, sourceJSON, intervalSecs){
     var len = 0, secTime;
     var resultJSON = {};
-    if(activityJSON['value'].length > 0) {
+    if((typeof activityJSON['value'] !== "undefined") && (activityJSON['value'].length > 0)) {
        try {
            resultJSON['summary'] = {};
 
@@ -333,7 +333,7 @@ function getStorageClusterPoolActivity(req, res,appData){
 function parseStorageClusterPoolActivityData(activityJSON, timeObj, timeGran,sourceJSON, intervalSecs){
     var len = 0, secTime;
     var resultJSON = {};
-    if(activityJSON['value'].length > 0) {
+    if((typeof activityJSON['value'] !== "undefined") && (activityJSON['value'].length > 0)) {
         try {
             resultJSON['summary'] = {};
             secTime = Math.floor(timeObj['start_time'] / 1000);
@@ -441,7 +441,7 @@ function getStorageClusterDiskActivity(req, res,appData){
 function parseStorageClusterDiskActivityData(activityJSON, timeObj, timeGran, sourceJSON, intervalSecs){
     var len = 0, secTime;
     var resultJSON = {};
-    if(activityJSON['value'].length > 0) {
+    if((typeof activityJSON['value'] !== "undefined") && (activityJSON['value'].length > 0)) {
         try {
             resultJSON['summary'] = {};
             secTime = Math.floor(timeObj['start_time'] / 1000);
