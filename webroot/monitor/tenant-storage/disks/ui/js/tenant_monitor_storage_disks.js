@@ -723,10 +723,16 @@ function populateDiskActivityClass() {
         self.updateLineCharts(data, 'iopsChart');
     }
 
+    this.setLatencyData = function(data) {
+        self.latData = data;
+        self.updateLineCharts(data, 'latencyChart');
+    }
+
     this.parseDiskStats = function(data) {
-        var retThrptData = [], retIopsData = [];
+        var retThrptData = [], retIopsData = [], retLatData = [];
         var dataThrptRead = [], dataThrptWrite = [];
         var dataIopsRead = [], dataIopsWrite = [];
+        var dataLatRead = [], dataLatWrite = [];
 
         $.each(data['flow-series'], function(idx, sample) {
             var readObj = {}, writeObj = {};
@@ -744,6 +750,12 @@ function populateDiskActivityClass() {
             writeObj['y'] = sample['writes'];
             dataIopsRead.push(readObj);
             dataIopsWrite.push(writeObj);
+
+            //Latency Data
+            readObj['y'] = sample['op_r_latency'];
+            writeObj['y'] = sample['op_w_latency'];
+            dataLatRead.push(readObj);
+            dataLatWrite.push(writeObj);
         });
 
         retThrptData = [{
@@ -770,7 +782,19 @@ function populateDiskActivityClass() {
             area: true
         }];
 
-        return [retThrptData, retIopsData];
+        retLatData = [{
+            values: dataLatRead,
+            key: 'Read',
+            color: 'steelblue',
+            area: true
+        }, {
+            values: dataLatWrite,
+            key: 'Write',
+            color: '#2ca02c',
+            area: true
+        }];
+
+        return [retThrptData, retIopsData, retLatData];
     }
 
     this.startFetchAndUpdateStats = function(obj) {
@@ -794,6 +818,7 @@ function populateDiskActivityClass() {
             parsedResp = self.parseDiskStats(response);
             self.setThrptData(parsedResp[0]);
             self.setIopsData(parsedResp[1]);
+            self.setLatencyData(parsedResp[2]);
             endWidgetLoading('diskActivity');
         });
     }
@@ -822,6 +847,14 @@ function populateDiskActivityClass() {
             selector = '#diskActivityIopsChart'
 
         } else if (chartId == 'latencyChart') {
+            var chartsData = {
+                title: 'Disk Latency',
+                d: data,
+                chartOptions: {
+                    tooltipFn: tenantStorageChartUtils.latencyActivityTooltipFn
+                }
+            };
+            selector = '#diskActivityLatencyChart'
 
         } else {
 
