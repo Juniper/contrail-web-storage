@@ -160,7 +160,7 @@ function formatFlowSeriesForPoolStats(storageFlowSeriesData, timeObj, timeGran)
 {
     var len = 0, secTime;
     var resultJSON = {};
-    if(storageFlowSeriesData['value'].length > 0) {
+    if(storageFlowSeriesData != undefined && storageFlowSeriesData['value']!= undefined && storageFlowSeriesData['value'].length > 0) {
         try {
             resultJSON['summary'] = {};
             secTime = Math.floor(timeObj['start_time'] / 1000);
