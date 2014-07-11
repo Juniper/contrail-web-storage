@@ -7,13 +7,19 @@ var storageApi= require('../../../common/api/storage.api.constants');
 var commonUtils = require(storageConfig.core_path +
                         '/src/serverroot/utils/common.utils'),
     global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+    config = require(storageConfig.core_path + '/config/config.global.js'),
     logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
     stMonUtils= require('../../../common/api/utils/storage.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
+    expireTime= storageApi.expireTimeSecs,
+    storagePoolsApi = module.exports;
 
-storagePoolsApi = module.exports;
+var redis = require("redis"),
+    redisServerPort = (config.redis_server_port) ? config.redis_server_port : global.DFLT_REDIS_SERVER_PORT,
+    redisServerIP = (config.redis_server_ip) ? config.redis_server_ip : global.DFLT_REDIS_SERVER_IP,
+    redisClient = redis.createClient(redisServerPort, redisServerIP);
 
 function getStoragePGPoolsSummary(req, res, appData){
 
@@ -27,15 +33,20 @@ function getStoragePGPoolsSummary(req, res, appData){
     commonUtils.createReqObj(dataObjArr, urlDF, null, null, 
                                          null, null, appData);
 
-    async.map(dataObjArr,
-                      commonUtils.getAPIServerResponse(storageRest.apiGet, true),
-                      function(err, data) {
-                resultJSON = parseStoragePGPoolsData(data);        
-                commonUtils.handleJSONResponse(err, res, resultJSON);
-            });
+    redisClient.get(urlPools, function(error, cachedJSONStr) {
+        if (error || cachedJSONStr == null) {
+            async.map(dataObjArr,
+                commonUtils.getAPIServerResponse(storageRest.apiGet, true),
+                function(err, data) {
+                    resultJSON = parseStoragePGPoolsData(data);
+                    redisClient.setex(urlPools, expireTime, JSON.stringify(resultJSON));
+                    commonUtils.handleJSONResponse(err, res, resultJSON);
+                });
+        } else {
+            commonUtils.handleJSONResponse(null, res, JSON.parse(cachedJSONStr));
+        }
+    });
 }
-
-
 
 function parseStoragePGPoolsData(poolJSON){
     var resultJSON = {};
@@ -57,9 +68,7 @@ function parsePoolsData(pools, odf){
             if( pId == dfPoolId){
                  pools[i]['name']=jsonPath(odf,"$.output.pools["+j+"].name")[0];
                  pools[i]['stats']=jsonPath(odf,"$.output.pools["+j+"].stats")[0];
-                
             }
-
         }
      }
     return pools;
@@ -97,10 +106,25 @@ function parseStoragePGPoolDetails(name, poolJSON){
 
 
 function getStoragePoolFlowSeries (req, res, appData) {
-    var source = req.query['hostName'];
     var sampleCnt = req.query['sampleCnt'];
+    if(typeof sampleCnt == "undefined"){
+        sampleCnt =10;
+    }else if(isNaN(sampleCnt)){
+        sampleCnt =10;
+    }
+
     var minsSince = req.query['minsSince'];
+    if(typeof minsSince == "undefined"){
+        minsSince =30;
+    }else if(isNaN(minsSince)){
+        minsSince =30;
+    }
+
     var endTime = req.query['endTime'];
+    if(typeof endTime == "undefined"){
+        endTime ='now';
+    }
+    var source = req.query['hostName'];
     var poolName= req.query['poolName'];
 
     var name = source +":"+poolName;
@@ -134,13 +158,16 @@ function getStoragePoolFlowSeries (req, res, appData) {
 
 function formatFlowSeriesForPoolStats(storageFlowSeriesData, timeObj, timeGran)
 {
-    var len = 0;
+    var len = 0, secTime;
     var resultJSON = {};
     if(storageFlowSeriesData['value'].length > 0) {
         try {
             resultJSON['summary'] = {};
-            resultJSON['summary']['start_time'] = timeObj['start_time'];
-            resultJSON['summary']['end_time'] = timeObj['end_time'];
+            secTime = Math.floor(timeObj['start_time'] / 1000);
+            resultJSON['summary']['start_time'] = new Date(secTime);
+
+            secTime = Math.floor(timeObj['end_time'] / 1000);
+            resultJSON['summary']['end_time'] = new Date(secTime);
             resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
             resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
             resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['uuid'];

@@ -7,11 +7,20 @@ var
     commonUtils = require(storageConfig.core_path +
                     '/src/serverroot/utils/common.utils'),
     storageRest= require('../../../../common/api/storage.rest.api'),
+    global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+    config = require(storageConfig.core_path + '/config/config.global.js'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
     osdApi= require('../../../tenant-storage/api/storage.osd.api'),
     monsApi= require('../../../tenant-storage/api/storage.mons.api'),
     storageInfraApi = module.exports;
+
+var  expireTime= storageApi.expireTimeSecs;
+
+var redis = require("redis"),
+    redisServerPort = (config.redis_server_port) ? config.redis_server_port : global.DFLT_REDIS_SERVER_PORT,
+    redisServerIP = (config.redis_server_ip) ? config.redis_server_ip : global.DFLT_REDIS_SERVER_IP,
+    redisClient = redis.createClient(redisServerPort, redisServerIP);
 
 function getTopologyURLs(appData){
     var dataObjArr = [];
@@ -29,17 +38,28 @@ function getTopologyURLs(appData){
                                          null, null, appData);
     return dataObjArr;
 }
-
-function getStorageTopology(req, res, appData){
-    var resultJSON = [];
+function processStorageTopologyRawList(res, appData, callback){
+    var urlOSDList = "/cluster/topology/ceph/list";
     dataObjArr = getTopologyURLs(appData);
-    async.map(dataObjArr,
-                      commonUtils.getAPIServerResponse(storageRest.apiGet, true),
-                      function(err, data) {
-                          parseStorageTopologyTree(data, function(resultJSON){
-                              commonUtils.handleJSONResponse(err, res, resultJSON);
-                          });
-            });
+    redisClient.get(urlOSDList, function(error, cachedJSONStr) {
+        if (error || cachedJSONStr == null) {
+            async.map(dataObjArr,
+                commonUtils.getAPIServerResponse(storageRest.apiGet, true),
+                function(err, resultJSON) {
+                    redisClient.setex(urlOSDList, expireTime, JSON.stringify(resultJSON));
+                    callback(err,res,resultJSON);
+                });
+        } else {
+            callback(null, res, JSON.parse(cachedJSONStr));
+        }
+    });
+}
+function getStorageTopology(req, res, appData){
+    processStorageTopologyRawList(res, appData, function(error,res,data){
+        parseStorageTopologyTree(data, function(resultJSON){
+            commonUtils.handleJSONResponse(error, res, resultJSON);
+        });
+    });
 }
 
 function parseStorageTopologyTree(osdJSON, callback){
@@ -59,7 +79,6 @@ function parseStorageTopologyTree(osdJSON, callback){
             osdApi.parseOSDFromDump(osds, osdDump);
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
             hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
-
             osdList.topology = parseRootFromHost(rootMap, hostMap)[0];
             callback(osdList);
         });
@@ -93,14 +112,11 @@ function parseMonitorWithHost(monsJSON, hostJSON){
 
 function getStorageTopologyDetails(req, res, appData){
     var hostName = req.param('hostname');
-    dataObjArr = getTopologyURLs(appData);
-    async.map(dataObjArr,
-                      commonUtils.getAPIServerResponse(storageRest.apiGet, true),
-                      function(err, data) {
-                          parseStorageTopologyDetails(hostName, data, function(resultJSON){
-                              commonUtils.handleJSONResponse(err, res, resultJSON);
-                          });
-            });
+    processStorageTopologyRawList(res, appData, function(error,res,data){
+        parseStorageTopologyDetails(hostName, data, function(resultJSON){
+            commonUtils.handleJSONResponse(error, res, resultJSON);
+        });
+    });
 }
 
 function parseStorageTopologyDetails(name, resultJSON, callback){

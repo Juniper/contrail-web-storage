@@ -8,6 +8,7 @@ var storageApi= require('../../../common/api/storage.api.constants');
 var commonUtils = require(storageConfig.core_path +
                     '/src/serverroot/utils/common.utils'),
     global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+    config = require(storageConfig.core_path + '/config/config.global.js'),
     logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
     stMonUtils= require('../../../common/api/utils/storage.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
@@ -15,16 +16,32 @@ var commonUtils = require(storageConfig.core_path +
     jsonPath = require('JSONPath').eval,
     storageOsdsApi = module.exports;
 
+var  expireTime= storageApi.expireTimeSecs;
+var redis = require("redis"),
+    redisServerPort = (config.redis_server_port) ? config.redis_server_port : global.DFLT_REDIS_SERVER_PORT,
+    redisServerIP = (config.redis_server_ip) ? config.redis_server_ip : global.DFLT_REDIS_SERVER_IP,
+    redisClient = redis.createClient(redisServerPort, redisServerIP);
+
 function getStorageOSDStatus(req, res, appData){
-    url = storageApi.url.osdStat;//"/osd/stat";
-     storageRest.apiGet(url, appData, function (error, resultJSON) {
-            if(!error && (resultJSON)) {
-                var resultJSON = parseStorageOSDStatus(resultJSON);
-                commonUtils.handleJSONResponse(null, res, resultJSON);
-            } else {
-                commonUtils.handleJSONResponse(error, res, null);
-            }
-        });     
+    var urlOSDStatus = storageApi.url.osdStat;//"/osd/stat";
+    redisClient.get(urlOSDStatus, function(error, cachedJSONStr) {
+        if (error || cachedJSONStr == null) {
+            storageRest.apiGet(urlOSDStatus, appData, function (error, resultJSON) {
+                if(!error && (resultJSON)) {
+                    var resultJSON = parseStorageOSDStatus(resultJSON);
+                    if(!resultJSON) {
+                        resultJSON = [];
+                    }
+                    redisClient.setex(urlOSDStatus, expireTime, JSON.stringify(resultJSON));
+                    commonUtils.handleJSONResponse(null, res, resultJSON);
+                } else {
+                    commonUtils.handleJSONResponse(error, res, null);
+                }
+            });
+        } else {
+            commonUtils.handleJSONResponse(null, res, JSON.parse(cachedJSONStr));
+        }
+    });
 }
 
 function parseStorageOSDStatus(osdJSON){
@@ -40,19 +57,47 @@ function parseStorageOSDStatus(osdJSON){
     obj['num_out_osds'] = num_out_osds;
     //c = obj;
     osdMapJSON['osd_stat']= osdJSON;
+    osdMapJSON['osd_stat']['last_updated_time']= new Date();
     return osdMapJSON;
 }
 
-function getStorageOSDSummary(req, res, appData){
-    var resultJSON = [];
-    dataObjArr = getOSDListURLs(appData);
-     async.map(dataObjArr,
-                      commonUtils.getAPIServerResponse(storageRest.apiGet, true),
-                      function(err, data) {
-                resultJSON = parseStorageOSDSummary(data);        
-                commonUtils.handleJSONResponse(err, res, resultJSON);
-            });
+function getOSDListURLs(appData){
+    var dataObjArr = [];
+    urlOSDsFromPG = storageApi.url.pgDumpOSDs;//"/pg/dump?dumpcontents=osds";
+    commonUtils.createReqObj(dataObjArr, urlOSDsFromPG, null, null,
+        null, null, appData);
+    urlOSDTree = storageApi.url.osdTree;//"/osd/tree";
+    commonUtils.createReqObj(dataObjArr, urlOSDTree, null, null,
+        null, null, appData);
+    urlOSDDump = storageApi.url.osdDump;//"/osd/dump";
+    commonUtils.createReqObj(dataObjArr, urlOSDDump, null, null,
+        null, null, appData);
+    return dataObjArr;
+}
 
+function processStorageOSDList(res, appData, callback){
+    var urlOSDList = "/cluster/osd/ceph/summary/list";
+    dataObjArr = getOSDListURLs(appData);
+    redisClient.get(urlOSDList, function(error, cachedJSONStr) {
+        if (error || cachedJSONStr == null) {
+            async.map(dataObjArr,
+                commonUtils.getAPIServerResponse(storageRest.apiGet, true),
+                function(err, resultJSON) {
+                    redisClient.setex(urlOSDList, expireTime, JSON.stringify(resultJSON));
+                    callback(err,res,resultJSON);
+                });
+        } else {
+            callback(null, res, JSON.parse(cachedJSONStr));
+        }
+    });
+}
+
+
+function getStorageOSDSummary(req, res, appData){
+    processStorageOSDList(res, appData, function(error,res,data){
+        resultJSON = parseStorageOSDSummary(data);
+        commonUtils.handleJSONResponse(error, res, resultJSON);
+    });
 }
 
 function parseStorageOSDSummary(osdJSON){
@@ -96,7 +141,7 @@ function appendHostToOSD(osds,hostJSON){
 
 function getOSDVersion(req, res, appData){
     var osdName= req.param('name'),
-        url = storageApi.url.osdVersion;
+    url = storageApi.url.osdVersion;
     url = url.replace(":osdName", osdName);
     storageRest.apiGet(url, appData, function (error, resultJSON) {
         if(!error && (resultJSON)) {
@@ -111,14 +156,10 @@ function getOSDVersion(req, res, appData){
 function getStorageOSDDetails(req, res, appData){
     var resultJSON = [];
     var osd_name = req.param('name');
-    dataObjArr = getOSDListURLs(appData);
-    async.map(dataObjArr,
-                      commonUtils.getAPIServerResponse(storageRest.apiGet, true),
-                      function(err, data) {
-                resultJSON = parseStorageOSDDetails(osd_name,data);        
-                commonUtils.handleJSONResponse(err, res, resultJSON);
-            });
-
+    processStorageOSDList(res, appData, function(error,res,data){
+        resultJSON = parseStorageOSDDetails(osd_name,data);
+        commonUtils.handleJSONResponse(error, res, resultJSON);
+    });
 }
 
 function parseStorageOSDDetails(name, resultJSON){
@@ -129,19 +170,7 @@ function parseStorageOSDDetails(name, resultJSON){
     return osdJSON;
 }
 
-function getOSDListURLs(appData){
-    var dataObjArr = [];
-    urlOSDsFromPG = storageApi.url.pgDumpOSDs;//"/pg/dump?dumpcontents=osds";
-    commonUtils.createReqObj(dataObjArr, urlOSDsFromPG, null, null, 
-                                         null, null, appData);
-    urlOSDTree = storageApi.url.osdTree;//"/osd/tree";
-    commonUtils.createReqObj(dataObjArr, urlOSDTree, null, null, 
-                                         null, null, appData);
-    urlOSDDump = storageApi.url.osdDump;//"/osd/dump";
-    commonUtils.createReqObj(dataObjArr, urlOSDDump, null, null, 
-                                         null, null, appData);
-    return dataObjArr;
-}
+
 
 function parseRootFromHost(rootJSON, hostJSON, treeReplace){
     var chldCnt= rootJSON[0].children.length;
@@ -197,14 +226,11 @@ function parseHostFromOSD(hostJSON,osdsJSON, version, treeReplace) {
 }
 
 function getStorageOSDTree(req, res, appData){
-    dataObjArr = getOSDListURLs(appData);
-    async.map(dataObjArr,
-                      commonUtils.getAPIServerResponse(storageRest.apiGet, true),
-                      function(err, data) {
-                          parseStorageOSDTree(data, function(resultJSON){
-                              commonUtils.handleJSONResponse(err, res, resultJSON);
-                          });
-            });
+    processStorageOSDList(res, appData, function(error,res,data){
+        parseStorageOSDTree(data, function(resultJSON){
+            commonUtils.handleJSONResponse(err, res, resultJSON);
+        });
+    });
  
 }
 
@@ -313,10 +339,25 @@ function parseOSDFromDump(osdTree, osdDump){
 }
 
 function getStorageOSDFlowSeries (req, res, appData) {
-    var source = req.query['hostName'];
     var sampleCnt = req.query['sampleCnt'];
+    if(typeof sampleCnt == "undefined"){
+        sampleCnt =10;
+    }else if(isNaN(sampleCnt)){
+        sampleCnt =10;
+    }
+
     var minsSince = req.query['minsSince'];
+    if(typeof minsSince == "undefined"){
+        minsSince =30;
+    }else if(isNaN(minsSince)){
+        minsSince =30;
+    }
+
     var endTime = req.query['endTime'];
+    if(typeof endTime == "undefined"){
+        endTime ='now';
+    }
+    var source = req.query['hostName'];
     var osdName= req.query['osdName'];
 
     var name = source +":"+osdName;
@@ -353,13 +394,16 @@ function getStorageOSDFlowSeries (req, res, appData) {
 
 function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran,osdName)
 {
-    var len = 0;
+    var len = 0, secTime;
     var resultJSON = {};
     if(storageFlowSeriesData != undefined && storageFlowSeriesData['value']!= undefined && storageFlowSeriesData['value'].length > 0) {
         try {
             resultJSON['summary'] = {};
-            resultJSON['summary']['start_time'] = timeObj['start_time'];
-            resultJSON['summary']['end_time'] = timeObj['end_time'];
+            secTime = Math.floor(timeObj['start_time'] / 1000);
+            resultJSON['summary']['start_time'] = new Date(secTime);
+
+            secTime = Math.floor(timeObj['end_time'] / 1000);
+            resultJSON['summary']['end_time'] = new Date(secTime);
             resultJSON['summary']['timeGran_microsecs'] = Math.floor(timeGran) * global.MILLISEC_IN_SEC * global.MICROSECS_IN_MILL;
             resultJSON['summary']['name'] = storageFlowSeriesData['value'][0]['name'];
             resultJSON['summary']['uuid'] = storageFlowSeriesData['value'][0]['UUID'];
@@ -389,8 +433,8 @@ function formatOsdSeriesLoadXMLData (resultJSON)
             results[i]['writes'] = resultJSON[i]['info_stats.writes'];
             results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
             results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
-           results[i]['op_r_latency'] = resultJSON[i]['info_stats.op_r_latency'];
-           results[i]['op_w_latency'] = resultJSON[i]['info_stats.op_w_latency'];
+            results[i]['op_r_latency'] = resultJSON[i]['info_stats.op_r_latency'];
+            results[i]['op_w_latency'] = resultJSON[i]['info_stats.op_w_latency'];
         }
         return results;
     } catch (e) {
