@@ -1070,7 +1070,7 @@ function poolsBarChart() {
         this.d3ChartElem = d3.select(chartId).append('svg');
 
         var barColor = d3.scale.ordinal()
-            .range(['#7f7f7f', '#bd9e39', '#8ca252', '#9e9ac8', '#6baed6']);
+            .range(['#9e9ac8', '#6baed6', '#8ca252', '#7f7f7f', '#bd9e39']);
 
         var chart = nv.models.multiBarHorizontalChart()
             .x(function(d) {
