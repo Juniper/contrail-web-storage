@@ -169,6 +169,7 @@ function tenantStorageDashboardClass() {
     }
     this.setClusterThrptData = function(data) {
         clusterThrptData = data;
+        updateStorageCharts.updateLineCharts(data, 'clusterThrptChart');
         //this.updateLineCharts(data, 'Cluster Throughput');
         //this.clusterActivityThrptChart.refresh(data);
     }
@@ -178,6 +179,7 @@ function tenantStorageDashboardClass() {
     this.setClusterIopsData = function(data) {
         clusterIopsData = data;
         //this.clusterActivityIopsChart.refresh(data);
+        updateStorageCharts.updateLineCharts(data, 'clusterIopsChart');
     }
     this.getClusterIopsData = function() {
         return clusterIopsData;
@@ -185,6 +187,7 @@ function tenantStorageDashboardClass() {
     this.setClusterLatencyData = function(data) {
         clusterLatencyData = data;
         //this.clusterActivityLatencyChart.refresh(data);
+        updateStorageCharts.updateLineCharts(data, 'clusterLatencyChart');
     }
     this.getClusterLatencyData = function() {
         return clusterLatencyData;
@@ -440,7 +443,6 @@ function parseClusterMonitorData(result) {
     var retObj = {};
     if (result != null) {
         var status = result['overall_status'];
-        console.log("Status:" + status);
         if (status == 'HEALTH_WARN') {
             retObj['monitor-status'] = 'WARN';
         } else if (status == 'HEALTH_OK')
@@ -678,6 +680,75 @@ function parseClusterLatency(response) {
 
 }
 
+function parseClusterDiskActivity(data) {
+    var retThrptData = [], retIopsData = [], retLatData = [];
+    var dataThrptRead = [], dataThrptWrite = [];
+    var dataIopsRead = [], dataIopsWrite = [];
+    var dataLatRead = [], dataLatWrite = [];
+
+    $.each(data['flow-series'], function(idx, sample) {
+        var readObj = {}, writeObj = {};
+        readObj['x'] = writeObj['x'] = sample['MessageTS'];
+        readObj['dt'] = d3.time.format("%c")(new Date(readObj['x']));
+
+        //Throughput Data
+        readObj['y'] = sample['reads_kbytes'];
+        writeObj['y'] = sample['writes_kbytes'];
+        dataThrptRead.push(readObj);
+        dataThrptWrite.push(writeObj);
+
+        //IOPS Data
+        readObj['y'] = sample['reads'];
+        writeObj['y'] = sample['writes'];
+        dataIopsRead.push(readObj);
+        dataIopsWrite.push(writeObj);
+
+        //Latency Data
+        readObj['y'] = sample['op_r_latency'];
+        writeObj['y'] = sample['op_w_latency'];
+        dataLatRead.push(readObj);
+        dataLatWrite.push(writeObj);
+    });
+
+    retThrptData = [{
+        values: dataThrptRead,
+        key: 'Read',
+        color: 'steelblue',
+        area: true
+    }, {
+        values: dataThrptWrite,
+        key: 'Write',
+        color: '#2ca02c',
+        area: true
+    }];
+
+    retIopsData = [{
+        values: dataIopsRead,
+        key: 'Read',
+        color: 'steelblue',
+        area: true
+    }, {
+        values: dataIopsWrite,
+        key: 'Write',
+        color: '#2ca02c',
+        area: true
+    }];
+
+    retLatData = [{
+        values: dataLatRead,
+        key: 'Read',
+        color: 'steelblue',
+        area: true
+    }, {
+        values: dataLatWrite,
+        key: 'Write',
+        color: '#2ca02c',
+        area: true
+    }];
+
+    return [retThrptData, retIopsData, retLatData];
+}
+
 function getClusterHealthStatus() {
     startWidgetLoading('dashHealth');
     $.ajax({
@@ -807,6 +878,20 @@ function getClusterLatency(deferredObj) {
 
     });
 
+}
+
+function getClusterDiskActivity(obj) {
+    startWidgetLoading('dashActivity');
+    $.ajax({
+        url: tenantMonitorStorageUrls['CLUSTER_DISK_ACTIVITY_NOW']
+    }).done(function(response) {
+        parsedResp = parseClusterDiskActivity(response);
+        tenantStorageDashboardView.setClusterThrptData(parsedResp[0]);
+        tenantStorageDashboardView.setClusterIopsData(parsedResp[1]);
+        tenantStorageDashboardView.setClusterLatencyData(parsedResp[2]);
+    }).always(function(){
+        endWidgetLoading('dashActivity');
+    });
 }
 
 function healthStatusRefresh() {
@@ -1070,7 +1155,7 @@ function poolsBarChart() {
         this.d3ChartElem = d3.select(chartId).append('svg');
 
         var barColor = d3.scale.ordinal()
-            .range(['#7f7f7f', '#bd9e39', '#8ca252', '#9e9ac8', '#6baed6']);
+            .range(['#9e9ac8', '#6baed6', '#8ca252', '#7f7f7f', '#bd9e39']);
 
         var chart = nv.models.multiBarHorizontalChart()
             .x(function(d) {
@@ -1295,6 +1380,6 @@ function statusDataRefresh() {
     getClusterDFStatus();
     getClusterPools();
     getOSDsStatus();
-    getClusterActivity();
+    getClusterDiskActivity();
 
 }

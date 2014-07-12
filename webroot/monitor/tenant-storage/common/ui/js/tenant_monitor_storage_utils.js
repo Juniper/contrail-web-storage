@@ -197,7 +197,6 @@ function updateTenantStorageCharts(data, nodeType) {
     chartsData['chartOptions'] = chartOptions;
     chartsData['widgetBoxId'] = 'recent';
     var chartObj = {};
-    console.log(chartsData);
     if (!tenantStorageChartsInitializationStatus[chartsData['key']]) {
         $('#' + chartsData['chartId']).initScatterChart(chartsData);
         tenantStorageChartsInitializationStatus[chartsData['key']] = true;
@@ -347,6 +346,83 @@ var updateStorageCharts = {
         if (selector != null){
             selector = $('#content-container').find(selector + ' > svg').first()[0];
             $(selector).parent('div').data('chart').update();
+        }
+    },
+    updateLineCharts: function(data, chartId) {
+        var chartObj = {},
+            selector;
+        if (chartId == 'thrptChart') {
+            var chartsData = {
+                title: 'Disk Throughput',
+                d: data,
+                chartOptions: {
+                    tooltipFn: tenantStorageChartUtils.thrptActivityTooltipFn
+                }
+            };
+            selector = '#diskActivityThrptChart';
+
+        } else if (chartId == 'iopsChart') {
+            var chartsData = {
+                title: 'Disk IOPS',
+                d: data,
+                chartOptions: {
+                    tooltipFn: tenantStorageChartUtils.iopsActivityTooltipFn
+                }
+            };
+            selector = '#diskActivityIopsChart'
+
+        } else if (chartId == 'latencyChart') {
+            var chartsData = {
+                title: 'Disk Latency',
+                d: data,
+                chartOptions: {
+                    tooltipFn: tenantStorageChartUtils.latencyActivityTooltipFn
+                }
+            };
+            selector = '#diskActivityLatencyChart'
+
+        } else if (chartId == 'clusterThrptChart') {
+            var chartsData = {
+                title: 'Disk Throughput',
+                d: data,
+                chartOptions: {
+                    tooltipFn: tenantStorageChartUtils.thrptActivityTooltipFn
+                }
+            };
+            selector = '#clusterActivityThrptChart'
+
+        } else if (chartId == 'clusterIopsChart') {
+            var chartsData = {
+                title: 'Disk IOPS',
+                d: data,
+                chartOptions: {
+                    tooltipFn: tenantStorageChartUtils.iopsActivityTooltipFn
+                }
+            };
+            selector = '#clusterActivityIopsChart'
+
+        } else if (chartId == 'clusterThrptChart') {
+            var chartsData = {
+                title: 'Disk Throughput',
+                d: data,
+                chartOptions: {
+                    tooltipFn: tenantStorageChartUtils.latencyActivityTooltipFn
+                }
+            };
+            selector = '#clusterActivityLatencyChart'
+
+        } else {
+
+        }
+
+        if (!isStorageChartInitialized(selector)) {
+            $(selector).storageActivityLineChart(chartsData);
+            tenantStorageChartsInitializationStatus[chartId] = true;
+        } else {
+            chartObj['selector'] = $('#content-container').find(selector + ' > svg').first()[0];
+            chartObj['data'] = data;
+            chartObj['type'] = 'storageActivityLineChart';
+            updateStorageCharts.updateView(chartObj);
         }
     }
 };
