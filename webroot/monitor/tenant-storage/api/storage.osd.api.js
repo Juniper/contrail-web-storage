@@ -226,7 +226,7 @@ function parseHostFromOSD(hostJSON,osdsJSON, version, treeReplace) {
 }
 
 function getStorageOSDTree(req, res, appData){
-    processStorageOSDList(res, appData, function(error,res,data){
+    processStorageOSDList(res, appData, function(err,res,data){
         parseStorageOSDTree(data, function(resultJSON){
             commonUtils.handleJSONResponse(error, res, resultJSON);
         });
