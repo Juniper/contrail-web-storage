@@ -2,15 +2,13 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 
-var storageConfig = require('../../../common/js/storage.config.global');
-
 var util = require('util'),
     qs = require('querystring'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
     storageRest= require('../../../common/api/storage.rest.api'),
     assert = require('assert'),
-    redisPub = require(storageConfig.core_path +'/src/serverroot/jobs/core/redisPub');
+    redisPub = require(process.mainModule.exports["corePath"] +'/src/serverroot/jobs/core/redisPub');
 
 
 function processStorageClusterStatus(pubChannel, saveChannelKey, jobData, done){
