@@ -1,14 +1,13 @@
 /*
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
-var storageConfig = require('../../../../common/js/storage.config.global');
 var storageApi= require('../../../../common/api/storage.api.constants');
 var 
-    commonUtils = require(storageConfig.core_path +
+    commonUtils = require(process.mainModule.exports["corePath"]  +
                     '/src/serverroot/utils/common.utils'),
     storageRest= require('../../../../common/api/storage.rest.api'),
-    global = require(storageConfig.core_path + '/src/serverroot/common/global'),
-    config = require(storageConfig.core_path + '/config/config.global.js'),
+    global = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/global'),
+    config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
     osdApi= require('../../../tenant-storage/api/storage.osd.api'),

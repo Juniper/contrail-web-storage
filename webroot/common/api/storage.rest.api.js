@@ -6,8 +6,8 @@ var storageConfig = require('../js/storage.config.global');
 
 var storageApi= require('./storage.api.constants');
 
-var rest  = require(storageConfig.core_path + '/src/serverroot/common/rest.api'),
-    global = require(storageConfig.core_path + '/src/serverroot/common/global'),
+var rest  = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/rest.api'),
+    global = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/global'),
     assert = require('assert');
 
 var serverIp = global.DFLT_SERVER_IP;

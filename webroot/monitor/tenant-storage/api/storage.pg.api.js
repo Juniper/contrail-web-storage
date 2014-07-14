@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
-var storageConfig = require('../../../common/js/storage.config.global');
+
 var storageApi= require('../../../common/api/storage.api.constants');
 
 
-var commonUtils = require(storageConfig.core_path +
+var commonUtils = require(process.mainModule.exports["corePath"] +
                         '/src/serverroot/utils/common.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
     async = require('async'),

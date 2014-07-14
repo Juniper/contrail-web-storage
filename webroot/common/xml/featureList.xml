@@ -4,12 +4,8 @@
 <featureLists>
 
     <require>
-        <define>storageConfig</define>
-        <path>../js/storage.config.global</path>
-    </require>
-    <require>
         <define>rbac</define>
-        <path>storageConfig.core_path + '/src/serverroot/web/core/rbac.api'</path>
+        <path>process.mainModule.exports["corePath"] + '/src/serverroot/web/core/rbac.api'</path>
     </require>
     <item>
         <feature>monitoring</feature>

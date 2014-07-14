@@ -7,21 +7,29 @@
        file
    -->
    <require>
-      <define>storageConfig</define>
-      <path>../js/storage.config.global</path>
-  </require>
-  <require>
       <define>jobsApi</define>
-      <path>storageConfig.core_path + '/src/serverroot/jobs/core/jobs.api'</path>
+      <path>process.mainModule.exports["corePath"] + '/src/serverroot/jobs/core/jobs.api'</path>
   </require>
+ 
+  <require>
+      <define>commonUtils</define>
+      <path>process.mainModule.exports["corePath"] + '/src/serverroot/utils/common.utils'</path>
+  </require>
+  
+  <require>
+      <define>config</define>
+      <path>process.mainModule.exports["corePath"] + '/config/config.global'</path>
+  </require>
+<!--
+ <require>
+      <define>jobsProcess</define>
+      <path>process.mainModule.exports["corePath"] + '/src/serverroot/jobs/core/jobsProcess.api'</path>
+  </require>
+-->
+  
   <require>
       <define>jobsProcess</define>
       <path>../api/jobs/storage.jobsProcess.api</path>
-  </require>
-
-  <require>
-      <define>config</define>
-      <path>storageConfig.core_path + '/config/config.global'</path>
   </require>
 
      <!-- Storage cluster status -->

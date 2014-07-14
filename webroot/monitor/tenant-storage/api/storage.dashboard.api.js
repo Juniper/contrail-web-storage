@@ -1,22 +1,21 @@
 /*
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
-var storageConfig = require('../../../common/js/storage.config.global');
 
 var storageGlobal = require('../../../common/js/storage.global');
 var storageApi= require('../../../common/api/storage.api.constants');
 
-var cacheApi = require(storageConfig.core_path +
+var cacheApi = require(process.mainModule.exports["corePath"] +
                     '/src/serverroot/web/core/cache.api'),
-    logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
-    global = require(storageConfig.core_path + '/src/serverroot/common/global'),
-    config = require(storageConfig.core_path + '/config/config.global.js'),
-    logutils = require(storageConfig.core_path + '/src/serverroot/utils/log.utils'),
+    logutils = require(process.mainModule.exports["corePath"] + '/src/serverroot/utils/log.utils'),
+    global = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/global'),
+    config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
+    logutils = require(process.mainModule.exports["corePath"] + '/src/serverroot/utils/log.utils'),
     stMonUtils= require('../../../common/api/utils/storage.utils'),
-    commonUtils = require(storageConfig.core_path +
+    commonUtils = require(process.mainModule.exports["corePath"] +
                         '/src/serverroot/utils/common.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
-    rest = require(storageConfig.core_path + '/src/serverroot/common/rest.api');
+    rest = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/rest.api');
     async = require('async'),
     jsonPath = require('JSONPath').eval,
     opServer = rest.getAPIServer({apiName:global.label.OPS_API_SERVER,
