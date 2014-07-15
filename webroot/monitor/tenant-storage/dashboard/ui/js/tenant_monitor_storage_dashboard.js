@@ -912,6 +912,11 @@ function monitorStatusRefresh() {
     var monStatusObj = tenantStorageDashboardView.getClusterMonitorData();
     var options = {};
     $("#monitor-status").text(monStatusObj['monitor-status']);
+    $("#monitor-status").parent().on("click", function(){
+        layoutHandler.setURLHashObj({
+            p: 'mon_storage_monitor'
+        });
+    });
     $("#monitor-status-icon").addClass(getIconClass(monStatusObj['monitor-status']));
     $("#monitor-status-icon").addClass(getIconColorClass(monStatusObj['monitor-status']));
 }

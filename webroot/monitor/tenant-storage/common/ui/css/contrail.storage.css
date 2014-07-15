@@ -15,7 +15,7 @@
     background: transparent;
     border: 1px solid #3182BD;
     text-align: center;
-    cursor: none;
+    cursor: pointer;
 }
 .status-message{
     color: black;
