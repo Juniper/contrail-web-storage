@@ -28,13 +28,25 @@
     <div class="row-fluid">
         <div class="span12">
             <div id="disk-dashboard" class="span5" style="margin-left:5px;"></div>
-            <div id="disk-stats" class="span7" style="margin-left:5px;">
+            <div id="disk-stats" class="span7" style="margin-left:15px;">
                 <div id="diskActivityStats" class="widget-box transparent">
                     <div class="widget-header"></div>
                     <div class="widget-body">
                         <div class="widget-main">
-                            <div id="diskActivityChart">
-                                <div class="disk-activity-chart">
+                            <div id="diskActivityChart" class="activity-chart">
+                                <div>
+                                    <div id="diskActivityThrptLabel" class="key"></div>
+                                    <div id="diskActivityThrptChart" class="chart-content"></div>
+                                </div>
+                                <div>
+                                    <div id="diskActivityIopsLabel" class="key"></div>
+                                    <div id="diskActivityIopsChart" class="chart-content"></div>
+                                </div>
+                                <div>
+                                    <div id="diskActivityLatencyLabel" class="key"></div>
+                                    <div id="diskActivityLatencyChart" class="chart-content"></div>
+                                </div>
+                                    <!--
                                     <div id="diskActivityThrptTabStrip">
                                         <ul><li><a href="#diskThrptTab">Throughput</a></li>
                                         </ul>
@@ -54,6 +66,7 @@
                                         <div id="diskLatencyTab"><div id="diskActivityLatencyChart" class="chart-content"></div></div>
                                     </div>
                                 </div>
+                                -->
                             </div>
                         </div>
                     </div>

@@ -302,6 +302,10 @@ function tenantStorageDashboardClass() {
         //End of Disks Bar charts
 
         //cluster activity charts
+        $('#clusterActivityThrptLabel').text('Throguhput');
+        $('#clusterActivityIopsLabel').text('IOPs');
+        $('#clusterActivityLatencyLabel').text('Latency');
+
         /*
         $('#clusterActivityThrptTabStrip').contrailTabs({
             activate: onClusterActivityChartTabActivate
@@ -687,27 +691,30 @@ function parseClusterDiskActivity(data) {
     var dataLatRead = [], dataLatWrite = [];
 
     $.each(data['flow-series'], function(idx, sample) {
-        var readObj = {}, writeObj = {};
-        readObj['x'] = writeObj['x'] = sample['MessageTS'];
-        readObj['dt'] = d3.time.format("%c")(new Date(readObj['x']));
+        var thrptReadObj = {}, thrptWriteObj = {},
+            iopsReadObj = {}, iopsWriteObj = {},
+            latReadObj = {}, latWriteObj = {};
+        thrptReadObj['x'] = thrptWriteObj['x'] = sample['MessageTS'];
+        iopsReadObj['x'] = iopsWriteObj['x'] = sample['MessageTS'];
+        latReadObj['x'] = latWriteObj['x'] = sample['MessageTS'];
 
         //Throughput Data
-        readObj['y'] = sample['reads_kbytes'];
-        writeObj['y'] = sample['writes_kbytes'];
-        dataThrptRead.push(readObj);
-        dataThrptWrite.push(writeObj);
+        thrptReadObj['y'] = sample['reads_kbytes'];
+        thrptWriteObj['y'] = sample['writes_kbytes'];
+        dataThrptRead.push(thrptReadObj);
+        dataThrptWrite.push(thrptWriteObj);
 
         //IOPS Data
-        readObj['y'] = sample['reads'];
-        writeObj['y'] = sample['writes'];
-        dataIopsRead.push(readObj);
-        dataIopsWrite.push(writeObj);
+        iopsReadObj['y'] = sample['reads'];
+        iopsWriteObj['y'] = sample['writes'];
+        dataIopsRead.push(iopsReadObj);
+        dataIopsWrite.push(iopsWriteObj);
 
         //Latency Data
-        readObj['y'] = sample['op_r_latency'];
-        writeObj['y'] = sample['op_w_latency'];
-        dataLatRead.push(readObj);
-        dataLatWrite.push(writeObj);
+        latReadObj['y'] = sample['op_r_latency'];
+        latWriteObj['y'] = sample['op_w_latency'];
+        dataLatRead.push(latReadObj);
+        dataLatWrite.push(latWriteObj);
     });
 
     retThrptData = [{
