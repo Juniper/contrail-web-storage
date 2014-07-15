@@ -51,7 +51,7 @@
     <!--  Contrail Storage API  -->
     <require>
         <define>storageInfraApi</define>
-        <path>../../monitor/infra/storagenode/api/storage.infra.api</path>
+        <path>../../monitor/storage-infra/storagenode/api/storage.infra.api</path>
     </require>
 
     <require>
