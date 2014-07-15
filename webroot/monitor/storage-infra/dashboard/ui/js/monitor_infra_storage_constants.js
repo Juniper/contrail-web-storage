@@ -21,9 +21,7 @@ var monitorInfraStorageUrls = {
     DISK_DETAILS            : '/api/tenant/storage/cluster/osd/details?name={0}'
 }
 
-var monitorInfraUrls = {
-    QUERY                       : '/api/admin/reports/query'
-}
+monitorInfraUrls['QUERY'] = '/api/admin/reports/query';
 
 var storageInfraAlertMsgs = {
     DISK_DOWN           : "{0:Disk;Disks} down - {1}",
