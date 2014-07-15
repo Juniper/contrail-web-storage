@@ -10,7 +10,7 @@
 
             <div class="dashboard-chart-item" style="float:left; width:100%;">
                 <div style="margin-left: 170px;">
-                    <div style="float:left;width: 58%;">
+                    <div style="float:left;width: 38%;">
                         <div id="dashPoolsBox" class="widget-box transparent">
                             <div class="widget-header"></div>
                             <div class="widget-body">
@@ -44,7 +44,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style="float:left; width: 38%; margin-left: 20px;">
+                    <div style="float:left; width: 58%; margin-left: 20px;">
                         <div id="dashActivityBox" class="widget-box transparent">
                             <div class="widget-header"></div>
                             <div class="widget-body">
@@ -53,7 +53,20 @@
                                         <span id="activity-status" class="status-message"></span>
                                         <i id="activity-status-icon" class="icon-status"></i>
                                     </span> -->
-                                    <div id="clusterActivityChart" class="cluster-activity-chart infra-stor-chart">
+                                    <div id="clusterActivityChart" class="activity-chart infra-stor-chart">
+                                        <div>
+                                            <div id="clusterActivityThrptLabel" class="key"></div>
+                                            <div id="clusterActivityThrptChart" class="chart-content"></div>
+                                        </div>
+                                        <div>
+                                            <div id="clusterActivityIopsLabel" class="key"></div>
+                                            <div id="clusterActivityIopsChart" class="chart-content"></div>
+                                        </div>
+                                        <div>
+                                            <div id="clusterActivityLatencyLabel" class="key"></div>
+                                            <div id="clusterActivityLatencyChart" class="chart-content"></div>
+                                        </div>
+                                        <!--
                                         <div id="clusterActivityThrptTabStrip">
                                             <ul><li><a href="#thrptTab">Throughput</a></li>
                                             </ul>
@@ -64,16 +77,16 @@
                                             </ul>
                                             <div id="iopsTab"><div id="clusterActivityIopsChart"></div></div>
                                         </div>
-                                        <!--
                                         <div id="clusterActivityObjTabStrip">
                                             <ul><li><a href="objTab">Objects</a></li></ul>
                                             <div id="objTab"><div id="clusterActivityObjChart"></div></div>
                                         </div>
-                                        -->
+
                                         <div id="clusterActivityLatencyTabStrip">
                                             <ul><li><a href="#latencyTab">Latency</a></li></ul>
                                             <div id="latencyTab"><div id="clusterActivityLatencyChart"></div></div>
                                         </div>
+                                        -->
                                     </div>
                                 </div>
                             </div>

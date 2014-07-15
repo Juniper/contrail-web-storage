@@ -322,28 +322,33 @@
     margin: 0px !important;
 }
 
-.disk-activity-chart {
+.activity-chart .key {
+    font-weight: normal;
+    color: #3182bd
+}
+.activity-chart {
     padding-bottom: 10px;
     margin-bottom: 10px;
 }
-.disk-activity-chart .ui-tabs-nav {
+.activity-chart .ui-tabs-nav {
     height: 0px;
     padding: 0px 0px 0px 10px !important;
     font-size: 13px;
     border-bottom: 0px !important;
     background-color: #ffffff !important;
 }
-.disk-activity-chart .ui-tabs-panel {
-    padding-bottom: 16px;
+.activity-chart .ui-tabs-panel {
+    padding-bottom: 2px;
 }
-.disk-activity-chart .chart-content {
+/*
+.activity-chart .chart-content {
     padding: 0 10px;
-}
-.disk-activity-chart svg {
-    height: 101px;
+}*/
+.activity-chart svg {
+    height: 110px;
     width: 100%;
     display: inline;
-    margin-top: 10px;
+    margin-top: -10px;
 }
 
 /*

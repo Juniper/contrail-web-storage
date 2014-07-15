@@ -401,9 +401,9 @@ var updateStorageCharts = {
             };
             selector = '#clusterActivityIopsChart'
 
-        } else if (chartId == 'clusterThrptChart') {
+        } else if (chartId == 'clusterLatencyChart') {
             var chartsData = {
-                title: 'Disk Throughput',
+                title: 'Disk Latency',
                 d: data,
                 chartOptions: {
                     tooltipFn: tenantStorageChartUtils.latencyActivityTooltipFn
@@ -436,11 +436,12 @@ var updateStorageCharts = {
             nv.addGraph(function() {
                 chart = nv.models.lineChart()
                     .margin({
-                        top: 30,
-                        right: 20,
+                        top: 20,
+                        right: 30,
                         bottom: 20,
-                        left: 30
+                        left: 50
                     })
+                    .interpolate("monotone")
                     .showLegend(true)
                     .showYAxis(true)
                     .showXAxis(true);
@@ -451,7 +452,7 @@ var updateStorageCharts = {
                 });
 
                 chart.yAxis.tickFormat(function(d) {
-                    return d3.format(',.02f')(d);
+                    return d3.format(',.0f')(d);
                 });
                 chart.lines.forceY([0]);
 
