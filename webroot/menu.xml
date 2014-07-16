@@ -35,7 +35,7 @@ and need to add the iconClass tag wherever we need to show some icons
                         <item>
                             <hash>mon_infra_storagedashboard</hash>
                             <label>Storage Dashboard</label>
-                            <rootDir>/monitor/infra/dashboard/ui/</rootDir>
+                            <rootDir>/monitor/storage-infra/dashboard/ui/</rootDir>
                             <js>monitor_infra_storage_dashboard.js</js>
                             <view>monitor_infra_storage_dashboard.view</view>
                             <js>monitor_infra_storage_constants.js</js>
@@ -50,7 +50,7 @@ and need to add the iconClass tag wherever we need to show some icons
                         <item>
                             <hash>mon_infra_storage</hash>
                             <label>Storage Nodes</label>
-                            <rootDir>/monitor/infra/storagenode/ui</rootDir>
+                            <rootDir>/monitor/storage-infra/storagenode/ui</rootDir>
                             <js>monitor_infra_storagenode.js</js>
                             <view>monitor_infra_storagenode.view</view>
                             <class>storNodesView</class>

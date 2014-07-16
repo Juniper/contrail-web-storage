@@ -159,7 +159,7 @@ var tenantStorageChartUtils = {
             value: 'Latency'
         }, {
             lbl: key,
-            value: currObj['y'] + 'µs'
+            value: currObj['y'] + 'ms'
         }, {
             lbl: 'Date',
             value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
