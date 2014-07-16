@@ -254,6 +254,7 @@ function formatOsdSeriesLoadXMLData(resultJSON){
             results[i]['Date']= new Date(secTime);
             var count = resultJSON[i]['COUNT(info_stats)'];
             results[i]['MessageTS'] = resultJSON[i]['T='];
+            results[i]['sampleCnt'] = count;
             results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
             results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
             results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
@@ -364,6 +365,7 @@ function formatPoolSeriesLoadXMLData(resultJSON){
             secTime = Math.floor(resultJSON[i]['T='] / 1000);
             results[i]['Date']= new Date(secTime);
             results[i]['MessageTS'] = resultJSON[i]['T='];
+            results[i]['sampleCnt'] = resultJSON[i]['COUNT(info_stats)'];
             results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
             results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
             results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
@@ -467,6 +469,7 @@ function formatDiskSeriesLoadXMLData(resultJSON){
             secTime = Math.floor(resultJSON[i]['T='] / 1000);
             results[i]['Date']= new Date(secTime);
             results[i]['MessageTS'] = resultJSON[i]['T='];
+            results[i]['sampleCnt'] = resultJSON[i]['COUNT(info_stats)'];
             results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
             results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
             results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
