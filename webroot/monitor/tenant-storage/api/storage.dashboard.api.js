@@ -264,7 +264,7 @@ function formatOsdSeriesLoadXMLData(resultJSON){
             results[i]['op_r_latency'] = op_r_latency/count;
 
             var op_w_latency = resultJSON[i]['SUM(info_stats.op_w_latency)'];
-            results[i]['op_w_latency'] = op_r_latency/count;
+            results[i]['op_w_latency'] = op_w_latency/count;
         }
         return results;
     } catch (e) {
