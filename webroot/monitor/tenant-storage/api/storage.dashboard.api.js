@@ -130,19 +130,23 @@ function createClause(fieldName, fieldValue, operator){
 }
 
 
-function processSources(res, callback){
-    var opsUrl = global.GET_TABLE_INFO_URL + '/MessageTable/column-values/Source';
+function processSources(res, appData, callback){
+    var urlOSDTree = storageApi.url.osdTree;
     var expireTime= 3600;
-    redisClient.get(opsUrl, function(error, cachedJSONStr) {
+    redisClient.get(urlOSDTree, function(error, cachedJSONStr) {
         if (error || cachedJSONStr == null) {
-            opServer.authorize(function () {
-                opServer.api.get(opsUrl, function (error, jsonData) {
-                    if(!jsonData) {
-                        jsonData = [];
+            storageRest.apiGet(urlOSDTree, appData, function (error, resultJSON) {
+                if(!error && (resultJSON)) {
+                   if(!resultJSON) {
+                        resultJSON = [];
                     }
-                    redisClient.setex(opsUrl, expireTime, JSON.stringify(jsonData));
-                    callback(error, res, jsonData);
-                });
+                    var hostMap = jsonPath(resultJSON, "$..nodes[?(@.type=='host')].name");
+
+                    redisClient.setex(urlOSDTree, expireTime, JSON.stringify(hostMap));
+                    callback(error, res, hostMap);
+                } else {
+                    callback(error, res, null);
+                }
             });
         } else {
             callback(null, res, JSON.parse(cachedJSONStr));
@@ -150,8 +154,8 @@ function processSources(res, callback){
     });
 }
 
-function getSources(req, res) {
-    processSources(res, function(error,res,resultJSON){
+function getSources(req, res, appData) {
+    processSources(res, appData, function(error,res,resultJSON){
         commonUtils.handleJSONResponse(error, res, resultJSON);
     });
 }
@@ -185,14 +189,12 @@ function getStorageClusterOSDActivity(req, res,appData){
 
     var tableName, whereClause=[],
     selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
-            "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)",
-            "info_stats.reads", "info_stats.writes", "info_stats.read_kbytes","info_stats.write_kbytes",
-            "info_stats.op_r_latency", "info_stats.op_w_latency"];
+            "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)", "COUNT(info_stats)" ];
 
     tableName = 'StatTable.ComputeStorageOsd.info_stats';
     selectArr.push("T="+intervalSecs);
 
-    processSources(res, function(error,res,sourceJSON){
+    processSources(res, appData, function(error,res,sourceJSON){
         var count = sourceJSON.length;
         for (i = 0; i < count; i += 1) {
             var whereClauseArray=[];
@@ -250,19 +252,19 @@ function formatOsdSeriesLoadXMLData(resultJSON){
             results[i] = {};
             secTime = Math.floor(resultJSON[i]['T='] / 1000);
             results[i]['Date']= new Date(secTime);
+            var count = resultJSON[i]['COUNT(info_stats)'];
             results[i]['MessageTS'] = resultJSON[i]['T='];
-            results[i]['reads'] = resultJSON[i]['info_stats.reads'];
-            results[i]['total_reads'] = resultJSON[i]['SUM(info_stats.reads)'];
-            results[i]['writes'] = resultJSON[i]['info_stats.writes'];
-            results[i]['total_writes'] = resultJSON[i]['SUM(info_stats.writes)'];
-            results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
-            results[i]['total_reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
-            results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
-            results[i]['total_writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
-            results[i]['op_r_latency'] = resultJSON[i]['info_stats.op_r_latency'];
-            results[i]['total_op_r_latency'] = resultJSON[i]['SUM(info_stats.op_r_latency)'];
-            results[i]['op_w_latency'] = resultJSON[i]['info_stats.op_w_latency'];
-            results[i]['total_op_w_latency'] = resultJSON[i]['SUM(info_stats.op_w_latency)'];
+            results[i]['sampleCnt'] = count;
+            results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
+            results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
+            results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
+            results[i]['writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
+
+            var op_r_latency = resultJSON[i]['SUM(info_stats.op_r_latency)'];
+            results[i]['op_r_latency'] = op_r_latency/count;
+
+            var op_w_latency = resultJSON[i]['SUM(info_stats.op_w_latency)'];
+            results[i]['op_w_latency'] = op_w_latency/count;
         }
         return results;
     } catch (e) {
@@ -299,13 +301,12 @@ function getStorageClusterPoolActivity(req, res,appData){
     }
 
     var tableName, whereClause=[],
-    selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
-        "SUM(info_stats.write_kbytes)", "info_stats.reads", "info_stats.writes", "info_stats.read_kbytes",
-        "info_stats.write_kbytes", ];
+    selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)", "COUNT(info_stats)",
+        "SUM(info_stats.write_kbytes)" ];
     tableName = 'StatTable.ComputeStoragePool.info_stats';
     selectArr.push("T="+intervalSecs);
 
-    processSources(res, function(error,res,sourceJSON) {
+    processSources(res, appData, function(error,res,sourceJSON) {
         var count = sourceJSON.length;
         for (i = 0; i < count; i += 1) {
             var whereClauseArray = [];
@@ -364,14 +365,11 @@ function formatPoolSeriesLoadXMLData(resultJSON){
             secTime = Math.floor(resultJSON[i]['T='] / 1000);
             results[i]['Date']= new Date(secTime);
             results[i]['MessageTS'] = resultJSON[i]['T='];
-            results[i]['reads'] = resultJSON[i]['info_stats.reads'];
-            results[i]['total_reads'] = resultJSON[i]['SUM(info_stats.reads)'];
-            results[i]['writes'] = resultJSON[i]['info_stats.writes'];
-            results[i]['total_writes'] = resultJSON[i]['SUM(info_stats.writes)'];
-            results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
-            results[i]['total_reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
-            results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
-            results[i]['total_writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
+            results[i]['sampleCnt'] = resultJSON[i]['COUNT(info_stats)'];
+            results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
+            results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
+            results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
+            results[i]['writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
         }
         return results;
     } catch (e) {
@@ -408,12 +406,11 @@ function getStorageClusterDiskActivity(req, res,appData){
 
     var tableName, whereClause=[],
     selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
-        "SUM(info_stats.write_kbytes)", "SUM(info_stats.iops)","SUM(info_stats.bw)" ,"info_stats.reads",
-        "info_stats.writes", "info_stats.read_kbytes", "info_stats.write_kbytes", "info_stats.iops", "info_stats.bw" ];
+        "SUM(info_stats.write_kbytes)", "SUM(info_stats.iops)","SUM(info_stats.bw)", "COUNT(info_stats)" ];
     tableName = 'StatTable.ComputeStorageDisk.info_stats';
     selectArr.push("T="+intervalSecs);
 
-    processSources(res, function(error,res,sourceJSON) {
+    processSources(res, appData, function(error,res,sourceJSON) {
         var count = sourceJSON.length;
         for (i = 0; i < count; i += 1) {
             var whereClauseArray = [];
@@ -472,18 +469,13 @@ function formatDiskSeriesLoadXMLData(resultJSON){
             secTime = Math.floor(resultJSON[i]['T='] / 1000);
             results[i]['Date']= new Date(secTime);
             results[i]['MessageTS'] = resultJSON[i]['T='];
-            results[i]['reads'] = resultJSON[i]['info_stats.reads'];
-            results[i]['total_reads'] = resultJSON[i]['SUM(info_stats.reads)'];
-            results[i]['writes'] = resultJSON[i]['info_stats.writes'];
-            results[i]['total_writes'] = resultJSON[i]['SUM(info_stats.writes)'];
-            results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
-            results[i]['total_reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
-            results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
-            results[i]['total_writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
-            results[i]['iops'] = resultJSON[i]['info_stats.iops'];
-            results[i]['total_iops'] = resultJSON[i]['SUM(info_stats.iops)'];
-            results[i]['bw'] = resultJSON[i]['info_stats.bw'];
-            results[i]['total_bw'] = resultJSON[i]['SUM(info_stats.bw)'];
+            results[i]['sampleCnt'] = resultJSON[i]['COUNT(info_stats)'];
+            results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
+            results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
+            results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
+            results[i]['writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
+            results[i]['iops'] = resultJSON[i]['SUM(info_stats.iops)'];
+            results[i]['bw'] = resultJSON[i]['SUM(info_stats.bw)'];
         }
         return results;
     } catch (e) {

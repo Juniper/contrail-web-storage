@@ -66,7 +66,7 @@ function tenantStorageDashboardClass() {
     }
     this.setClusterHealthData = function(data) {
         healthStatusObj = data;
-        healthStatusRefresh();
+        //healthStatusRefresh();
     }
     this.getClusterMonitorData = function() {
         return healthStatusObj;
@@ -256,7 +256,7 @@ function tenantStorageDashboardClass() {
 
     this.updateClusterDashboard = function() {
         $('#dashHealthBox .widget-header').initWidgetHeader({
-            title: 'Health',
+            title: 'Monitor Health',
             widgetBoxId: 'dashHealth'
         });
         $('#dashUsageBox .widget-header').initWidgetHeader({
@@ -280,9 +280,9 @@ function tenantStorageDashboardClass() {
         this.clusterUsageDial.draw();
 
         //Cluster Pools Charts
-        $('#poolsBarTabStrip').contrailTabs({
+        /*$('#poolsBarTabStrip').contrailTabs({
             activate: onPoolsBarTabActivate
-        });
+        });*/
 
         this.clusterPoolsGbChart.init('#poolsBarGbChart');
         this.clusterPoolsGbChart.draw();
@@ -292,16 +292,20 @@ function tenantStorageDashboardClass() {
         //end of Cluster Pools charts
 
         //Disks Bar Charts
-        $('#disksStatusBarTabStrip').contrailTabs({});
+        //$('#disksStatusBarTabStrip').contrailTabs({});
         this.diskStatusChart.init('#diskStatusChart');
         this.diskStatusChart.draw();
 
-        $('#disksClusterBarTabStrip').contrailTabs({});
+        //$('#disksClusterBarTabStrip').contrailTabs({});
         this.diskClusterStatusChart.init('#diskClusterChart');
         this.diskClusterStatusChart.draw();
         //End of Disks Bar charts
 
         //cluster activity charts
+        $('#clusterActivityThrptLabel').text('Throughput');
+        $('#clusterActivityIopsLabel').text('IOPs');
+        $('#clusterActivityLatencyLabel').text('Latency');
+
         /*
         $('#clusterActivityThrptTabStrip').contrailTabs({
             activate: onClusterActivityChartTabActivate
@@ -514,7 +518,7 @@ function parseOSDsStatusData(result) {
             } else if (idx == 'num_down_osds') {
                 var val1 = [];
                 obj1['label'] = 'Status';
-                obj1['value'] = parseInt(val);
+                obj1['value'] = -Math.abs(parseInt(val));
                 val1.push(obj1);
                 key1['key'] = 'DOWN';
                 key1['values'] = val1;
@@ -522,7 +526,7 @@ function parseOSDsStatusData(result) {
                 statusSeries.push(key1);
             } else if (idx == 'num_in_osds') {
                 var val1 = [];
-                obj1['label'] = 'Cluster status';
+                obj1['label'] = 'Membership';
                 obj1['value'] = parseInt(val);
                 val1.push(obj1);
                 key1['key'] = 'IN';
@@ -530,8 +534,8 @@ function parseOSDsStatusData(result) {
                 clusterSeries.push(key1);
             } else if (idx == 'num_out_osds') {
                 var val1 = [];
-                obj1['label'] = 'Cluster status';
-                obj1['value'] = parseInt(val);
+                obj1['label'] = 'Membership';
+                obj1['value'] = -Math.abs(parseInt(val));
                 val1.push(obj1);
                 key1['key'] = 'OUT';
                 key1['values'] = val1;
@@ -632,7 +636,6 @@ function parseClusterThroughput(response) {
 }
 
 function parseClusterLatency(response) {
-    console.log(response);
     var firstTime = new Boolean();
     firstTime = true;
     var t1, t2, v;
@@ -687,63 +690,60 @@ function parseClusterDiskActivity(data) {
     var dataLatRead = [], dataLatWrite = [];
 
     $.each(data['flow-series'], function(idx, sample) {
-        var readObj = {}, writeObj = {};
-        readObj['x'] = writeObj['x'] = sample['MessageTS'];
-        readObj['dt'] = d3.time.format("%c")(new Date(readObj['x']));
+        var thrptReadObj = {}, thrptWriteObj = {},
+            iopsReadObj = {}, iopsWriteObj = {},
+            latReadObj = {}, latWriteObj = {};
+        thrptReadObj['x'] = thrptWriteObj['x'] = sample['MessageTS'];
+        iopsReadObj['x'] = iopsWriteObj['x'] = sample['MessageTS'];
+        latReadObj['x'] = latWriteObj['x'] = sample['MessageTS'];
 
         //Throughput Data
-        readObj['y'] = sample['reads_kbytes'];
-        writeObj['y'] = sample['writes_kbytes'];
-        dataThrptRead.push(readObj);
-        dataThrptWrite.push(writeObj);
+        thrptReadObj['y'] = sample['reads_kbytes'];
+        thrptWriteObj['y'] = sample['writes_kbytes'];
+        dataThrptRead.push(thrptReadObj);
+        dataThrptWrite.push(thrptWriteObj);
 
         //IOPS Data
-        readObj['y'] = sample['reads'];
-        writeObj['y'] = sample['writes'];
-        dataIopsRead.push(readObj);
-        dataIopsWrite.push(writeObj);
+        iopsReadObj['y'] = sample['reads'];
+        iopsWriteObj['y'] = sample['writes'];
+        dataIopsRead.push(iopsReadObj);
+        dataIopsWrite.push(iopsWriteObj);
 
         //Latency Data
-        readObj['y'] = sample['op_r_latency'];
-        writeObj['y'] = sample['op_w_latency'];
-        dataLatRead.push(readObj);
-        dataLatWrite.push(writeObj);
+        latReadObj['y'] = sample['op_r_latency'];
+        latWriteObj['y'] = sample['op_w_latency'];
+        dataLatRead.push(latReadObj);
+        dataLatWrite.push(latWriteObj);
     });
 
     retThrptData = [{
         values: dataThrptRead,
         key: 'Read',
-        color: 'steelblue',
-        area: true
+        color: 'steelblue'
     }, {
         values: dataThrptWrite,
         key: 'Write',
-        color: '#2ca02c',
-        area: true
+        color: '#2ca02c'
     }];
 
     retIopsData = [{
         values: dataIopsRead,
         key: 'Read',
-        color: 'steelblue',
-        area: true
+        color: 'steelblue'
     }, {
         values: dataIopsWrite,
         key: 'Write',
-        color: '#2ca02c',
-        area: true
+        color: '#2ca02c'
     }];
 
     retLatData = [{
         values: dataLatRead,
         key: 'Read',
-        color: 'steelblue',
-        area: true
+        color: 'steelblue'
     }, {
         values: dataLatWrite,
         key: 'Write',
-        color: '#2ca02c',
-        area: true
+        color: '#2ca02c'
     }];
 
     return [retThrptData, retIopsData, retLatData];
@@ -1238,7 +1238,7 @@ function disksBarChart() {
             })
             .showValues(false)
             .tooltips(true)
-            .stacked(false)
+            .stacked(true)
             .showControls(false);
 
         chart.yAxis

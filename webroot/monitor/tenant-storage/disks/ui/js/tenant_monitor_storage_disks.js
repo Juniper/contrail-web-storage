@@ -709,11 +709,11 @@ function populateDiskActivityClass() {
             widgetBoxId: 'diskActivity'
         });
 
-        //disk activity chart tabs
-        $('#diskActivityThrptTabStrip').contrailTabs({});
-        $('#diskActivityIopsTabStrip').contrailTabs({});
-        $('#diskActivityLatencyTabStrip').contrailTabs({});
-        //End of disk Activity Chart tabs
+        //disk activity charts label
+        $('#diskActivityThrptLabel').text('Throughput')
+        $('#diskActivityIopsLabel').text('IOPs');
+        $('#diskActivityLatencyLabel').text('Latency');
+        //End of disk Activity Chart
     }
 
     this.setThrptData = function(data) {
@@ -738,63 +738,60 @@ function populateDiskActivityClass() {
         var dataLatRead = [], dataLatWrite = [];
 
         $.each(data['flow-series'], function(idx, sample) {
-            var readObj = {}, writeObj = {};
-            readObj['x'] = writeObj['x'] = sample['MessageTS'];
-            readObj['dt'] = d3.time.format("%c")(new Date(readObj['x']));
+            var thrptReadObj = {}, thrptWriteObj = {},
+                iopsReadObj = {}, iopsWriteObj = {},
+                latReadObj = {}, latWriteObj = {};
+            thrptReadObj['x'] = thrptWriteObj['x'] = sample['MessageTS'];
+            iopsReadObj['x'] = iopsWriteObj['x'] = sample['MessageTS'];
+            latReadObj['x'] = latWriteObj['x'] = sample['MessageTS'];
 
             //Throughput Data
-            readObj['y'] = sample['reads_kbytes'];
-            writeObj['y'] = sample['writes_kbytes'];
-            dataThrptRead.push(readObj);
-            dataThrptWrite.push(writeObj);
+            thrptReadObj['y'] = sample['reads_kbytes'];
+            thrptWriteObj['y'] = sample['writes_kbytes'];
+            dataThrptRead.push(thrptReadObj);
+            dataThrptWrite.push(thrptWriteObj);
 
             //IOPS Data
-            readObj['y'] = sample['reads'];
-            writeObj['y'] = sample['writes'];
-            dataIopsRead.push(readObj);
-            dataIopsWrite.push(writeObj);
+            iopsReadObj['y'] = sample['reads'];
+            iopsWriteObj['y'] = sample['writes'];
+            dataIopsRead.push(iopsReadObj);
+            dataIopsWrite.push(iopsWriteObj);
 
             //Latency Data
-            readObj['y'] = sample['op_r_latency'];
-            writeObj['y'] = sample['op_w_latency'];
-            dataLatRead.push(readObj);
-            dataLatWrite.push(writeObj);
+            latReadObj['y'] = sample['op_r_latency'];
+            latWriteObj['y'] = sample['op_w_latency'];
+            dataLatRead.push(latReadObj);
+            dataLatWrite.push(latWriteObj);
         });
 
         retThrptData = [{
             values: dataThrptRead,
             key: 'Read',
-            color: 'steelblue',
-            area: true
+            color: 'steelblue'
         }, {
             values: dataThrptWrite,
             key: 'Write',
-            color: '#2ca02c',
-            area: true
+            color: '#2ca02c'
         }];
 
         retIopsData = [{
             values: dataIopsRead,
             key: 'Read',
-            color: 'steelblue',
-            area: true
+            color: 'steelblue'
         }, {
             values: dataIopsWrite,
             key: 'Write',
-            color: '#2ca02c',
-            area: true
+            color: '#2ca02c'
         }];
 
         retLatData = [{
             values: dataLatRead,
             key: 'Read',
-            color: 'steelblue',
-            area: true
+            color: 'steelblue'
         }, {
             values: dataLatWrite,
             key: 'Write',
-            color: '#2ca02c',
-            area: true
+            color: '#2ca02c'
         }];
 
         return [retThrptData, retIopsData, retLatData];
@@ -822,6 +819,7 @@ function populateDiskActivityClass() {
             self.setThrptData(parsedResp[0]);
             self.setIopsData(parsedResp[1]);
             self.setLatencyData(parsedResp[2]);
+        }).always(function(){
             endWidgetLoading('diskActivity');
         });
     }
