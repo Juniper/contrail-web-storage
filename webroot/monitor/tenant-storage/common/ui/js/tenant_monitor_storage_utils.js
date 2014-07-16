@@ -133,7 +133,7 @@ var tenantStorageChartUtils = {
             value: 'Throughput'
         }, {
             lbl: key,
-            value: currObj['y'] + ' Kbps'
+            value: currObj['y'] + ' KB'
         }, {
             lbl: 'Date',
             value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
@@ -159,7 +159,7 @@ var tenantStorageChartUtils = {
             value: 'Latency'
         }, {
             lbl: key,
-            value: currObj['y'] + ' ms'
+            value: currObj['y'] + 'µs'
         }, {
             lbl: 'Date',
             value: d3.time.format('%c')(new Date(currObj['x'] / 1000))

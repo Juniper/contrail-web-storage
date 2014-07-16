@@ -767,37 +767,31 @@ function populateDiskActivityClass() {
         retThrptData = [{
             values: dataThrptRead,
             key: 'Read',
-            color: 'steelblue',
-            area: true
+            color: 'steelblue'
         }, {
             values: dataThrptWrite,
             key: 'Write',
-            color: '#2ca02c',
-            area: true
+            color: '#2ca02c'
         }];
 
         retIopsData = [{
             values: dataIopsRead,
             key: 'Read',
-            color: 'steelblue',
-            area: true
+            color: 'steelblue'
         }, {
             values: dataIopsWrite,
             key: 'Write',
-            color: '#2ca02c',
-            area: true
+            color: '#2ca02c'
         }];
 
         retLatData = [{
             values: dataLatRead,
             key: 'Read',
-            color: 'steelblue',
-            area: true
+            color: 'steelblue'
         }, {
             values: dataLatWrite,
             key: 'Write',
-            color: '#2ca02c',
-            area: true
+            color: '#2ca02c'
         }];
 
         return [retThrptData, retIopsData, retLatData];

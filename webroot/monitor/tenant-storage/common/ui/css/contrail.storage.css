@@ -27,7 +27,12 @@
     margin-left: 20px;
     color: grey;
     font-size: 1.5em;
-    cursor: none;
+}
+#dashHealthBox {
+    padding-bottom: 10px;
+}
+.monitor-status {
+    padding-top: 15px;
 }
 
 .success-color{
@@ -76,11 +81,11 @@
 }
 .pools-bar-chart svg {
     height: 70px;
-    margin-top: 15px;
+    padding-bottom: 10px;
 }
 .disks-bar-chart svg{
-    height: 85px;
-    margin-top: 15px;
+    height: 70px;
+    padding-bottom: 10px;
 }
 .disks-bar-chart .nv-legend-text {
     font-size: 13px !important;
@@ -167,6 +172,10 @@
     color: #3182BD;
 }
 
+.infra-stor-chart .key {
+    font-weight: normal;
+    color: #3182bd
+}
 .infra-stor-chart g.nv-lineChart g.nv-group{
     fill-opacity: .3 !important;
 }
@@ -371,14 +380,6 @@
     height: 20px;
     background: transparent;
     border: 1px solid #3182BD;
-    text-align: center;
-}
-#monitor-status{
-    width: 200px;
-    height: 20px;
-    background: transparent;
-    border: 1px solid #3182BD;
-    color: black;
     text-align: center;
 }
 #activity-status{
