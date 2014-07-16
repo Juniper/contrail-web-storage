@@ -924,7 +924,7 @@ function populateDiskDetailsTab(obj) {
         });
 
         $.ajax({
-            url: contrail.format(monitorInfraStorageUrls['DISK_DETAILS'], osdName)
+            url: contrail.format(tenantMonitorStorageUrls['DISK_DETAILS'], osdName)
         }).done(function(response) {
             var diskData = response.osd_details;
             var noDataStr = "N/A",
