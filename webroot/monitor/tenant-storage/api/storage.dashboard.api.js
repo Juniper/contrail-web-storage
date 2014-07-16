@@ -189,7 +189,7 @@ function getStorageClusterOSDActivity(req, res,appData){
 
     var tableName, whereClause=[],
     selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
-            "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)"];
+            "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)", "COUNT(info_stats)" ];
 
     tableName = 'StatTable.ComputeStorageOsd.info_stats';
     selectArr.push("T="+intervalSecs);
@@ -252,13 +252,19 @@ function formatOsdSeriesLoadXMLData(resultJSON){
             results[i] = {};
             secTime = Math.floor(resultJSON[i]['T='] / 1000);
             results[i]['Date']= new Date(secTime);
+            var count = resultJSON[i]['COUNT(info_stats)'];
             results[i]['MessageTS'] = resultJSON[i]['T='];
+            results[i]['sampleCnt'] = count;
             results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
             results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
             results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
             results[i]['writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
-            results[i]['op_r_latency'] = resultJSON[i]['SUM(info_stats.op_r_latency)'];
-            results[i]['op_w_latency'] = resultJSON[i]['SUM(info_stats.op_w_latency)'];
+
+            var op_r_latency = resultJSON[i]['SUM(info_stats.op_r_latency)'];
+            results[i]['op_r_latency'] = op_r_latency/count;
+
+            var op_w_latency = resultJSON[i]['SUM(info_stats.op_w_latency)'];
+            results[i]['op_w_latency'] = op_r_latency/count;
         }
         return results;
     } catch (e) {
@@ -295,12 +301,12 @@ function getStorageClusterPoolActivity(req, res,appData){
     }
 
     var tableName, whereClause=[],
-    selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
+    selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)", "COUNT(info_stats)",
         "SUM(info_stats.write_kbytes)" ];
     tableName = 'StatTable.ComputeStoragePool.info_stats';
     selectArr.push("T="+intervalSecs);
 
-    processSources(res, function(error,res,sourceJSON) {
+    processSources(res, appData, function(error,res,sourceJSON) {
         var count = sourceJSON.length;
         for (i = 0; i < count; i += 1) {
             var whereClauseArray = [];
@@ -359,6 +365,7 @@ function formatPoolSeriesLoadXMLData(resultJSON){
             secTime = Math.floor(resultJSON[i]['T='] / 1000);
             results[i]['Date']= new Date(secTime);
             results[i]['MessageTS'] = resultJSON[i]['T='];
+            results[i]['sampleCnt'] = resultJSON[i]['COUNT(info_stats)'];
             results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
             results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
             results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
@@ -399,11 +406,11 @@ function getStorageClusterDiskActivity(req, res,appData){
 
     var tableName, whereClause=[],
     selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
-        "SUM(info_stats.write_kbytes)", "SUM(info_stats.iops)","SUM(info_stats.bw)" ];
+        "SUM(info_stats.write_kbytes)", "SUM(info_stats.iops)","SUM(info_stats.bw)", "COUNT(info_stats)" ];
     tableName = 'StatTable.ComputeStorageDisk.info_stats';
     selectArr.push("T="+intervalSecs);
 
-    processSources(res, function(error,res,sourceJSON) {
+    processSources(res, appData, function(error,res,sourceJSON) {
         var count = sourceJSON.length;
         for (i = 0; i < count; i += 1) {
             var whereClauseArray = [];
@@ -462,6 +469,7 @@ function formatDiskSeriesLoadXMLData(resultJSON){
             secTime = Math.floor(resultJSON[i]['T='] / 1000);
             results[i]['Date']= new Date(secTime);
             results[i]['MessageTS'] = resultJSON[i]['T='];
+            results[i]['sampleCnt'] = resultJSON[i]['COUNT(info_stats)'];
             results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
             results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
             results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
