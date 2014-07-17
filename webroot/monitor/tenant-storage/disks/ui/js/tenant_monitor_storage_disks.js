@@ -1252,15 +1252,13 @@ function osdTree() {
             var duration = 750;
             diagonal = tenantStorageDisksView.osdsTree.diagonal;
 
-            if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
-                var clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
+            if (storageTreeChartExpandedNodes.length != 0) {
+                var clickedArr = storageTreeChartExpandedNodes.slice(0);
                 source = selectiveCollapse(source, clickedArr);
-                tenantStorageDisksView.osdsTree.root = source;
             } else {
                 source.children.forEach(collapse);
-                tenantStorageDisksView.osdsTree.root = source;
             }
-
+            tenantStorageDisksView.osdsTree.root = source;
         }
 
         // Compute the new tree layout.
@@ -1406,19 +1404,21 @@ function osdTree() {
 
         if (d.type == "host") {
             if (self.lastClickedNode != null) {
+                clickedArr = storageTreeChartExpandedNodes.slice(0);
                 if (self.lastClickedNode.name != d.name) {
                     self.lastClickedNode._children = self.lastClickedNode.children;
                     self.lastClickedNode.children = null;
                     tenantStorageDisksView.osdsTree.update(self.lastClickedNode, false);
-                    self.lastClickedNode = d;
+                    clickedArr = []; //we are only expanding one node at a time
+                    clickedArr.push(d.name);
+                } else {
+                    clickedArr = []; //already in list; so empty it out.
                 }
             } else {
-                self.lastClickedNode = d;
+                clickedArr.push(d.name);
             }
-
-            if (tenantStorageDisksView.osdsTree.expandedNodes.length != 0) {
-                clickedArr = tenantStorageDisksView.osdsTree.expandedNodes.slice(0);
-            }
+            storageTreeChartExpandedNodes = clickedArr.slice(0);
+            self.lastClickedNode = d;
             if (d.children) {
                 d._children = d.children;
                 d.children = null;
@@ -1430,20 +1430,14 @@ function osdTree() {
                 d.children = d._children;
                 d._children = null;
                 clickedArr.push(d.name);
-
-            }
-            /*if (clickedArr.length != 0) {
-                tenantStorageDisksView.osdsTree.expandedNodes = clickedArr.slice(0);
-            }*/
-            if (self.lastClickedNode != null) {
-                tenantStorageDisksView.osdsTree.expandedNodes = [];
-                tenantStorageDisksView.osdsTree.expandedNodes.push(self.lastClickedNode.name);
-            } else {
-                tenantStorageDisksView.osdsTree.expandedNodes = [];
             }
             tenantStorageDisksView.osdsTree.update(d, false);
+        } else if(d.type == 'osd') {
+            var currObj = {};
+            currObj['name'] = d.name;
+            currObj['host'] = d.parent.name;
+            tenantStorageChartUtils.onDiskDrillDown(currObj);
         }
-
     }
     nodeMouseover = function(d) {
         var infoTooltip = tenantStorageDisksView.osdsTree.infoTooltip;
