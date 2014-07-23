@@ -447,13 +447,15 @@ var updateStorageCharts = {
                     .showXAxis(true);
 
 
-                chart.xAxis.tickFormat(function(d) {
-                    return d3.time.format('%H:%M:%S')(new Date(d / 1000));
-                });
+                chart.xAxis.axisLabel(ifNull(chartOptions['xLbl'],''))
+                    .tickFormat(function(d) {
+                        return d3.time.format('%H:%M:%S')(new Date(d / 1000));
+                     });
 
-                chart.yAxis.tickFormat(function(d) {
-                    return d3.format(',.0f')(d);
-                });
+                chart.yAxis.axisLabel(ifNull(chartOptions['yLbl'],''))
+                    .tickFormat(function(d) {
+                        return d3.format(',.0f')(d);
+                    });
                 chart.lines.forceY([0]);
 
                 if (chartOptions['tooltipFn'] == null) {

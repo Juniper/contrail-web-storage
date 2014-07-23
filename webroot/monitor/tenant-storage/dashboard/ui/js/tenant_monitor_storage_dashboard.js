@@ -684,39 +684,45 @@ function parseClusterLatency(response) {
 }
 
 function parseClusterDiskActivity(data) {
-    var retThrptData = [], retIopsData = [], retLatData = [];
     var dataThrptRead = [], dataThrptWrite = [];
     var dataIopsRead = [], dataIopsWrite = [];
     var dataLatRead = [], dataLatWrite = [];
 
-    $.each(data['flow-series'], function(idx, sample) {
-        var thrptReadObj = {}, thrptWriteObj = {},
-            iopsReadObj = {}, iopsWriteObj = {},
-            latReadObj = {}, latWriteObj = {};
-        thrptReadObj['x'] = thrptWriteObj['x'] = sample['MessageTS'];
-        iopsReadObj['x'] = iopsWriteObj['x'] = sample['MessageTS'];
-        latReadObj['x'] = latWriteObj['x'] = sample['MessageTS'];
+    if(data != null && data.hasOwnProperty('flow-series')) {
+        $.each(data['flow-series'], function(idx, sample) {
+            //Throughput Data
+            dataThrptRead.push({
+                'x': sample['MessageTS'],
+                'y': sample['reads_kbytes']
+            });
+            dataThrptWrite.push({
+                'x': sample['MessageTS'],
+                'y': sample['writes_kbytes']
+            });
 
-        //Throughput Data
-        thrptReadObj['y'] = sample['reads_kbytes'];
-        thrptWriteObj['y'] = sample['writes_kbytes'];
-        dataThrptRead.push(thrptReadObj);
-        dataThrptWrite.push(thrptWriteObj);
+            //IOPS Data
+            dataIopsRead.push({
+                'x': sample['MessageTS'],
+                'y': sample['reads']
+            });
+            dataIopsWrite.push({
+                'x': sample['MessageTS'],
+                'y': sample['writes']
+            });
 
-        //IOPS Data
-        iopsReadObj['y'] = sample['reads'];
-        iopsWriteObj['y'] = sample['writes'];
-        dataIopsRead.push(iopsReadObj);
-        dataIopsWrite.push(iopsWriteObj);
+            //Latency Data
+            dataLatRead.push({
+                'x': sample['MessageTS'],
+                'y': sample['op_r_latency']
+            });
+            dataLatWrite.push({
+                'x': sample['MessageTS'],
+                'y': sample['op_w_latency']
+            });
+        });
+    }
 
-        //Latency Data
-        latReadObj['y'] = sample['op_r_latency'];
-        latWriteObj['y'] = sample['op_w_latency'];
-        dataLatRead.push(latReadObj);
-        dataLatWrite.push(latWriteObj);
-    });
-
-    retThrptData = [{
+    var retThrptData = [{
         values: dataThrptRead,
         key: 'Read',
         color: 'steelblue'
@@ -726,7 +732,7 @@ function parseClusterDiskActivity(data) {
         color: '#2ca02c'
     }];
 
-    retIopsData = [{
+    var retIopsData = [{
         values: dataIopsRead,
         key: 'Read',
         color: 'steelblue'
@@ -736,7 +742,7 @@ function parseClusterDiskActivity(data) {
         color: '#2ca02c'
     }];
 
-    retLatData = [{
+    var retLatData = [{
         values: dataLatRead,
         key: 'Read',
         color: 'steelblue'
