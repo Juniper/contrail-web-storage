@@ -460,9 +460,9 @@ function parseClusterMonitorData(result) {
 function parseCephClusterDFData(result) {
     var retObj = {};
     if (result != null) {
-        retObj['total_used'] = kiloByteToGB(result['total_used']);
-        retObj['total_avail'] = kiloByteToGB(result['total_avail']);
-        retObj['total_space'] = kiloByteToGB(result['total_space']);
+        retObj['total_used'] = result['total_used'];
+        retObj['total_avail'] = result['total_avail'];
+        retObj['total_space'] = result['total_space'];
         retObj['used_perc'] = ((retObj['total_used'] / retObj['total_space']) * 100).toFixed(2);
     }
     tenantStorageDashboardView.setDFUsageData(retObj);
@@ -1085,8 +1085,8 @@ function usageDial() {
         //dfUsageObj['used_perc'] = 60.00;
 
         $("#df-used-perc").text(dfUsageObj['used_perc'] + "%");
-        $("#df-used").text(dfUsageObj['total_used'] + " GB");
-        $("#df-total").text(dfUsageObj['total_space'] + " GB");
+        $("#df-used").text(formatBytes(dfUsageObj['total_used'] * 1024));
+        $("#df-total").text(formatBytes(dfUsageObj['total_space'] * 1024));
 
         this.labelPercData[0].value = dfUsageObj['used_perc'];
 
