@@ -514,6 +514,7 @@ function parseOSDsStatusData(result) {
                 val1.push(obj1);
                 key1['key'] = 'UP';
                 key1['values'] = val1;
+                key1['color'] = '#6baed6';
                 statusSeries.push(key1);
             } else if (idx == 'num_down_osds') {
                 var val1 = [];
@@ -531,6 +532,7 @@ function parseOSDsStatusData(result) {
                 val1.push(obj1);
                 key1['key'] = 'IN';
                 key1['values'] = val1;
+                key1['color'] = '#6baed6';
                 clusterSeries.push(key1);
             } else if (idx == 'num_out_osds') {
                 var val1 = [];
@@ -693,11 +695,11 @@ function parseClusterDiskActivity(data) {
             //Throughput Data
             dataThrptRead.push({
                 'x': sample['MessageTS'],
-                'y': sample['reads_kbytes']
+                'y': sample['reads_kbytes'] * 1024
             });
             dataThrptWrite.push({
                 'x': sample['MessageTS'],
-                'y': sample['writes_kbytes']
+                'y': sample['writes_kbytes'] * 1024
             });
 
             //IOPS Data

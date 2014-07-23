@@ -718,17 +718,17 @@ function populateDiskActivityClass() {
 
     this.setThrptData = function(data) {
         self.thrptData = data;
-        self.updateLineCharts(data, 'thrptChart')
+        updateStorageCharts.updateLineCharts(data, 'thrptChart')
     }
 
     this.setIopsData = function(data) {
         self.iopsData = data;
-        self.updateLineCharts(data, 'iopsChart');
+        updateStorageCharts.updateLineCharts(data, 'iopsChart');
     }
 
     this.setLatencyData = function(data) {
         self.latData = data;
-        self.updateLineCharts(data, 'latencyChart');
+        updateStorageCharts.updateLineCharts(data, 'latencyChart');
     }
 
     this.parseDiskStats = function(data) {
@@ -741,11 +741,11 @@ function populateDiskActivityClass() {
                 //Throughput Data
                 dataThrptRead.push({
                     'x': sample['MessageTS'],
-                    'y': sample['reads_kbytes']
+                    'y': sample['reads_kbytes'] * 1024
                 });
                 dataThrptWrite.push({
                     'x': sample['MessageTS'],
-                    'y': sample['writes_kbytes']
+                    'y': sample['writes_kbytes'] * 1024
                 });
 
                 //IOPS Data
@@ -828,54 +828,6 @@ function populateDiskActivityClass() {
         }).always(function(){
             endWidgetLoading('diskActivity');
         });
-    }
-
-    this.updateLineCharts = function(data, chartId) {
-        var chartObj = {},
-            selector;
-        if (chartId == 'thrptChart') {
-            var chartsData = {
-                title: 'Disk Throughput',
-                d: data,
-                chartOptions: {
-                    tooltipFn: tenantStorageChartUtils.thrptActivityTooltipFn
-                }
-            };
-            selector = '#diskActivityThrptChart';
-
-        } else if (chartId == 'iopsChart') {
-            var chartsData = {
-                title: 'Disk IOPS',
-                d: data,
-                chartOptions: {
-                    tooltipFn: tenantStorageChartUtils.iopsActivityTooltipFn
-                }
-            };
-            selector = '#diskActivityIopsChart'
-
-        } else if (chartId == 'latencyChart') {
-            var chartsData = {
-                title: 'Disk Latency',
-                d: data,
-                chartOptions: {
-                    tooltipFn: tenantStorageChartUtils.latencyActivityTooltipFn
-                }
-            };
-            selector = '#diskActivityLatencyChart'
-
-        } else {
-
-        }
-
-        if (!isStorageChartInitialized(selector)) {
-            $(selector).storageActivityLineChart(chartsData);
-            tenantStorageChartsInitializationStatus[chartId] = true;
-        } else {
-            chartObj['selector'] = $('#content-container').find(selector + ' > svg').first()[0];
-            chartObj['data'] = data;
-            chartObj['type'] = 'storageActivityLineChart';
-            updateStorageCharts.updateView(chartObj);
-        }
     }
 
 }

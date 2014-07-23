@@ -133,7 +133,7 @@ var tenantStorageChartUtils = {
             value: 'Throughput'
         }, {
             lbl: key,
-            value: currObj['y'] + ' KB'
+            value: formatBytes(currObj['origY'])
         }, {
             lbl: 'Date',
             value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
@@ -165,6 +165,12 @@ var tenantStorageChartUtils = {
             value: d3.time.format('%c')(new Date(currObj['x'] / 1000))
         }];
         return tooltipContents;
+    },
+    tickFormatFloatFn: function(d){
+        return d3.format(',.2f')(d);
+    },
+    tickFormatIntFn: function(d){
+        return d3.format(',0.0f')(d);
     }
 }
 
@@ -352,11 +358,14 @@ var updateStorageCharts = {
         var chartObj = {},
             selector;
         if (chartId == 'thrptChart') {
+            var formattedData = formatByteAxis(data);
             var chartsData = {
                 title: 'Disk Throughput',
-                d: data,
+                d: formattedData['data'],
                 chartOptions: {
-                    tooltipFn: tenantStorageChartUtils.thrptActivityTooltipFn
+                    tooltipFn: tenantStorageChartUtils.thrptActivityTooltipFn,
+                    tickFormatFn: tenantStorageChartUtils.tickFormatFloatFn,
+                    yLbl: formattedData['yLbl']
                 }
             };
             selector = '#diskActivityThrptChart';
@@ -366,7 +375,8 @@ var updateStorageCharts = {
                 title: 'Disk IOPS',
                 d: data,
                 chartOptions: {
-                    tooltipFn: tenantStorageChartUtils.iopsActivityTooltipFn
+                    tooltipFn: tenantStorageChartUtils.iopsActivityTooltipFn,
+                    tickFormatFn: tenantStorageChartUtils.tickFormatIntFn
                 }
             };
             selector = '#diskActivityIopsChart'
@@ -376,17 +386,21 @@ var updateStorageCharts = {
                 title: 'Disk Latency',
                 d: data,
                 chartOptions: {
-                    tooltipFn: tenantStorageChartUtils.latencyActivityTooltipFn
+                    tooltipFn: tenantStorageChartUtils.latencyActivityTooltipFn,
+                    tickFormatFn: tenantStorageChartUtils.tickFormatFloatFn
                 }
             };
             selector = '#diskActivityLatencyChart'
 
         } else if (chartId == 'clusterThrptChart') {
+            var formattedData = formatByteAxis(data);
             var chartsData = {
                 title: 'Disk Throughput',
-                d: data,
+                d: formattedData['data'],
                 chartOptions: {
-                    tooltipFn: tenantStorageChartUtils.thrptActivityTooltipFn
+                    tooltipFn: tenantStorageChartUtils.thrptActivityTooltipFn,
+                    tickFormatFn: tenantStorageChartUtils.tickFormatFloatFn,
+                    yLbl: formattedData['yLbl']
                 }
             };
             selector = '#clusterActivityThrptChart'
@@ -396,7 +410,8 @@ var updateStorageCharts = {
                 title: 'Disk IOPS',
                 d: data,
                 chartOptions: {
-                    tooltipFn: tenantStorageChartUtils.iopsActivityTooltipFn
+                    tooltipFn: tenantStorageChartUtils.iopsActivityTooltipFn,
+                    tickFormatFn: tenantStorageChartUtils.tickFormatIntFn
                 }
             };
             selector = '#clusterActivityIopsChart'
@@ -406,7 +421,8 @@ var updateStorageCharts = {
                 title: 'Disk Latency',
                 d: data,
                 chartOptions: {
-                    tooltipFn: tenantStorageChartUtils.latencyActivityTooltipFn
+                    tooltipFn: tenantStorageChartUtils.latencyActivityTooltipFn,
+                    tickFormatFn: tenantStorageChartUtils.tickFormatFloatFn
                 }
             };
             selector = '#clusterActivityLatencyChart'
@@ -453,9 +469,7 @@ var updateStorageCharts = {
                      });
 
                 chart.yAxis.axisLabel(ifNull(chartOptions['yLbl'],''))
-                    .tickFormat(function(d) {
-                        return d3.format(',.0f')(d);
-                    });
+                    .tickFormat(ifNull(chartOptions['tickFormatFn'], tenantStorageChartUtils.tickFormatIntFn));
                 chart.lines.forceY([0]);
 
                 if (chartOptions['tooltipFn'] == null) {
