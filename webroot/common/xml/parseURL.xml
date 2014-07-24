@@ -130,6 +130,13 @@
     </item>
 
     <item>
+        <url>/api/tenant/storage/cluster/usage</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterUsage</callback>
+    </item>
+
+    <item>
         <url>/api/tenant/storage/cluster/osd/activity</url>
         <method>get</method>
         <feature>storage</feature>

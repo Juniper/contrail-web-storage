@@ -37,12 +37,14 @@ function parseStoragePGData(pgJSON){
     var pgSummary= pgJSON[1];
     var pgMap = jsonPath(pgStatusJson, "$..pgmap");
     var pgDelta = jsonPath(pgSummary, "$..pg_stats_delta")[0];
-    var pgSum= jsonPath(pgSummary, "$..pg_stats_sum")[0]; 
+    var pgSum= jsonPath(pgSummary, "$..pg_stats_sum")[0];
+    var osdSum= jsonPath(pgSummary, "$..osd_stats_sum")[0];
 
     if (pgMap.length > 0) {
         pgMapJSON['pg_overview']= pgMap[0];
         pgMapJSON['pg_stats_delta']=pgDelta;
         pgMapJSON['pg_stats_sum']=pgSum;
+        pgMapJSON['osd_stats_sum']=osdSum;
         pgMapJSON['stamp'] =jsonPath(pgSummary, "$.output.stamp")[0];
         return pgMapJSON;
     }
