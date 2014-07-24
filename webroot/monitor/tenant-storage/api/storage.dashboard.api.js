@@ -484,6 +484,84 @@ function formatDiskSeriesLoadXMLData(resultJSON){
     }
 }
 
+
+function getStorageClusterUsage(req, res, appData){
+    var urlPGSummary = storageApi.url.pgDumpSummary;
+    console.log("url:"+urlPGSummary);
+    redisClient.get(urlPGSummary, function(error, cachedJSONStr) {
+        if (error || cachedJSONStr == null) {
+            processOSDStatus(res, appData, function(error,res,osdStatusJSON) {
+                storageRest.apiGet(urlPGSummary, appData, function (error, resultJSON) {
+                    if (!error && (resultJSON)) {
+                        var resultJSON = processClusterUsage(resultJSON, osdStatusJSON);
+                        if (!resultJSON) {
+                            resultJSON = [];
+                        }
+                        redisClient.setex(urlPGSummary, expireTime, JSON.stringify(resultJSON));
+                        commonUtils.handleJSONResponse(null, res, resultJSON);
+                    } else {
+                        commonUtils.handleJSONResponse(error, res, null);
+                    }
+                });
+            });
+        } else {
+            commonUtils.handleJSONResponse(null, res, JSON.parse(cachedJSONStr));
+        }
+    });
+}
+
+function processClusterUsage(resultJSON, osdStatusJSON){
+    var output={};
+    var osdStatsSum= jsonPath(resultJSON, "$..osd_stats_sum")[0];
+    output['usage_summary'] = {};
+    output['usage_summary']['osd_status']=jsonPath(osdStatusJSON, "$..osd_stat")[0];
+    output['usage_summary']['osd_summary']=osdStatsSum;
+    output['usage_summary']['osd_summary']['full_ratio']=jsonPath(resultJSON, "$..full_ratio")[0];
+    output['usage_summary']['osd_summary']['near_full_ratio']=jsonPath(resultJSON, "$..near_full_ratio")[0];
+    return output;
+}
+
+function processOSDStatus(res, appData, callback){
+    var urlOSDStatus = storageApi.url.osdStat;//"/osd/stat";
+    console.log("url:"+urlOSDStatus);
+    redisClient.get(urlOSDStatus, function(error, cachedJSONStr) {
+        if (error || cachedJSONStr == null) {
+            storageRest.apiGet(urlOSDStatus, appData, function (error, resultJSON) {
+                if(!error && (resultJSON)) {
+                    var resultJSON = parseStorageOSDStatus(resultJSON);
+                    if(!resultJSON) {
+                        resultJSON = [];
+                    }
+                    redisClient.setex(urlOSDStatus, expireTime, JSON.stringify(resultJSON));
+                    callback(error, res, resultJSON);
+                } else {
+                    callback(error, res, null);
+                }
+            });
+        } else {
+            callback(null, res, JSON.parse(cachedJSONStr));
+        }
+    });
+}
+
+function parseStorageOSDStatus(osdJSON){
+    console.log("osdJSON:"+jsonPath(osdJSON, "$.output")[0]);
+    var osdMapJSON ={};
+    var num_osds= jsonPath(osdJSON, "$.output.num_osds")[0];
+    var num_up_osds= jsonPath(osdJSON, "$.output.num_up_osds")[0];
+    var num_in_osds= jsonPath(osdJSON, "$.output.num_in_osds")[0];
+    var num_down_osds = num_osds - num_up_osds;
+    var num_out_osds = num_osds - num_in_osds;
+
+    var obj = jsonPath(osdJSON, "$.output")[0];
+    obj['num_down_osds'] = num_down_osds;
+    obj['num_out_osds'] = num_out_osds;
+    //c = obj;
+    osdMapJSON['osd_stat']= osdJSON;
+    osdMapJSON['osd_stat']['last_updated_time']= new Date();
+    return osdMapJSON;
+}
+
 /* List all public functions */
 exports.getStorageClusterStatus = getStorageClusterStatus;
 exports.getStorageClusterDFStatus = getStorageClusterDFStatus;
@@ -492,3 +570,4 @@ exports.getStorageClusterOSDActivity = getStorageClusterOSDActivity;
 exports.getStorageClusterPoolActivity = getStorageClusterPoolActivity;
 exports.getStorageClusterDiskActivity = getStorageClusterDiskActivity;
 exports.getSources = getSources;
+exports.getStorageClusterUsage= getStorageClusterUsage;
