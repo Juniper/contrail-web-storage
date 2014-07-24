@@ -18,6 +18,14 @@ and need to add the iconClass tag wherever we need to show some icons
         <item>
           <label>Infrastructure</label>
           <iconClass>icon-desktop</iconClass>
+          <resources>
+            <resource>
+              <rootDir>/monitor/storage-infra/common/ui</rootDir>
+              <js>monitor_infra_storage_constants.js</js>
+              <js>monitor_infra_storage_utils.js</js>
+              <view>monitor_infra_storage_common.view</view>
+            </resource>
+          </resources>
           <access>
             <roles>
               <role>admin</role>
@@ -36,9 +44,6 @@ and need to add the iconClass tag wherever we need to show some icons
                   <rootDir>/monitor/storage-infra/dashboard/ui/</rootDir>
                   <js>monitor_infra_storage_dashboard.js</js>
                   <view>monitor_infra_storage_dashboard.view</view>
-                  <js>monitor_infra_storage_constants.js</js>
-                  <js>monitor_infra_storage_utils.js</js>
-                  <view>monitor_infra_storage_common.view</view>
                   <class>infraMonitorStorageDashView</class>
                 </resource>
               </resources>

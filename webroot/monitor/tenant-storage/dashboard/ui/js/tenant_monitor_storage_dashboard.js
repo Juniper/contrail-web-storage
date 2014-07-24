@@ -11,23 +11,7 @@ function tenantStorageDashboardClass() {
         monStatusObj = {},
         poolsBarGbData, poolsBarObjData,
         disksStatusData, disksClusterStatusData,
-        clusterThrptData, clusterIopsData, clusterLatencyData,
-        disksBubbleData;
-
-    //for junkData
-    var t1, t2, t3, t4, v, dataRead, dataWrite, dataObj, dataLat;
-    //end of junkData
-
-    /*
-    clusterActivityThrptChart = new activityLineChart();
-    this.clusterActivityThrptChart = clusterActivityThrptChart;
-    clusterActivityIopsChart = new activityLineChart();
-    this.clusterActivityIopsChart = clusterActivityIopsChart;
-    clusterActivityObjChart = new activityLineChart();
-    this.clusterActivityObjChart = clusterActivityObjChart;
-    clusterActivityLatencyChart = new activityLineChart();
-    this.clusterActivityLatencyChart = clusterActivityLatencyChart;
-    */
+        clusterThrptData, clusterIopsData, clusterLatencyData;
 
     clusterUsageDial = new usageDial();
     this.clusterUsageDial = clusterUsageDial;
@@ -43,9 +27,6 @@ function tenantStorageDashboardClass() {
 
     diskClusterStatusChart = new disksBarChart();
     this.diskClusterStatusChart = diskClusterStatusChart;
-
-    disksBubbleChart = new diskScatterPlot();
-    this.disksBubbleChart = disksBubbleChart;
 
     this.destroy = function() {
         var cGrid = $('.contrail-grid').data('contrailGrid');
@@ -78,107 +59,15 @@ function tenantStorageDashboardClass() {
     this.getClusterActivityData = function() {
         return actStatusObj;
     }
-
-    this.setClusterActivityData = function(data) {
-
-        //this is a junk data generation for cluster activity chart
-        if (firstTime) {
-            t1 = 1404227489268324;
-            t2 = 1404227489268324;
-            t3 = 1404227489268324;
-            t4 = 1404227489268324;
-            v = 70; // start value (subscribers)
-            dataRead = d3.range(t1, t1 + 1000, 10).map(nextRead);
-            dataWrite = d3.range(t2, t1 + 1000, 10).map(nextWrite);
-            dataObj = d3.range(t3).map(nextObj);
-            dataLat = d3.range(t4).map(nextLat);
-
-            firstTime = false;
-        } else {
-            dataRead.shift();
-            dataRead.push(nextRead());
-            dataWrite.shift();
-            dataWrite.push(nextWrite());
-            dataLat.shift();
-            dataLat.push(nextLat());
-            dataObj.shift();
-            dataObj.push(nextObj());
-        }
-
-        function nextRead() {
-            return {
-                x: ++t1,
-                y: v = ~~Math.max(10, Math.min(90, v + 10 * (Math.random() - .5)))
-            };
-        }
-
-        function nextWrite() {
-            return {
-                x: ++t2,
-                y: v = ~~Math.max(10, Math.min(90, v + 10 * (Math.random() - .5)))
-            };
-        }
-
-        function nextObj() {
-            return {
-                x: ++t3,
-                y: v = ~~Math.max(4000, Math.min(4090, 4050 + 10 * (Math.random() - .5)))
-            };
-        }
-
-        function nextLat() {
-            return {
-                x: ++t4,
-                y: v = ~~Math.max(10, Math.min(90, 40 + 10 * (Math.random() - .5)))
-            };
-        }
-
-        junkThrptData = [{
-            values: dataRead,
-            key: 'Read',
-            color: 'steelblue',
-            area: true
-        }, {
-            values: dataWrite,
-            key: 'Write',
-            color: '#2ca02c',
-            area: true
-        }];
-        this.setClusterThrptData(junkThrptData);
-
-        junkIopsData = [{
-            values: dataRead,
-            key: 'Read',
-            color: '#1f77b4',
-            area: true
-        }, {
-            values: dataWrite,
-            key: 'Write',
-            color: '#2ca02c',
-            area: true
-        }];
-        this.setClusterIopsData(junkIopsData);
-
-        junkLatData = [{
-            values: dataLat,
-            key: 'Latency',
-            color: '#6baed6'
-        }];
-        this.clusterActivityLatencyChart.refresh(junkLatData);
-
-    }
     this.setClusterThrptData = function(data) {
         clusterThrptData = data;
         updateStorageCharts.updateLineCharts(data, 'clusterThrptChart');
-        //this.updateLineCharts(data, 'Cluster Throughput');
-        //this.clusterActivityThrptChart.refresh(data);
     }
     this.getClusterThrptData = function() {
         return clusterThrptData;
     }
     this.setClusterIopsData = function(data) {
         clusterIopsData = data;
-        //this.clusterActivityIopsChart.refresh(data);
         updateStorageCharts.updateLineCharts(data, 'clusterIopsChart');
     }
     this.getClusterIopsData = function() {
@@ -186,13 +75,11 @@ function tenantStorageDashboardClass() {
     }
     this.setClusterLatencyData = function(data) {
         clusterLatencyData = data;
-        //this.clusterActivityLatencyChart.refresh(data);
         updateStorageCharts.updateLineCharts(data, 'clusterLatencyChart');
     }
     this.getClusterLatencyData = function() {
         return clusterLatencyData;
     }
-
     this.getClusterMonitorData = function() {
         return monStatusObj;
     }
@@ -235,25 +122,6 @@ function tenantStorageDashboardClass() {
     this.getDisksClusterStatusData = function() {
         return disksClusterStatusData;
     }
-
-    this.setDisksBubbleData = function(data) {
-        disksBubbleData = data;
-        this.disksBubbleChart.refresh(data);
-    }
-    this.getDisksBubbleData = function() {
-        return disksBubbleData;
-    }
-    this.setDisksData = function(data) {
-        //disksDS.data(data);
-    }
-
-    this.getDisksData = function() {
-        return disksDS.data();
-    }
-    this.setSingleDiskData = function(data) {
-        singleDiskDS.data(data);
-    }
-
     this.updateClusterDashboard = function() {
         $('#dashHealthBox .widget-header').initWidgetHeader({
             title: 'Monitor Health',
@@ -280,23 +148,15 @@ function tenantStorageDashboardClass() {
         this.clusterUsageDial.draw();
 
         //Cluster Pools Charts
-        /*$('#poolsBarTabStrip').contrailTabs({
-            activate: onPoolsBarTabActivate
-        });*/
-
         this.clusterPoolsGbChart.init('#poolsBarGbChart');
         this.clusterPoolsGbChart.draw();
-
-        this.clusterPoolsObjChart.init('#poolsBarObjChart');
-        this.clusterPoolsObjChart.draw();
+        //this.clusterPoolsObjChart.init('#poolsBarObjChart');
+        //this.clusterPoolsObjChart.draw();
         //end of Cluster Pools charts
 
         //Disks Bar Charts
-        //$('#disksStatusBarTabStrip').contrailTabs({});
         this.diskStatusChart.init('#diskStatusChart');
         this.diskStatusChart.draw();
-
-        //$('#disksClusterBarTabStrip').contrailTabs({});
         this.diskClusterStatusChart.init('#diskClusterChart');
         this.diskClusterStatusChart.draw();
         //End of Disks Bar charts
@@ -305,31 +165,9 @@ function tenantStorageDashboardClass() {
         $('#clusterActivityThrptLabel').text('Throughput');
         $('#clusterActivityIopsLabel').text('IOPs');
         $('#clusterActivityLatencyLabel').text('Latency');
-
-        /*
-        $('#clusterActivityThrptTabStrip').contrailTabs({
-            activate: onClusterActivityChartTabActivate
-        })
-        $('#clusterActivityIopsTabStrip').contrailTabs({});
-        $('#clusterActivityLatencyTabStrip').contrailTabs({});
-
-        this.clusterActivityThrptChart.init('#clusterActivityThrptChart');
-        this.clusterActivityThrptChart.draw();
-        
-        this.clusterActivityIopsChart.init('#clusterActivityIopsChart');
-        this.clusterActivityIopsChart.draw();
-
-        this.clusterActivityLatencyChart.init('#clusterActivityLatencyChart');
-        this.clusterActivityLatencyChart.draw();
-        */
         //End of Cluster Activity Charts
 
         statusDataRefresh();
-
-        /*$('#clusterActivityObjTabStrip').contrailTabs({})
-         this.clusterActivityObjChart.init('#clusterActivityObjChart');
-         this.clusterActivityObjChart.draw();
-         */
 
     }
     this.updateMonitorDashboard = function(ds) {
@@ -346,18 +184,6 @@ function tenantStorageDashboardClass() {
 
         }
     }
-    this.updateDisksDashboard = function(ds) {
-        if (tenantStorageDashboardView.tabsLoaded['disks'] == 0) {
-            tenantStorageDashboardView.tabsLoaded['disks'] = 1;
-
-            this.disksBubbleChart.init('#disksBubble');
-            this.disksBubbleChart.draw();
-            this.disksBubbleChart.refresh(this.getDisksBubbleData());
-        } else {
-            this.disksBubbleChart.refresh(this.getDisksBubbleData());
-        }
-    }
-
     this.loadViewFromNode = function(hashObj) {
         if (hashObj['node'].indexOf('Monitor:') == 0) {
             oneMntrView.load({
@@ -460,9 +286,9 @@ function parseClusterMonitorData(result) {
 function parseCephClusterDFData(result) {
     var retObj = {};
     if (result != null) {
-        retObj['total_used'] = kiloByteToGB(result['total_used']);
-        retObj['total_avail'] = kiloByteToGB(result['total_avail']);
-        retObj['total_space'] = kiloByteToGB(result['total_space']);
+        retObj['total_used'] = result['total_used'];
+        retObj['total_avail'] = result['total_avail'];
+        retObj['total_space'] = result['total_space'];
         retObj['used_perc'] = ((retObj['total_used'] / retObj['total_space']) * 100).toFixed(2);
     }
     tenantStorageDashboardView.setDFUsageData(retObj);
@@ -496,7 +322,7 @@ function parseCephPoolsData(result) {
         });
     }
     tenantStorageDashboardView.setPoolsBarGbData(gbUsedKeys);
-    tenantStorageDashboardView.setPoolsBarObjData(objectsKeys);
+    //tenantStorageDashboardView.setPoolsBarObjData(objectsKeys);
 }
 
 function parseOSDsStatusData(result) {
@@ -514,6 +340,7 @@ function parseOSDsStatusData(result) {
                 val1.push(obj1);
                 key1['key'] = 'UP';
                 key1['values'] = val1;
+                key1['color'] = '#6baed6';
                 statusSeries.push(key1);
             } else if (idx == 'num_down_osds') {
                 var val1 = [];
@@ -531,6 +358,7 @@ function parseOSDsStatusData(result) {
                 val1.push(obj1);
                 key1['key'] = 'IN';
                 key1['values'] = val1;
+                key1['color'] = '#6baed6';
                 clusterSeries.push(key1);
             } else if (idx == 'num_out_osds') {
                 var val1 = [];
@@ -583,140 +411,46 @@ function parseCephPGData(result) {
     return retArr;
 }
 
-var cnt1 = cnt2 = 0;
-
-function parseClusterThroughput(response) {
-    var firstTime = new Boolean();
-    firstTime = true;
-    var t1, t2, v;
-    if (firstTime) {
-        t1 = 1404227489268324;
-        t2 = 1404227489268324;
-        v = 70; // start value (subscribers)
-        dataRead = d3.range(t1, t1 + 10000, 100).map(nextRead);
-        dataWrite = d3.range(t2, t2 + 10000, 100).map(nextWrite);
-
-        firstTime = false;
-    } else {
-        dataRead.shift();
-        dataRead.push(nextRead());
-        dataWrite.shift();
-        dataWrite.push(nextWrite());
-    }
-
-    function nextRead() {
-        cnt1 += 1;
-        return {
-            x: t1 = t1 + cnt1 * 100,
-            y: v = ~~Math.max(10, Math.min(90, v + 10 * (Math.random() - .5)))
-        };
-    }
-
-    function nextWrite() {
-        cnt2 += 1;
-        return {
-            x: t2 = t2 + cnt2 * 100,
-            y: v = ~~Math.max(10, Math.min(90, v + 10 * (Math.random() - .5)))
-        };
-    }
-
-    junkThrptData = [{
-        values: dataRead,
-        key: 'Read',
-        color: 'steelblue',
-        area: true
-    }, {
-        values: dataWrite,
-        key: 'Write',
-        color: '#2ca02c',
-        area: true
-    }];
-    tenantStorageDashboardView.setClusterThrptData(junkThrptData);
-    tenantStorageDashboardView.setClusterIopsData(junkThrptData);
-}
-
-function parseClusterLatency(response) {
-    var firstTime = new Boolean();
-    firstTime = true;
-    var t1, t2, v;
-    if (firstTime) {
-        t1 = 1;
-        t2 = 1;
-        v = 70; // start value (subscribers)
-        dataRead = d3.range(50).map(nextRead);
-        dataWrite = d3.range(50).map(nextWrite);
-
-        firstTime = false;
-    } else {
-        dataRead.shift();
-        dataRead.push(nextRead());
-        dataWrite.shift();
-        dataWrite.push(nextWrite());
-    }
-
-    function nextRead() {
-        return {
-            x: ++t1,
-            y: v = ~~Math.max(10, Math.min(90, v + 10 * (Math.random() - .5)))
-        };
-    }
-
-    function nextWrite() {
-        return {
-            x: ++t2,
-            y: v = ~~Math.max(10, Math.min(90, v + 10 * (Math.random() - .5)))
-        };
-    }
-
-    junkThrptData = [{
-        values: dataRead,
-        key: 'Read',
-        color: 'steelblue',
-        area: false
-    }, {
-        values: dataWrite,
-        key: 'Write',
-        color: '#2ca02c',
-        area: false
-    }];
-    tenantStorageDashboardView.setClusterLatencyData(junkThrptData);
-
-}
-
 function parseClusterDiskActivity(data) {
-    var retThrptData = [], retIopsData = [], retLatData = [];
     var dataThrptRead = [], dataThrptWrite = [];
     var dataIopsRead = [], dataIopsWrite = [];
     var dataLatRead = [], dataLatWrite = [];
 
-    $.each(data['flow-series'], function(idx, sample) {
-        var thrptReadObj = {}, thrptWriteObj = {},
-            iopsReadObj = {}, iopsWriteObj = {},
-            latReadObj = {}, latWriteObj = {};
-        thrptReadObj['x'] = thrptWriteObj['x'] = sample['MessageTS'];
-        iopsReadObj['x'] = iopsWriteObj['x'] = sample['MessageTS'];
-        latReadObj['x'] = latWriteObj['x'] = sample['MessageTS'];
+    if(data != null && data.hasOwnProperty('flow-series')) {
+        $.each(data['flow-series'], function(idx, sample) {
+            //Throughput Data
+            dataThrptRead.push({
+                'x': sample['MessageTS'],
+                'y': sample['reads_kbytes'] * 1024
+            });
+            dataThrptWrite.push({
+                'x': sample['MessageTS'],
+                'y': sample['writes_kbytes'] * 1024
+            });
 
-        //Throughput Data
-        thrptReadObj['y'] = sample['reads_kbytes'];
-        thrptWriteObj['y'] = sample['writes_kbytes'];
-        dataThrptRead.push(thrptReadObj);
-        dataThrptWrite.push(thrptWriteObj);
+            //IOPS Data
+            dataIopsRead.push({
+                'x': sample['MessageTS'],
+                'y': sample['reads']
+            });
+            dataIopsWrite.push({
+                'x': sample['MessageTS'],
+                'y': sample['writes']
+            });
 
-        //IOPS Data
-        iopsReadObj['y'] = sample['reads'];
-        iopsWriteObj['y'] = sample['writes'];
-        dataIopsRead.push(iopsReadObj);
-        dataIopsWrite.push(iopsWriteObj);
+            //Latency Data
+            dataLatRead.push({
+                'x': sample['MessageTS'],
+                'y': sample['op_r_latency']
+            });
+            dataLatWrite.push({
+                'x': sample['MessageTS'],
+                'y': sample['op_w_latency']
+            });
+        });
+    }
 
-        //Latency Data
-        latReadObj['y'] = sample['op_r_latency'];
-        latWriteObj['y'] = sample['op_w_latency'];
-        dataLatRead.push(latReadObj);
-        dataLatWrite.push(latWriteObj);
-    });
-
-    retThrptData = [{
+    var retThrptData = [{
         values: dataThrptRead,
         key: 'Read',
         color: 'steelblue'
@@ -726,7 +460,7 @@ function parseClusterDiskActivity(data) {
         color: '#2ca02c'
     }];
 
-    retIopsData = [{
+    var retIopsData = [{
         values: dataIopsRead,
         key: 'Read',
         color: 'steelblue'
@@ -736,7 +470,7 @@ function parseClusterDiskActivity(data) {
         color: '#2ca02c'
     }];
 
-    retLatData = [{
+    var retLatData = [{
         values: dataLatRead,
         key: 'Read',
         color: 'steelblue'
@@ -758,10 +492,10 @@ function getClusterHealthStatus() {
 
     }).done(function(response) {
         parseClusterHealthData(response);
-        endWidgetLoading('dashHealth');
-
     }).fail(function(result) {
 
+    }).always(function() {
+        endWidgetLoading('dashHealth');
     });
 }
 
@@ -774,9 +508,10 @@ function getClusterMonitorStatus() {
 
     }).done(function(response) {
         parseClusterMonitorData(response);
-        endWidgetLoading('dashHealth');
     }).fail(function(result) {
 
+    }).always(function() {
+        endWidgetLoading('dashHealth');
     });
 
 }
@@ -790,9 +525,10 @@ function getClusterDFStatus() {
 
     }).done(function(response) {
         parseCephClusterDFData(response['utilization_stats']['output']['stats']);
-        endWidgetLoading('dashUsage');
     }).fail(function(result) {
 
+    }).always(function() {
+        endWidgetLoading('dashUsage');
     });
 
 }
@@ -806,10 +542,11 @@ function getClusterPools() {
 
     }).done(function(response) {
         parseCephPoolsData(response['pools']);
-        endWidgetLoading('dashPools');
 
     }).fail(function(result) {
         //flash error message;
+    }).always(function() {
+        endWidgetLoading('dashPools');
     });
 
 }
@@ -823,61 +560,11 @@ function getOSDsStatus() {
 
     }).done(function(response) {
         parseOSDsStatusData(response);
-        endWidgetLoading('dashDisks');
     }).fail(function(result) {
         //flash error message;
+    }).always(function() {
+        endWidgetLoading('dashDisks');
     });
-
-}
-
-function getClusterActivity() {
-    startWidgetLoading('dashActivity');
-    var deferredObjs = [];
-    var thrptDeferred = $.Deferred(),
-        latDeferred = $.Deferred();
-
-    deferredObjs.push(thrptDeferred);
-    deferredObjs.push(latDeferred);
-
-    getClusterThroughput(thrptDeferred);
-    getClusterLatency(latDeferred);
-
-    $.when.apply(window, deferredObjs).done(function() {
-        endWidgetLoading('dashActivity');
-    });
-
-}
-
-function getClusterThroughput(deferredObj) {
-
-    $.ajax({
-        url: '/api/tenant/storage/cluster/throughput/summary',
-        dataType: "json",
-        cache: false
-
-    }).done(function(response) {
-        parseClusterThroughput(response);
-        deferredObj.resolve();
-    }).fail(function(result) {
-
-    });
-
-}
-
-function getClusterLatency(deferredObj) {
-
-    $.ajax({
-        url: '/api/tenant/storage/cluster/latency',
-        dataType: "json",
-        cache: false
-
-    }).done(function(response) {
-        parseClusterLatency(response);
-        deferredObj.resolve();
-    }).fail(function(result) {
-
-    });
-
 }
 
 function getClusterDiskActivity(obj) {
@@ -1079,8 +766,8 @@ function usageDial() {
         //dfUsageObj['used_perc'] = 60.00;
 
         $("#df-used-perc").text(dfUsageObj['used_perc'] + "%");
-        $("#df-used").text(dfUsageObj['total_used'] + " GB");
-        $("#df-total").text(dfUsageObj['total_space'] + " GB");
+        $("#df-used").text(formatBytes(dfUsageObj['total_used'] * 1024));
+        $("#df-total").text(formatBytes(dfUsageObj['total_space'] * 1024));
 
         this.labelPercData[0].value = dfUsageObj['used_perc'];
 
@@ -1130,26 +817,6 @@ function usageDial() {
                 else return 0.5;
             });
     }
-}
-
-function onClusterActivityChartTabActivate(e, ui) {
-    var selTab = ui.newTab.context.innerText;
-    if (selTab == "Throughput") {
-        tenantStorageDashboardView.clusterActivityThrptChart.refresh(tenantStorageDashboardView.getClusterThrptData());
-    } else if (selTab == "IOPs") {
-        tenantStorageDashboardView.clusterActivityIopsChart.refresh(tenantStorageDashboardView.getClusterIopsData());
-    } else {}
-
-}
-
-function onPoolsBarTabActivate(e, ui) {
-    var selTab = ui.newTab.context.innerText;
-    if (selTab == "GB Used") {
-        tenantStorageDashboardView.clusterPoolsGbChart.refresh(tenantStorageDashboardView.getPoolsBarGbData());
-    } else if (selTab == "Objects") {
-        tenantStorageDashboardView.clusterPoolsObjChart.refresh(tenantStorageDashboardView.getPoolsBarObjData());
-    } else {}
-
 }
 
 function poolsBarChart() {
@@ -1266,117 +933,6 @@ function disksBarChart() {
         //nv.utils.windowResize(this.chart.update);
     }
 }
-
-/* Disks Scatter Plot
- 
- */
-
-function diskScatterPlot() {
-    var self = this;
-    var chart;
-
-    this.init = function(chartId) {
-        this.chartId = chartId;
-
-        var chart = nv.models.scatterChart()
-            .margin({
-                top: 20,
-                right: 20,
-                bottom: 50,
-                left: 80
-            })
-            .showDistX(true)
-            .showDistY(true)
-            .showLegend(true)
-            .transitionDuration(350)
-            .size(25).sizeRange([200, 200])
-            .shape("circle")
-            .x(function(d) {
-                return d.avail_percent
-            })
-            .y(function(d) {
-                return d.gb
-            })
-            .tooltipContent(function(key, x, y, e, graph) {
-                return '<h3>' + e.point.name + '</h3>' +
-                    '<p> Status: ' + e.point.status + '</p>' +
-                    '<p> Host: ' + e.point.host + '</p>' +
-                    '<p> GB Avail: ' + e.point.gb_avail + '</p>';
-            })
-            .color(function(d) {
-                return d.color
-            });
-
-        //Axis settings
-        chart.xAxis
-            .tickFormat(d3.format('.02f'))
-            .axisLabel('Available Percentage')
-            .axisLabelDistance(5);
-
-        chart.yAxis
-            .tickFormat(d3.format('.02f'))
-            .axisLabel('Total space (GB)')
-
-        chart.scatter.dispatch.on('elementClick', function(e) {
-            showOSDDetails(e.point.name);
-        });
-        chart.scatter.dispatch.on('elementMouseover', function() { /*console.log(d3.select(this).attr());*/ });
-
-        this.chart = chart;
-
-        this.d3ChartElem = d3.select(this.chartId).append('svg');
-
-    }
-
-    this.draw = function() {
-        nv.addGraph(function() {
-            return this.chart
-        });
-    }
-
-    this.refresh = function(data) {
-
-        /* calculating X and Y axis ranges.
-         extent of gb and avail_percent of all OSDs in all groups
-         is taken and padding is added to eliminate circles shown on chart margin
-         */
-        var yvals = [];
-        $.each(data, function(idx, grp) {
-            $.each(grp.values, function(i, osd) {
-                yvals.push(parseFloat(osd.gb));
-            });
-        });
-        var yscale = d3.extent(yvals);
-
-        yscale[0] = yscale[0] - 150;
-        yscale[1] = yscale[1] + 150;
-
-        var xvals = [];
-        $.each(data, function(idx, grp) {
-            $.each(grp.values, function(i, osd) {
-                xvals.push(parseFloat(osd.avail_percent));
-            });
-        });
-        var xscale = d3.extent(xvals);
-        xscale[0] = xscale[0] - 0.2;
-        xscale[1] = (xscale[1] >= 95.5) ? 100.00 : xscale[1] + 0.5;
-
-        this.chart.forceX(xscale)
-            .forceY(yscale)
-
-        this.d3ChartElem
-            .datum(data)
-            .call(this.chart);
-
-        nv.utils.windowResize(this.chart.update);
-
-    }
-}
-
-
-/* End of Disks Scatter Plot
- 
- */
 
 function statusDataRefresh() {
 
