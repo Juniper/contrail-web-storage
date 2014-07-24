@@ -5,17 +5,14 @@
 
 cephOSDsView = function() {
 
-    var self = this;
-    var errorMsg;
-    osdsBubble = new osdScatterPlot();
-    this.osdsBubble = osdsBubble;
-    osdsTree = new osdTree();
+    var self = this,
+        errorMsg,
+        osdsTree = new osdTree(),
+        currOSD = null,
+        osdsDV = new ContrailDataView(),
+        osdDV = new ContrailDataView();
+
     this.osdsTree = osdsTree;
-    var currOSD = null;
-    var osdsDV = new ContrailDataView();
-
-    singleOSDDS = new ContrailDataView();
-
     this.currTab = null;
 
     this.destroy = function() {
@@ -24,16 +21,16 @@ cephOSDsView = function() {
             cGrid.destroy();
         if (this.timerId)
             clearInterval(this.timerId);
-        if (tenantStorageDisksView.diskTimerId)
-            clearInterval(tenantStorageDisksView.diskTimerId);
         if (this.currTab)
             this.currTab = null;
+
+        // cleanup diskActivity, stop fetching individual disk stats
+        diskActivity.destroy();
     }
 
     this.setOSDsBubbleData = function(data) {
         this.osdsBubbleData = data;
         updateDisksChart(this.osdsBubbleData);
-        //this.osdsBubble.refresh(this.osdsBubbleData);
     }
 
     this.setOSDsTreeData = function(data) {
@@ -49,24 +46,24 @@ cephOSDsView = function() {
          }*/
     }
 
-    this.setOSDsDetailsData = function(data) {
+    this.setOSDsData = function(data) {
         osdsDV.setData(data);
-        /*if( currOSD == null)
-         showOSDDetails();
-         */
     }
 
-    this.getOSDsDetailsData = function() {
+    this.getOSDsData = function() {
         return osdsDV.getItems();
     }
 
-    this.setSingleOSDData = function(data) {
-        singleOSDDS.data(data);
+    this.setOSDData = function(data) {
+        osdDV.setData(data);
+    }
+
+    this.getOSDData = function() {
+        return osdDV.getItems();
     }
 
     this.setCurrOSD = function(data) {
         currOSD = data;
-        showOSDDetails(currOSD);
     }
 
     this.getCurrOSD = function() {
@@ -75,7 +72,6 @@ cephOSDsView = function() {
 
     this.setErrorMessage = function(msg) {
         errorMsg = msg;
-        $('#scatter-log-message').text(errorMsg);
     }
 
     function populateOSDs() {
@@ -359,10 +355,7 @@ function updateDisksChart(data) {
 function parseOSDsDataSingleSeries(data) {
     var retArr = [],
         osdErrArr = [];
-    var osdArr = [],
-        osdUpInArr = [],
-        osdDownArr = [],
-        osdUpOutArr = [];
+    var osdArr = [];
     var skip_osd_bubble = new Boolean();
     var statusTemplate = contrail.getTemplate4Id("disk-status-template");
 
@@ -426,7 +419,7 @@ function parseOSDsDataSingleSeries(data) {
             osdArr.push(osd);
         });
     }
-    tenantStorageDisksView.setOSDsDetailsData(osdArr);
+    tenantStorageDisksView.setOSDsData(osdArr);
     tenantStorageDisksView.setOSDsBubbleData(retArr);
 }
 
@@ -526,7 +519,7 @@ function parseOSDsData(data) {
         downGroup.color = color_imp;
         retArr.push(downGroup);
     }
-    tenantStorageDisksView.setOSDsDetailsData(osdArr);
+    tenantStorageDisksView.setOSDsData(osdArr);
     tenantStorageDisksView.setOSDsBubbleData(retArr);
     if (osdErrArr.length != 0) {
         var msg = ' Following OSDs were not added to Scatter Chart due to insufficient data ';
@@ -554,147 +547,6 @@ function getOSDs() {
 
 }
 
-function osdScatterPlot() {
-    var self = this;
-    var chart;
-
-    this.init = function() {
-        var chart = nv.models.scatterChart()
-            .margin({
-                top: 20,
-                right: 20,
-                bottom: 50,
-                left: 80
-            })
-            .showDistX(true)
-            .showDistY(true)
-            .showLegend(true)
-            .tooltips(true)
-            //.transitionDuration(350)
-            .size(25).sizeRange([200, 200])
-            .shape("circle")
-            .x(function(d) {
-                return d.available_perc
-            })
-            .y(function(d) {
-                return d.gb
-            })
-            .tooltipContent(function(key, x, y, e, graph) {
-                return '<h3>' + e.point.name + '</h3>' +
-                    '<p> Status: ' + e.point.status + '</p>' +
-                    '<p> Host: ' + e.point.host + '</p>' +
-                    '<p> GB Avail: ' + e.point.gb_avail + '</p>';
-            })
-            .color(function(d) {
-                return d.color
-            });
-
-        //Axis settings
-        chart.xAxis
-            .tickFormat(d3.format('.02f'))
-            .axisLabel('Available Percentage');
-        //.axisLabelDistance(5);
-
-        chart.yAxis
-            .tickFormat(d3.format('.02f'))
-            .axisLabel('Total space (GB)')
-
-        chart.scatter.dispatch.on('elementClick', function(e) {
-            showOSDDetails(e.point.name);
-        });
-        //chart.scatter.dispatch.on('elementMouseover', function(){ /*console.log(d3.select(this).attr());*/});
-
-        this.chart = chart;
-
-    }
-
-    this.draw = function() {
-        nv.addGraph(function() {
-            return this.chart
-        });
-    }
-
-    this.refresh = function(data) {
-
-        /*var q = d3.geom.quadtree(nodes),
-         i = 0,
-         n = nodes.length;
-
-         while (++i < n) {
-         q.visit(collide(nodes[i]));
-         }
-
-         this.chart.selectAll("circle")
-         .attr("cx", function(d) { return d.x; })
-         .attr("cy", function(d) { return d.y; });
-         */
-
-        // retrieves all the data from chart
-        //d3.selectAll('g.nv-wrap.nv-scatter').data()
-
-        /* calculating X and Y axis ranges.
-         extent of gb and available_perc of all OSDs in all groups
-         is taken and padding is added to eliminate circles shown on chart margin
-         */
-
-        var yvals = [];
-        $.each(data, function(idx, grp) {
-            $.each(grp.values, function(i, osd) {
-                yvals.push(parseFloat(osd.gb));
-            });
-        });
-        var yscale = d3.extent(yvals);
-
-        yscale[0] = yscale[0] - 150;
-        yscale[1] = yscale[1] + 150;
-
-        var xvals = [];
-        $.each(data, function(idx, grp) {
-            $.each(grp.values, function(i, osd) {
-                xvals.push(parseFloat(osd.available_perc));
-            });
-        });
-        var xscale = d3.extent(xvals);
-        xscale[0] = xscale[0] - 0.2;
-        xscale[1] = (xscale[1] >= 95.5) ? 100.00 : xscale[1] + 0.5;
-
-        this.chart.forceX(xscale)
-            .forceY(yscale)
-
-        d3.select('#osd-bubble svg')
-            .datum(data)
-            .call(this.chart);
-
-        nv.utils.windowResize(this.chart.update);
-
-
-    }
-
-    function collide(node) {
-        var r = node.radius + 16,
-            nx1 = node.x - r,
-            nx2 = node.x + r,
-            ny1 = node.y - r,
-            ny2 = node.y + r;
-        return function(quad, x1, y1, x2, y2) {
-            if (quad.point && (quad.point !== node)) {
-                var x = node.x - quad.point.x,
-                    y = node.y - quad.point.y,
-                    l = Math.sqrt(x * x + y * y),
-                    r = node.radius + quad.point.radius;
-                if (l < r) {
-                    l = (l - r) / l * .5;
-                    node.x -= x *= l;
-                    node.y -= y *= l;
-                    quad.point.x += x;
-                    quad.point.y += y;
-                }
-            }
-            return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-        };
-    }
-}
-
 function populateDiskActivityClass() {
 
     var self = this;
@@ -714,6 +566,11 @@ function populateDiskActivityClass() {
         $('#diskActivityIopsLabel').text('IOPs');
         $('#diskActivityLatencyLabel').text('Latency');
         //End of disk Activity Chart
+    }
+
+    this.destroy = function() {
+        if (this.diskTimerId)
+            clearInterval(this.diskTimerId);
     }
 
     this.setThrptData = function(data) {
@@ -807,10 +664,10 @@ function populateDiskActivityClass() {
         self.fetchDiskStats(obj);
         self.diskName = obj['name'];
 
-        if (tenantStorageDisksView.diskTimerId) {
-            clearInterval(tenantStorageDisksView.diskTimerId);
+        if (self.diskTimerId) {
+            clearInterval(self.diskTimerId);
         } else {
-            tenantStorageDisksView.diskTimerId = setInterval(function() {
+            self.diskTimerId = setInterval(function() {
                 self.fetchDiskStats(obj);
             }, refreshTimeout);
         }
@@ -1007,53 +864,6 @@ function populateDiskDetailsTab(obj) {
 
         });
     });
-}
-
-function showOSDDetails(osd_name) {
-    var retArr = [];
-
-    osds = tenantStorageDisksView.getOSDsDetailsData();
-
-    var fields = ['Name', 'Host', 'UUID', 'Public Address', 'Reweight', 'Crush Weight', 'Depth',
-        'Total GB', 'Available GB', 'Used GB', 'Apply Latency ms', 'Commit Latency ms', 'Down Stamp', 'Cluster Status', 'Status'
-    ];
-
-    $.each(fields, function(idx, val) {
-        var obj = {};
-        obj['field'] = val;
-        obj['value'] = '';
-        retArr.push(obj);
-    });
-
-    if (osd_name == null) {
-        osd_name = 'osd.0';
-    }
-
-    if (osds != null) {
-        $.each(osds, function(idx, osd) {
-            if (osd.name == osd_name) {
-                retArr[0]['value'] = osd.name;
-                retArr[1]['value'] = osd.host;
-                retArr[2]['value'] = osd.uuid;
-                retArr[3]['value'] = osd.public_addr;
-                retArr[4]['value'] = osd.reweight;
-                retArr[5]['value'] = osd.crush_weight;
-                retArr[6]['value'] = osd.depth;
-                retArr[7]['value'] = osd.gb;
-                retArr[8]['value'] = osd.gb_avail;
-                retArr[9]['value'] = osd.gb_used;
-                retArr[10]['value'] = osd.fs_perf_stat.apply_latency_ms;
-                retArr[11]['value'] = osd.fs_perf_stat.commit_latency_ms;
-                retArr[12]['value'] = osd.osd_xinfo.down_stamp;
-                retArr[13]['value'] = osd.cluster_status;
-                retArr[14]['value'] = osd.status;
-            }
-        });
-    }
-    $("#osd-details").removeClass("osd-details-default");
-    $("#osd-details").addClass("osd-details");
-    tenantStorageDisksView.setSingleOSDData(retArr);
-    return retArr;
 }
 
 function getOSDsTree() {
