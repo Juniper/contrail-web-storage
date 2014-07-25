@@ -269,7 +269,7 @@ var storageChartUtils = {
     onStorageNodeDrillDown: function(currObj) {
         layoutHandler.setURLHashParams({
             node: 'Storage Nodes:' + currObj['name'],
-            tab: ''
+            tab: 'details'
         }, {
             p: 'mon_infra_storage'
         });

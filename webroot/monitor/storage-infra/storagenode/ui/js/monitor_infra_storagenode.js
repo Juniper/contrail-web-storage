@@ -226,12 +226,11 @@ storageNodeView = function() {
         } else {
 
             var tabIdx = $.inArray(obj['tab'], storageNodeTabs);
-            if (tabIdx == -1) {
-                tabIdx = 0;
-                populateDetailsTab(storNodeInfo);
-            }
             //If any tab is stored in URL,select it else select the first tab
+            if (tabIdx == -1)
+                tabIdx = 0;
             selectTab(storNodeTabStrip, tabIdx);
+            populateDetailsTab(storNodeInfo);
         }
     }
 
