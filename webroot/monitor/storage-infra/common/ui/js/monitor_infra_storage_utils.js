@@ -47,7 +47,7 @@ var infraMonitorStorageAlertUtils = {
         }
         return alertsList.sort(dashboardUtils.sortInfraAlerts);
     }
-}
+};
 
 var infraMonitorStorageUtils = {
     /**
@@ -113,7 +113,7 @@ var infraMonitorStorageUtils = {
         });
         storageConsoleTimer = [];
     }
-}
+};
 
 /**
  * populateFn for storageDS
@@ -160,8 +160,8 @@ function getStorageNodeStatusTmpl(obj) {
 }
 
 /**
- * This function takes parsed nodeData from the infra parse functions and returns object with all alerts displaying in dashboard tooltip,
- * and tooltip messages array
+ * This function takes parsed nodeData from the infra parse functions and returns object
+ * with all alerts displaying in dashboard tooltip and tooltip messages array
  */
 function getNodeStatusForSummaryPages(data, page) {
     var result = {},
@@ -336,6 +336,5 @@ var storageChartUtils = {
             });
         }
         return tooltipContents;
-    },
-
-}
+    }
+};

@@ -21,7 +21,16 @@ var monitorInfraStorageUrls = {
     DISK_DETAILS            : '/api/tenant/storage/cluster/osd/details?name={0}'
 }
 
-monitorInfraUrls['QUERY'] = '/api/admin/reports/query';
+/*
+hack for now
+monitorInfraUrls is defined in controller.
+for storage only installations, define it so sysinfo widget API call pass through
+ */
+if( typeof monitorInfraUrls === 'undefined'){
+    monitorInfraUrls = {
+        'QUERY' : '/api/admin/reports/query'
+    };
+}
 
 var storageInfraAlertMsgs = {
     DISK_DOWN           : "{0:Disk;Disks} down - {1}",
