@@ -11,219 +11,14 @@ function InfraStorageUtilsMockData() {
                         "hosts": [{
                             "osds": [{
                                 "status": "up",
-                                "name": "osd.15",
+                                "name": "osd.3",
                                 "exists": 1,
                                 "type_id": 0,
                                 "reweight": "1.000000",
                                 "crush_weight": "0.819992",
                                 "depth": 2,
                                 "type": "osd",
-                                "id": 15,
-                                "kb": 877609036,
-                                "kb_avail": 473767792,
-                                "kb_used": 403841244,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 19,
-                                    "commit_latency_ms": 103
-                                },
-                                "heartbeat_back_addr": "40.1.0.3:6826/11350",
-                                "heartbeat_front_addr": "40.1.0.3:6827/11350",
-                                "public_addr": "40.1.0.3:6824/11350",
-                                "cluster_addr": "40.1.0.3:6825/11350",
-                                "uuid": "69c67c16-9b10-4c3f-8234-a12d9c9eac8f",
-                                "down_at": 0,
-                                "up_from": 83,
-                                "lost_at": 0,
-                                "up_thru": 129,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 0,
-                                "last_clean_end": 0,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.000000",
-                                    "down_stamp": "0.000000",
-                                    "osd": 15,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.14",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.819992",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 14,
-                                "kb": 877609036,
-                                "kb_avail": 466263716,
-                                "kb_used": 411345320,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 25,
-                                    "commit_latency_ms": 104
-                                },
-                                "heartbeat_back_addr": "40.1.0.3:6834/1009741",
-                                "heartbeat_front_addr": "40.1.0.3:6835/1009741",
-                                "public_addr": "40.1.0.3:6820/9741",
-                                "cluster_addr": "40.1.0.3:6807/1009741",
-                                "uuid": "082b5425-c612-428f-a0a3-df476be88e72",
-                                "down_at": 123,
-                                "up_from": 126,
-                                "lost_at": 0,
-                                "up_thru": 129,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 78,
-                                "last_clean_end": 124,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.300000",
-                                    "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 14,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.13",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.819992",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 13,
-                                "kb": 877609036,
-                                "kb_avail": 426412212,
-                                "kb_used": 451196824,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 22,
-                                    "commit_latency_ms": 109
-                                },
-                                "heartbeat_back_addr": "40.1.0.3:6829/1008654",
-                                "heartbeat_front_addr": "40.1.0.3:6830/1008654",
-                                "public_addr": "40.1.0.3:6816/8654",
-                                "cluster_addr": "40.1.0.3:6828/1008654",
-                                "uuid": "20b1630b-29a9-4161-9e43-e5b25837b31b",
-                                "down_at": 123,
-                                "up_from": 125,
-                                "lost_at": 0,
-                                "up_thru": 129,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 74,
-                                "last_clean_end": 123,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.300000",
-                                    "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 13,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.12",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.819992",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 12,
-                                "kb": 877609036,
-                                "kb_avail": 416730948,
-                                "kb_used": 460878088,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 25,
-                                    "commit_latency_ms": 112
-                                },
-                                "heartbeat_back_addr": "40.1.0.3:6837/1007244",
-                                "heartbeat_front_addr": "40.1.0.3:6838/1007244",
-                                "public_addr": "40.1.0.3:6812/7244",
-                                "cluster_addr": "40.1.0.3:6836/1007244",
-                                "uuid": "12206d67-abb7-4520-a4a3-8a8867e2f7eb",
-                                "down_at": 123,
-                                "up_from": 126,
-                                "lost_at": 0,
-                                "up_thru": 129,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 70,
-                                "last_clean_end": 124,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.300000",
-                                    "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 12,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.11",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.819992",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 11,
-                                "kb": 877609036,
-                                "kb_avail": 502387120,
-                                "kb_used": 375221916,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 23,
-                                    "commit_latency_ms": 98
-                                },
-                                "heartbeat_back_addr": "40.1.0.3:6840/1006202",
-                                "heartbeat_front_addr": "40.1.0.3:6841/1006202",
-                                "public_addr": "40.1.0.3:6808/6202",
-                                "cluster_addr": "40.1.0.3:6839/1006202",
-                                "uuid": "c5f818a9-b4cf-4046-b6c1-5eb295cb34e7",
-                                "down_at": 123,
-                                "up_from": 127,
-                                "lost_at": 0,
-                                "up_thru": 129,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 65,
-                                "last_clean_end": 125,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.300000",
-                                    "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 11,
-                                    "laggy_interval": 1
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.10",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.819992",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 10,
+                                "id": 3,
                                 "kb": 877609036,
                                 "kb_avail": 458594040,
                                 "kb_used": 419014996,
@@ -252,19 +47,19 @@ function InfraStorageUtilsMockData() {
                                 "osd_xinfo": {
                                     "laggy_probability": "0.300000",
                                     "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 10,
+                                    "osd": 3,
                                     "laggy_interval": 0
                                 }
                             }, {
                                 "status": "up",
-                                "name": "osd.9",
+                                "name": "osd.2",
                                 "exists": 1,
                                 "type_id": 0,
                                 "reweight": "1.000000",
                                 "crush_weight": "0.819992",
                                 "depth": 2,
                                 "type": "osd",
-                                "id": 9,
+                                "id": 2,
                                 "kb": 877609036,
                                 "kb_avail": 481903312,
                                 "kb_used": 395705724,
@@ -293,7 +88,7 @@ function InfraStorageUtilsMockData() {
                                 "osd_xinfo": {
                                     "laggy_probability": "0.000000",
                                     "down_stamp": "0.000000",
-                                    "osd": 9,
+                                    "osd": 2,
                                     "laggy_interval": 0
                                 }
                             }],
@@ -323,293 +118,6 @@ function InfraStorageUtilsMockData() {
                             "status": "up"
                         }, {
                             "osds": [{
-                                "status": "up",
-                                "name": "osd.8",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.129990",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 8,
-                                "kb": 142255632,
-                                "kb_avail": 71314100,
-                                "kb_used": 70941532,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 17,
-                                    "commit_latency_ms": 39
-                                },
-                                "heartbeat_back_addr": "40.1.0.2:6818/5277",
-                                "heartbeat_front_addr": "40.1.0.2:6825/5277",
-                                "public_addr": "40.1.0.2:6805/5277",
-                                "cluster_addr": "40.1.0.2:6809/5277",
-                                "uuid": "2215c6c5-efcb-4785-8f97-94647e88ad0c",
-                                "down_at": 120,
-                                "up_from": 121,
-                                "lost_at": 0,
-                                "up_thru": 127,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 51,
-                                "last_clean_end": 118,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.000000",
-                                    "down_stamp": "2014-07-28 10:40:22.269822",
-                                    "osd": 8,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.7",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.129990",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 7,
-                                "kb": 142255632,
-                                "kb_avail": 85417628,
-                                "kb_used": 56838004,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 18,
-                                    "commit_latency_ms": 42
-                                },
-                                "heartbeat_back_addr": "40.1.0.2:6820/5279",
-                                "heartbeat_front_addr": "40.1.0.2:6827/5279",
-                                "public_addr": "40.1.0.2:6800/5279",
-                                "cluster_addr": "40.1.0.2:6810/5279",
-                                "uuid": "5499402c-3d65-4317-8d8e-cf8a80cb82fc",
-                                "down_at": 119,
-                                "up_from": 121,
-                                "lost_at": 0,
-                                "up_thru": 126,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 44,
-                                "last_clean_end": 118,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.000000",
-                                    "down_stamp": "2014-07-28 10:40:05.453208",
-                                    "osd": 7,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.6",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.909988",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 6,
-                                "kb": 975236544,
-                                "kb_avail": 376983444,
-                                "kb_used": 598253100,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 28,
-                                    "commit_latency_ms": 69
-                                },
-                                "heartbeat_back_addr": "40.1.0.2:6838/1005276",
-                                "heartbeat_front_addr": "40.1.0.2:6849/1005276",
-                                "public_addr": "40.1.0.2:6808/5276",
-                                "cluster_addr": "40.1.0.2:6836/1005276",
-                                "uuid": "25c24f55-39b9-47f5-9b9b-d4db03eb2f4d",
-                                "down_at": 123,
-                                "up_from": 124,
-                                "lost_at": 0,
-                                "up_thru": 127,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 121,
-                                "last_clean_end": 123,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.300000",
-                                    "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 6,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.5",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.909988",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 5,
-                                "kb": 975236544,
-                                "kb_avail": 525185584,
-                                "kb_used": 450050960,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 27,
-                                    "commit_latency_ms": 63
-                                },
-                                "heartbeat_back_addr": "40.1.0.2:6850/1005275",
-                                "heartbeat_front_addr": "40.1.0.2:6851/1005275",
-                                "public_addr": "40.1.0.2:6802/5275",
-                                "cluster_addr": "40.1.0.2:6831/1005275",
-                                "uuid": "73f45808-4ea4-4255-99ac-f1ff2aa85da1",
-                                "down_at": 123,
-                                "up_from": 124,
-                                "lost_at": 0,
-                                "up_thru": 127,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 121,
-                                "last_clean_end": 123,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.300000",
-                                    "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 5,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.4",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.909988",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 4,
-                                "kb": 975236544,
-                                "kb_avail": 491501812,
-                                "kb_used": 483734732,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 28,
-                                    "commit_latency_ms": 63
-                                },
-                                "heartbeat_back_addr": "40.1.0.2:6816/1005278",
-                                "heartbeat_front_addr": "40.1.0.2:6848/1005278",
-                                "public_addr": "40.1.0.2:6804/5278",
-                                "cluster_addr": "40.1.0.2:6837/1005278",
-                                "uuid": "ca8b1d07-4e87-4019-896b-c86f5b7f7ce4",
-                                "down_at": 123,
-                                "up_from": 124,
-                                "lost_at": 0,
-                                "up_thru": 127,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 121,
-                                "last_clean_end": 123,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.300000",
-                                    "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 4,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.3",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.909988",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 3,
-                                "kb": 975236544,
-                                "kb_avail": 392300464,
-                                "kb_used": 582936080,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 12,
-                                    "commit_latency_ms": 68
-                                },
-                                "heartbeat_back_addr": "40.1.0.2:6841/1005274",
-                                "heartbeat_front_addr": "40.1.0.2:6846/1005274",
-                                "public_addr": "40.1.0.2:6806/5274",
-                                "cluster_addr": "40.1.0.2:6840/1005274",
-                                "uuid": "1f0a8cc0-a63f-4311-aad2-0576bb173096",
-                                "down_at": 123,
-                                "up_from": 124,
-                                "lost_at": 0,
-                                "up_thru": 127,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 121,
-                                "last_clean_end": 123,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.300000",
-                                    "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 3,
-                                    "laggy_interval": 0
-                                }
-                            }, {
-                                "status": "up",
-                                "name": "osd.2",
-                                "exists": 1,
-                                "type_id": 0,
-                                "reweight": "1.000000",
-                                "crush_weight": "0.449997",
-                                "depth": 2,
-                                "type": "osd",
-                                "id": 2,
-                                "kb": 487099008,
-                                "kb_avail": 270222852,
-                                "kb_used": 216876156,
-                                "fs_perf_stat": {
-                                    "apply_latency_ms": 35,
-                                    "commit_latency_ms": 60
-                                },
-                                "heartbeat_back_addr": "40.1.0.2:6853/1005271",
-                                "heartbeat_front_addr": "40.1.0.2:6854/1005271",
-                                "public_addr": "40.1.0.2:6803/5271",
-                                "cluster_addr": "40.1.0.2:6852/1005271",
-                                "uuid": "d9ea0677-6b16-4e34-ac19-697e026ec198",
-                                "down_at": 123,
-                                "up_from": 129,
-                                "lost_at": 0,
-                                "up_thru": 129,
-                                "cluster_status": "in",
-                                "up": 1,
-                                "in": 1,
-                                "state": [
-                                    "exists",
-                                    "up"
-                                ],
-                                "last_clean_begin": 121,
-                                "last_clean_end": 127,
-                                "osd_xinfo": {
-                                    "laggy_probability": "0.300000",
-                                    "down_stamp": "2014-07-28 10:44:16.594251",
-                                    "osd": 2,
-                                    "laggy_interval": 1
-                                }
-                            }, {
                                 "status": "up",
                                 "name": "osd.1",
                                 "exists": 1,
@@ -735,7 +243,7 @@ function InfraStorageUtilsMockData() {
                     "y": 387.46,
                     "available_perc": "94.00",
                     "total": "387.46 GB",
-                    "size": 1.4999999999999996,
+                    "size": 1,
                     "shape": "circle",
                     "type": "storageNode",
                     "display_type": "Storage Node",
@@ -743,219 +251,14 @@ function InfraStorageUtilsMockData() {
                     "isPartialUveMissing": false,
                     "osds": [{
                         "status": "up",
-                        "name": "osd.15",
+                        "name": "osd.3",
                         "exists": 1,
                         "type_id": 0,
                         "reweight": "1.000000",
                         "crush_weight": "0.819992",
                         "depth": 2,
                         "type": "osd",
-                        "id": 15,
-                        "kb": 877609036,
-                        "kb_avail": 473767792,
-                        "kb_used": 403841244,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 19,
-                            "commit_latency_ms": 103
-                        },
-                        "heartbeat_back_addr": "40.1.0.3:6826/11350",
-                        "heartbeat_front_addr": "40.1.0.3:6827/11350",
-                        "public_addr": "40.1.0.3:6824/11350",
-                        "cluster_addr": "40.1.0.3:6825/11350",
-                        "uuid": "69c67c16-9b10-4c3f-8234-a12d9c9eac8f",
-                        "down_at": 0,
-                        "up_from": 83,
-                        "lost_at": 0,
-                        "up_thru": 129,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 0,
-                        "last_clean_end": 0,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.000000",
-                            "down_stamp": "0.000000",
-                            "osd": 15,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.14",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.819992",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 14,
-                        "kb": 877609036,
-                        "kb_avail": 466263716,
-                        "kb_used": 411345320,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 25,
-                            "commit_latency_ms": 104
-                        },
-                        "heartbeat_back_addr": "40.1.0.3:6834/1009741",
-                        "heartbeat_front_addr": "40.1.0.3:6835/1009741",
-                        "public_addr": "40.1.0.3:6820/9741",
-                        "cluster_addr": "40.1.0.3:6807/1009741",
-                        "uuid": "082b5425-c612-428f-a0a3-df476be88e72",
-                        "down_at": 123,
-                        "up_from": 126,
-                        "lost_at": 0,
-                        "up_thru": 129,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 78,
-                        "last_clean_end": 124,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.300000",
-                            "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 14,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.13",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.819992",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 13,
-                        "kb": 877609036,
-                        "kb_avail": 426412212,
-                        "kb_used": 451196824,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 22,
-                            "commit_latency_ms": 109
-                        },
-                        "heartbeat_back_addr": "40.1.0.3:6829/1008654",
-                        "heartbeat_front_addr": "40.1.0.3:6830/1008654",
-                        "public_addr": "40.1.0.3:6816/8654",
-                        "cluster_addr": "40.1.0.3:6828/1008654",
-                        "uuid": "20b1630b-29a9-4161-9e43-e5b25837b31b",
-                        "down_at": 123,
-                        "up_from": 125,
-                        "lost_at": 0,
-                        "up_thru": 129,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 74,
-                        "last_clean_end": 123,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.300000",
-                            "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 13,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.12",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.819992",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 12,
-                        "kb": 877609036,
-                        "kb_avail": 416730948,
-                        "kb_used": 460878088,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 25,
-                            "commit_latency_ms": 112
-                        },
-                        "heartbeat_back_addr": "40.1.0.3:6837/1007244",
-                        "heartbeat_front_addr": "40.1.0.3:6838/1007244",
-                        "public_addr": "40.1.0.3:6812/7244",
-                        "cluster_addr": "40.1.0.3:6836/1007244",
-                        "uuid": "12206d67-abb7-4520-a4a3-8a8867e2f7eb",
-                        "down_at": 123,
-                        "up_from": 126,
-                        "lost_at": 0,
-                        "up_thru": 129,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 70,
-                        "last_clean_end": 124,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.300000",
-                            "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 12,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.11",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.819992",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 11,
-                        "kb": 877609036,
-                        "kb_avail": 502387120,
-                        "kb_used": 375221916,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 23,
-                            "commit_latency_ms": 98
-                        },
-                        "heartbeat_back_addr": "40.1.0.3:6840/1006202",
-                        "heartbeat_front_addr": "40.1.0.3:6841/1006202",
-                        "public_addr": "40.1.0.3:6808/6202",
-                        "cluster_addr": "40.1.0.3:6839/1006202",
-                        "uuid": "c5f818a9-b4cf-4046-b6c1-5eb295cb34e7",
-                        "down_at": 123,
-                        "up_from": 127,
-                        "lost_at": 0,
-                        "up_thru": 129,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 65,
-                        "last_clean_end": 125,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.300000",
-                            "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 11,
-                            "laggy_interval": 1
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.10",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.819992",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 10,
+                        "id": 3,
                         "kb": 877609036,
                         "kb_avail": 458594040,
                         "kb_used": 419014996,
@@ -984,19 +287,19 @@ function InfraStorageUtilsMockData() {
                         "osd_xinfo": {
                             "laggy_probability": "0.300000",
                             "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 10,
+                            "osd": 3,
                             "laggy_interval": 0
                         }
                     }, {
                         "status": "up",
-                        "name": "osd.9",
+                        "name": "osd.2",
                         "exists": 1,
                         "type_id": 0,
                         "reweight": "1.000000",
                         "crush_weight": "0.819992",
                         "depth": 2,
                         "type": "osd",
-                        "id": 9,
+                        "id": 2,
                         "kb": 877609036,
                         "kb_avail": 481903312,
                         "kb_used": 395705724,
@@ -1025,12 +328,12 @@ function InfraStorageUtilsMockData() {
                         "osd_xinfo": {
                             "laggy_probability": "0.000000",
                             "down_stamp": "0.000000",
-                            "osd": 9,
+                            "osd": 2,
                             "laggy_interval": 0
                         }
                     }],
-                    "osds_total": "5.72 TB",
-                    "osds_used": "2.72 TB",
+                    "osds_total": "1.63 TB",
+                    "osds_used": "776.98 GB",
                     "monitor": {
                         "name": "cmbu-vxa2010-17",
                         "rank": 1,
@@ -1053,309 +356,19 @@ function InfraStorageUtilsMockData() {
                     "nodeAlerts": [],
                     "alerts": [],
                     "processAlerts": [],
-                    "version": "Ceph 0.67.5-1-g09ecfd2",
-                    "id": "id_0",
-                    "multiTooltip": true,
-                    "diskCnt": 7
+                    "version": "Ceph 0.67.5-1-g09ecfd2"
                 }, {
                     "x": 92,
                     "y": 316.59,
                     "available_perc": "92.00",
                     "total": "316.59 GB",
-                    "size": 1.4999999999999996,
+                    "size": 1,
                     "shape": "circle",
                     "type": "storageNode",
                     "display_type": "Storage Node",
                     "name": "cmbu-vxa2100-proto3",
                     "isPartialUveMissing": false,
                     "osds": [{
-                        "status": "up",
-                        "name": "osd.8",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.129990",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 8,
-                        "kb": 142255632,
-                        "kb_avail": 71314100,
-                        "kb_used": 70941532,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 17,
-                            "commit_latency_ms": 39
-                        },
-                        "heartbeat_back_addr": "40.1.0.2:6818/5277",
-                        "heartbeat_front_addr": "40.1.0.2:6825/5277",
-                        "public_addr": "40.1.0.2:6805/5277",
-                        "cluster_addr": "40.1.0.2:6809/5277",
-                        "uuid": "2215c6c5-efcb-4785-8f97-94647e88ad0c",
-                        "down_at": 120,
-                        "up_from": 121,
-                        "lost_at": 0,
-                        "up_thru": 127,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 51,
-                        "last_clean_end": 118,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.000000",
-                            "down_stamp": "2014-07-28 10:40:22.269822",
-                            "osd": 8,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.7",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.129990",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 7,
-                        "kb": 142255632,
-                        "kb_avail": 85417628,
-                        "kb_used": 56838004,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 18,
-                            "commit_latency_ms": 42
-                        },
-                        "heartbeat_back_addr": "40.1.0.2:6820/5279",
-                        "heartbeat_front_addr": "40.1.0.2:6827/5279",
-                        "public_addr": "40.1.0.2:6800/5279",
-                        "cluster_addr": "40.1.0.2:6810/5279",
-                        "uuid": "5499402c-3d65-4317-8d8e-cf8a80cb82fc",
-                        "down_at": 119,
-                        "up_from": 121,
-                        "lost_at": 0,
-                        "up_thru": 126,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 44,
-                        "last_clean_end": 118,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.000000",
-                            "down_stamp": "2014-07-28 10:40:05.453208",
-                            "osd": 7,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.6",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.909988",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 6,
-                        "kb": 975236544,
-                        "kb_avail": 376983444,
-                        "kb_used": 598253100,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 28,
-                            "commit_latency_ms": 69
-                        },
-                        "heartbeat_back_addr": "40.1.0.2:6838/1005276",
-                        "heartbeat_front_addr": "40.1.0.2:6849/1005276",
-                        "public_addr": "40.1.0.2:6808/5276",
-                        "cluster_addr": "40.1.0.2:6836/1005276",
-                        "uuid": "25c24f55-39b9-47f5-9b9b-d4db03eb2f4d",
-                        "down_at": 123,
-                        "up_from": 124,
-                        "lost_at": 0,
-                        "up_thru": 127,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 121,
-                        "last_clean_end": 123,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.300000",
-                            "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 6,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.5",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.909988",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 5,
-                        "kb": 975236544,
-                        "kb_avail": 525185584,
-                        "kb_used": 450050960,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 27,
-                            "commit_latency_ms": 63
-                        },
-                        "heartbeat_back_addr": "40.1.0.2:6850/1005275",
-                        "heartbeat_front_addr": "40.1.0.2:6851/1005275",
-                        "public_addr": "40.1.0.2:6802/5275",
-                        "cluster_addr": "40.1.0.2:6831/1005275",
-                        "uuid": "73f45808-4ea4-4255-99ac-f1ff2aa85da1",
-                        "down_at": 123,
-                        "up_from": 124,
-                        "lost_at": 0,
-                        "up_thru": 127,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 121,
-                        "last_clean_end": 123,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.300000",
-                            "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 5,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.4",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.909988",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 4,
-                        "kb": 975236544,
-                        "kb_avail": 491501812,
-                        "kb_used": 483734732,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 28,
-                            "commit_latency_ms": 63
-                        },
-                        "heartbeat_back_addr": "40.1.0.2:6816/1005278",
-                        "heartbeat_front_addr": "40.1.0.2:6848/1005278",
-                        "public_addr": "40.1.0.2:6804/5278",
-                        "cluster_addr": "40.1.0.2:6837/1005278",
-                        "uuid": "ca8b1d07-4e87-4019-896b-c86f5b7f7ce4",
-                        "down_at": 123,
-                        "up_from": 124,
-                        "lost_at": 0,
-                        "up_thru": 127,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 121,
-                        "last_clean_end": 123,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.300000",
-                            "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 4,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.3",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.909988",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 3,
-                        "kb": 975236544,
-                        "kb_avail": 392300464,
-                        "kb_used": 582936080,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 12,
-                            "commit_latency_ms": 68
-                        },
-                        "heartbeat_back_addr": "40.1.0.2:6841/1005274",
-                        "heartbeat_front_addr": "40.1.0.2:6846/1005274",
-                        "public_addr": "40.1.0.2:6806/5274",
-                        "cluster_addr": "40.1.0.2:6840/1005274",
-                        "uuid": "1f0a8cc0-a63f-4311-aad2-0576bb173096",
-                        "down_at": 123,
-                        "up_from": 124,
-                        "lost_at": 0,
-                        "up_thru": 127,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 121,
-                        "last_clean_end": 123,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.300000",
-                            "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 3,
-                            "laggy_interval": 0
-                        }
-                    }, {
-                        "status": "up",
-                        "name": "osd.2",
-                        "exists": 1,
-                        "type_id": 0,
-                        "reweight": "1.000000",
-                        "crush_weight": "0.449997",
-                        "depth": 2,
-                        "type": "osd",
-                        "id": 2,
-                        "kb": 487099008,
-                        "kb_avail": 270222852,
-                        "kb_used": 216876156,
-                        "fs_perf_stat": {
-                            "apply_latency_ms": 35,
-                            "commit_latency_ms": 60
-                        },
-                        "heartbeat_back_addr": "40.1.0.2:6853/1005271",
-                        "heartbeat_front_addr": "40.1.0.2:6854/1005271",
-                        "public_addr": "40.1.0.2:6803/5271",
-                        "cluster_addr": "40.1.0.2:6852/1005271",
-                        "uuid": "d9ea0677-6b16-4e34-ac19-697e026ec198",
-                        "down_at": 123,
-                        "up_from": 129,
-                        "lost_at": 0,
-                        "up_thru": 129,
-                        "cluster_status": "in",
-                        "up": 1,
-                        "in": 1,
-                        "state": [
-                            "exists",
-                            "up"
-                        ],
-                        "last_clean_begin": 121,
-                        "last_clean_end": 127,
-                        "osd_xinfo": {
-                            "laggy_probability": "0.300000",
-                            "down_stamp": "2014-07-28 10:44:16.594251",
-                            "osd": 2,
-                            "laggy_interval": 1
-                        }
-                    }, {
                         "status": "up",
                         "name": "osd.1",
                         "exists": 1,
@@ -1438,8 +451,8 @@ function InfraStorageUtilsMockData() {
                             "laggy_interval": 0
                         }
                     }],
-                    "osds_total": "5.26 TB",
-                    "osds_used": "2.72 TB",
+                    "osds_total": "929.07 GB",
+                    "osds_used": "436.44 GB",
                     "monitor": {
                         "name": "cmbu-vxa2100-proto3",
                         "rank": 0,
@@ -1462,10 +475,7 @@ function InfraStorageUtilsMockData() {
                     "nodeAlerts": [],
                     "alerts": [],
                     "processAlerts": [],
-                    "version": "Ceph 0.67.5-1-g09ecfd2",
-                    "id": "id_1",
-                    "multiTooltip": true,
-                    "diskCnt": 9
+                    "version": "Ceph 0.67.5-1-g09ecfd2"
                 }],
                 'test2': [],
                 'test3': []
