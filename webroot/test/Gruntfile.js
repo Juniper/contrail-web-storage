@@ -30,6 +30,10 @@ module.exports = function( grunt ) {
                 monitor_storage_infra: {
                     options: {
                         files:commonFiles.concat([
+                            /* STORAGE UTILS */
+                            "contrail-web-storage/webroot/monitor/storage-infra/test/monitor_infra_storage_utils_mock.js",
+                            "contrail-web-storage/webroot/monitor/storage-infra/test/monitor_infra_storage_utils_test.js",
+
                             /* STORAGE DASHBOARD */
                             "contrail-web-storage/webroot/monitor/storage-infra/dashboard/ui/js/monitor_infra_storage_dashboard.js",
                             "contrail-web-storage/webroot/monitor/storage-infra/test/monitor_infra_storage_dashboard_mock.js",

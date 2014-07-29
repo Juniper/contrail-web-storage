@@ -3,7 +3,7 @@
  */
 module.exports = function(config) {
   config.set({
-    basePath: '../..',    //"contrail-web-storage" directory
+    basePath: '../../..',    //"contrail-web-storage" directory
     autoWatch: true,
     frameworks: ['qunit'],
     files: [
