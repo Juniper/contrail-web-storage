@@ -1,0 +1,261 @@
+<!--
+ Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
+-->
+
+<urlLists>
+
+      <require>
+        <define>longPoll</define>
+        <path>process.mainModule.exports["corePath"] + '/src/serverroot/web/core/longPolling.api'</path>
+     </require>
+
+     <require>
+        <define>cacheApi</define>
+        <path>process.mainModule.exports["corePath"] + '/src/serverroot/web/core/cache.api'</path>
+    </require>
+
+    <require>
+        <define>rbac</define>
+        <path>process.mainModule.exports["corePath"] + '/src/serverroot/web/core/rbac.api'</path>
+    </require>
+
+    <require>
+        <define>commonUtils</define>
+        <path>process.mainModule.exports["corePath"] + '/src/serverroot/utils/common.utils'</path>
+    </require>
+
+    <item>
+        <url>/api/service/networking/orchestration/model</url>
+        <method>get</method>
+        <feature>orchestration</feature>
+        <callback>commonUtils.getOrchestrationPluginModel</callback>
+    </item>
+    <item>
+        <url>/api/service/networking/web-server-info</url>
+        <method>get</method>
+        <feature>monitoring</feature>
+        <callback>commonUtils.getWebServerInfo</callback>
+    </item>
+    
+    <require>
+        <define>timeout</define>
+        <!-- Available tags for timeout
+            timeout         - Request timeout in seconds
+            timeoutCallback - Callback to be called once request times out, if
+                              not provided, then default callback
+                              defHandleReqTimeout() gets called
+         -->
+        <path>request-timeout</path>
+    </require>
+
+    <!--  Contrail Storage API  -->
+    <require>
+        <define>storageInfraApi</define>
+        <path>../../monitor/storage-infra/storagenode/api/storage.infra.api</path>
+    </require>
+
+    <require>
+        <define>storageDashboardApi</define>
+        <path>../../monitor/tenant-storage/api/storage.dashboard.api</path>
+    </require>
+    
+    <require>
+        <define>storageMonsApi</define>
+        <path>../../monitor/tenant-storage/api/storage.mons.api</path>
+    </require>
+
+    <require>
+        <define>storageOsdsApi</define>
+        <path>../../monitor/tenant-storage/api/storage.osd.api</path>
+    </require>
+    
+    <require>
+        <define>storagePGsApi</define>
+        <path>../../monitor/tenant-storage/api/storage.pg.api</path>
+    </require>    
+
+    <require>
+        <define>storagePoolsApi</define>
+        <path>../../monitor/tenant-storage/api/storage.pool.api</path>
+    </require>   
+
+    <item>
+        <url>/api/storage/</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>handler.dashboard</callback>
+    </item>
+
+    <item>
+        <url>/api/admin/monitor/infrastructure/storagenodes/summary</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageInfraApi.getStorageTopology</callback>
+    </item>
+    <!-- queryString ...details?hostname= -->
+     <item>
+        <url>/api/admin/monitor/infrastructure/storagenodes/details</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageInfraApi.getStorageTopologyDetails</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/hosts</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getSources</callback>
+    </item>
+
+
+    <item>
+        <url>/api/tenant/storage/cluster/health/status</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterStatus</callback>
+    </item>
+    
+    <item>
+        <url>/api/tenant/storage/cluster/status</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterHealthStatus</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/df/status</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterDFStatus</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/usage</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterUsage</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/osd/activity</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterOSDActivity</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/pool/activity</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterPoolActivity</callback>
+    </item>
+    <item>
+        <url>/api/tenant/storage/cluster/disk/activity</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterDiskActivity</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/osd/status</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getStorageOSDStatus</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/monitors/summary</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageMonsApi.getMonitorSummary</callback>
+    </item>
+    <!-- queryString ...details?name= -->
+    <item>
+        <url>/api/tenant/storage/cluster/monitor/details</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageMonsApi.getMonitorDetails</callback>
+    </item>
+    <item>
+        <url>/api/tenant/storage/cluster/osds/summary</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getStorageOSDSummary</callback>
+    </item>
+   <!-- queryString ...details?name= -->
+    <item>
+        <url>/api/tenant/storage/cluster/osd/details</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getStorageOSDDetails</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/osd/version</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getOSDVersion</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/osds/tree</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getStorageOSDTree</callback>
+    </item>
+    
+    <item>
+        <url>/api/tenant/storage/cluster/pools/summary</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storagePoolsApi.getStoragePGPoolsSummary</callback>
+    </item>
+    <!-- queryString ...details?name= -->
+    <item>
+        <url>/api/tenant/storage/cluster/pool/details</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storagePoolsApi.getStoragePGPoolDetails</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/pgs/summary</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storagePGsApi.getStoragePGSummary</callback>
+    </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/pgs/stuck</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storagePGsApi.getStoragePGStuck</callback>
+    </item>
+
+    <!-- flow-series of pool data by name and host -->
+    <item>
+        <url>/api/tenant/storage/cluster/pool/flow-series</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storagePoolsApi.getStoragePoolFlowSeries</callback>
+    </item>
+    <!-- flow-series of osd data by name and host -->
+    <item>
+        <url>/api/tenant/storage/cluster/osd/flow-series</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getStorageOSDFlowSeries</callback>
+    </item>
+    <!-- flow-series of disk data by name and host -->
+    <item>
+        <url>/api/tenant/storage/cluster/disk/flow-series</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageMonsApi.getStorageDiskFlowSeries</callback>
+    </item>
+
+    <!-- Contrail Storage -->
+
+
+   
+</urlLists>
