@@ -1,0 +1,21 @@
+<!--
+ Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
+-->
+
+<packageList>
+    <package>
+        <name>webStorage</name>
+        <parseURL>
+            <path>webStorage:webroot/common/xml/parseURL.xml</path>
+            <output>webStorage:webroot/common/api/url.routes.js</output>
+        </parseURL>
+        <jobProcess>
+            <path>webStorage:webroot/common/xml/jobProcess.xml</path>
+            <output>webStorage:webroot/common/api/jobsCb.api.js</output>
+        </jobProcess>
+        <featureList>
+            <path>webStorage:webroot/common/xml/featureList.xml</path>
+            <output>webStorage:webroot/common/api/feature.list.js</output>
+        </featureList>
+    </package>
+</packageList>
