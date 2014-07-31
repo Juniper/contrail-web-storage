@@ -487,7 +487,6 @@ function formatDiskSeriesLoadXMLData(resultJSON){
 
 function getStorageClusterUsage(req, res, appData){
     var urlPGSummary = storageApi.url.pgDumpSummary;
-    console.log("url:"+urlPGSummary);
     redisClient.get(urlPGSummary, function(error, cachedJSONStr) {
         if (error || cachedJSONStr == null) {
             processOSDStatus(res, appData, function(error,res,osdStatusJSON) {
@@ -523,7 +522,6 @@ function processClusterUsage(resultJSON, osdStatusJSON){
 
 function processOSDStatus(res, appData, callback){
     var urlOSDStatus = storageApi.url.osdStat;//"/osd/stat";
-    console.log("url:"+urlOSDStatus);
     redisClient.get(urlOSDStatus, function(error, cachedJSONStr) {
         if (error || cachedJSONStr == null) {
             storageRest.apiGet(urlOSDStatus, appData, function (error, resultJSON) {
@@ -545,7 +543,6 @@ function processOSDStatus(res, appData, callback){
 }
 
 function parseStorageOSDStatus(osdJSON){
-    console.log("osdJSON:"+jsonPath(osdJSON, "$.output")[0]);
     var osdMapJSON ={};
     var num_osds= jsonPath(osdJSON, "$.output.num_osds")[0];
     var num_up_osds= jsonPath(osdJSON, "$.output.num_up_osds")[0];
