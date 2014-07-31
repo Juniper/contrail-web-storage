@@ -6,6 +6,7 @@ function tenantStorageDashboardClass() {
     var self = this,
         currPage,
         dfUsageObj = {},
+        clusterUsageObj = {},
         healthStatusObj = {},
         actStatusObj = {},
         monStatusObj = {},
@@ -92,6 +93,13 @@ function tenantStorageDashboardClass() {
     }
     this.setDFUsageData = function(data) {
         dfUsageObj = data;
+        this.clusterUsageDial.refresh();
+    }
+    this.getClusterUsageData = function() {
+        return clusterUsageObj;
+    }
+    this.setClusterUsageData = function(data) {
+        clusterUsageObj = data;
         this.clusterUsageDial.refresh();
     }
     this.setPoolsBarGbData = function(data) {
@@ -283,6 +291,83 @@ function parseClusterMonitorData(result) {
     tenantStorageDashboardView.setClusterMonitorData(retObj);
 }
 
+function parseClusterUsageData(data) {
+    var retObj = {};
+    if (data != null) {
+        var osd_summary = data['usage_summary']['osd_summary'];
+
+        osd_summary['near_full_ratio'] = (osd_summary['near_full_ratio'] * 100).toFixed(2);
+        osd_summary['full_ratio'] = (osd_summary['full_ratio'] * 100).toFixed(2);
+
+        retObj['usage_data'] = {
+            kb_used: osd_summary['kb_used'],
+            kb_avail: osd_summary['kb_avail'],
+            kb_total: osd_summary['kb'],
+            total_used: formatBytes(osd_summary['kb_used'] * 1024),
+            total_avail: formatBytes(osd_summary['kb_avail'] * 1024),
+            total_space: formatBytes(osd_summary['kb'] * 1024),
+            used_perc: ((osd_summary['kb_used'] / osd_summary['kb']) * 100).toFixed(2)
+        }
+        retObj['usage_perc_data'] = [{
+            name: "Used",
+            value: Math.ceil(retObj['usage_data']['used_perc']),
+            tooltip_data: [{
+                lbl: "Used",
+                value: retObj['usage_data']['total_used']
+            }, {
+                lbl: "Percentage",
+                value: retObj['usage_data']['used_perc'] + "%"
+            }]
+        }, {
+            name: "Available",
+            value: 100 - Math.ceil(retObj['usage_data']['used_perc']),
+            tooltip_data: [{
+                lbl: "Available",
+                value: retObj['usage_data']['total_avail']
+            }, {
+                lbl: "Percentage",
+                value: (100 - retObj['usage_data']['used_perc']) + "%"
+            }]
+        }];
+
+        retObj['status_data'] = [{
+            name: "Normal Ratio",
+            status: "Normal",
+            value: parseInt(osd_summary['near_full_ratio']),
+            tooltip_data: [{
+                lbl: "Range",
+                value: '0 - ' + osd_summary['near_full_ratio'] + ' %'
+            }]
+        }, {
+            name: "Near Full Ratio",
+            status: "Warning",
+            value: parseInt(osd_summary['full_ratio'] - osd_summary['near_full_ratio']),
+            tooltip_data: [{
+                lbl: "Range",
+                value: osd_summary['near_full_ratio'] + ' - ' + osd_summary['full_ratio'] + ' %'
+            }]
+        }, {
+            name: "Full Ratio",
+            status: "Critical",
+            value: parseInt(100 - osd_summary['full_ratio']),
+            tooltip_data: [{
+                lbl: "Range",
+                value: osd_summary['full_ratio'] + ' - 100 %'
+            }]
+        }];
+
+        if (retObj['usage_data']['used_perc'] < osd_summary['near_full_ratio']) {
+            retObj['status_flag'] = "Normal";
+        } else if (retObj['usage_data']['used_perc'] > osd_summary['near_full_ratio'] &&
+            retObj['usage_data']['used_perc'] < osd_summary['full_ratio']) {
+            retObj['status_flag'] = "Warning";
+        } else {
+            retObj['status_flag'] = "Critical";
+        }
+    }
+    tenantStorageDashboardView.setClusterUsageData(retObj);
+}
+
 function parseCephClusterDFData(result) {
     var retObj = {};
     if (result != null) {
@@ -412,11 +497,14 @@ function parseCephPGData(result) {
 }
 
 function parseClusterDiskActivity(data) {
-    var dataThrptRead = [], dataThrptWrite = [];
-    var dataIopsRead = [], dataIopsWrite = [];
-    var dataLatRead = [], dataLatWrite = [];
+    var dataThrptRead = [],
+        dataThrptWrite = [];
+    var dataIopsRead = [],
+        dataIopsWrite = [];
+    var dataLatRead = [],
+        dataLatWrite = [];
 
-    if(data != null && data.hasOwnProperty('flow-series')) {
+    if (data != null && data.hasOwnProperty('flow-series')) {
         $.each(data['flow-series'], function(idx, sample) {
             //Throughput Data
             dataThrptRead.push({
@@ -533,6 +621,21 @@ function getClusterDFStatus() {
 
 }
 
+function getClusterUsage() {
+    startWidgetLoading('dashUsage');
+    $.ajax({
+        url: contrail.format(tenantMonitorStorageUrls['CLUSTER_USAGE']),
+        dataType: "json",
+        cache: false
+    }).done(function(response) {
+        parseClusterUsageData(response);
+    }).fail(function(result) {
+
+    }).always(function() {
+        endWidgetLoading('dashUsage');
+    });
+}
+
 function getClusterPools() {
     startWidgetLoading('dashPools')
     $.ajax({
@@ -576,7 +679,7 @@ function getClusterDiskActivity(obj) {
         tenantStorageDashboardView.setClusterThrptData(parsedResp[0]);
         tenantStorageDashboardView.setClusterIopsData(parsedResp[1]);
         tenantStorageDashboardView.setClusterLatencyData(parsedResp[2]);
-    }).always(function(){
+    }).always(function() {
         endWidgetLoading('dashActivity');
     });
 }
@@ -599,7 +702,7 @@ function monitorStatusRefresh() {
     var monStatusObj = tenantStorageDashboardView.getClusterMonitorData();
     var options = {};
     $("#monitor-status").text(monStatusObj['monitor-status']);
-    $("#monitor-status").parent().on("click", function(){
+    $("#monitor-status").parent().on("click", function() {
         layoutHandler.setURLHashObj({
             p: 'mon_storage_monitor'
         });
@@ -639,30 +742,9 @@ function usageDial() {
             value: 100
         }];
 
-        this.labelUsedData = [{
-            name: "used"
-        }];
-        this.labelUsedData[0].value = dfUsageObj['total_used'];
+        this.usageTooltip = nv.tooltip;
+        this.statusTooltip = nv.tooltip;
 
-        this.labelTotalData = [{
-            name: "available"
-        }];
-        this.labelTotalData[0].value = dfUsageObj['total_space'];
-
-        this.labelPercData = [{
-            name: "used_perc"
-        }];
-        this.labelPercData[0].value = dfUsageObj['used_perc'];
-        /*
-         this.initStatusColor = d3.scale.ordinal()
-         .range(["#D5EDD4", "#FFE5CF", "#F3BEBE"]);
-         this.statusColorNormal  = d3.scale.ordinal()
-         .range(["#2CA02C", "#FFE5CF", "#F3BEBE"]);
-         this.statusColorWarn    = d3.scale.ordinal()
-         .range(["#D5EDD4", "#FF7F0E", "#F3BEBE"]);
-         this.statusColorCritcal = d3.scale.ordinal()
-         .range(["#D5EDD4", "#FFE5CF", "#D62728"]);
-         */
         this.statusColorBright = d3.scale.ordinal()
             .range(["#2CA02C", "#FF7F0E", "#D62728"]);
         this.usageColor = d3.scale.ordinal()
@@ -679,9 +761,7 @@ function usageDial() {
 
         this.usageDialChart = d3.select("#usage-dial")
             .append('svg')
-        //.attr("width", width + margin.left + margin.right)
-        //.attr("height", height + margin.top + margin.bottom)
-        .append("g")
+            .append("g")
             .attr("transform", "translate(" + ((width / 2)) + "," + ((height / 2) + margin.top) + ")");
 
         var radius = Math.min(width, height) / 2;
@@ -709,6 +789,8 @@ function usageDial() {
         statusColorBright = this.statusColorBright;
         usageData = this.usageData;
         usageArc = this.usageArc;
+        statusTooltip = this.statusTooltip;
+        usageTooltip = this.usageTooltip;
 
         this.statusPathGroup = this.usageDialChart.selectAll(".status-arc")
             .data(this.pie(this.statusData))
@@ -721,7 +803,16 @@ function usageDial() {
             .style("opacity", function(d) {
                 return 0.5;
             })
-            .attr("d", this.statusArc);
+            .attr("d", this.statusArc)
+            .each(function(d) {
+                this._current = d;
+            }).on("mouseover", function(d) {
+                var pos = [d3.event.pageX, d3.event.pageY];
+                var content = formatSmallLblValueTooltip(tenantStorageChartUtils.statusDialTooltipFn(d));
+                statusTooltip.show([pos[0], pos[1]], content, null, null, null);
+            }).on("mouseout", function(d) {
+                statusTooltip.cleanup();
+            });
 
         usageArcEnter = this.usageDialChart.selectAll(".usage-arc")
             .data(this.pie(this.usageData))
@@ -735,53 +826,60 @@ function usageDial() {
             .attr("d", usageArc)
             .each(function(d) {
                 this._current = d;
+            }).on("mouseover", function(d) {
+                var pos = [d3.event.pageX, d3.event.pageY];
+                var content = formatSmallLblValueTooltip(tenantStorageChartUtils.usageDialTooltipFn(d));
+                usageTooltip.show([pos[0], pos[1]], content, null, null, null);
+            }).on("mouseout", function(d) {
+                usageTooltip.cleanup();
             });
-
-        this.statusPathGroup.transition().delay(function(d, i) {
-            return i * 500;
-        }).duration(1800)
-            .style("fill", function(d) {
-                return statusColorBright(d.data.name);
-            })
-            .style("opacity", function(d) {
-                return 0.5;
-            });
-
     }
 
-    this.refresh = function() {
-
-        var dfUsageObj = tenantStorageDashboardView.getDFUsageData();
-        var usageData = [{
-            name: "used"
-        }, {
-            name: "available"
-        }];
-        var status_flag = '';
+    this.refresh = function(data) {
+        var clusterUsageObj = ifNull(data, tenantStorageDashboardView.getClusterUsageData());
+        var usageData = clusterUsageObj['usage_perc_data'];
+        var statusData = clusterUsageObj['status_data'];
+        var statusFlag = clusterUsageObj['status_flag'];
         statusColorBright = this.statusColorBright;
-
-        //test
-        //dfUsageObj['used_perc'] = 80.00;
-        //dfUsageObj['used_perc'] = 91.00;
-        //dfUsageObj['used_perc'] = 60.00;
-
-        $("#df-used-perc").text(dfUsageObj['used_perc'] + "%");
-        $("#df-used").text(formatBytes(dfUsageObj['total_used'] * 1024));
-        $("#df-total").text(formatBytes(dfUsageObj['total_space'] * 1024));
-
-        this.labelPercData[0].value = dfUsageObj['used_perc'];
-
-        usageData[0].value = Math.ceil(dfUsageObj['used_perc']);
-        usageData[1].value = 100 - usageData[0].value;
-
-        this.labelUsedData[0].value = dfUsageObj['total_used'];
-        this.labelTotalData[0].value = dfUsageObj['total_space'];
-
+        statusArc = this.statusArc;
         usageArc = this.usageArc;
-        this.usagePathGroup = this.usagePathGroup.data(this.pie(usageData));
-        this.usagePathGroup.transition().duration(750).attrTween("d", arcTween);;
 
-        function arcTween(a) {
+        $("#df-used-perc").text(clusterUsageObj['usage_data']['used_perc'] + "%");
+        $("#df-used").text(clusterUsageObj['usage_data']['total_used']);
+        $("#df-total").text(clusterUsageObj['usage_data']['total_space']);
+
+        this.usagePathGroup = this.usagePathGroup.data(this.pie(usageData));
+        this.usagePathGroup.transition().duration(750).attrTween("d", usageArcTween);
+
+        if (statusFlag == "Warning") {
+            $("#df-used-perc").removeClass("usage-perc-label");
+            $("#df-used-perc").addClass("usage-perc-warn-label");
+        } else if (statusFlag == "Critical") {
+            $("#df-used-perc").removeClass("usage-perc-label");
+            $("#df-used-perc").addClass("usage-perc-crit-label");
+        }
+        this.statusPathGroup = this.statusPathGroup.data(this.pie(statusData));
+        this.statusPathGroup.transition().duration(750)
+            .attrTween("d", statusArcTween)
+            .style("fill", function(d) {
+                return statusColorBright(d.data.status);
+            })
+            .style("stroke", function(d) {
+                if (d.data.status == statusFlag)
+                    return statusColorBright(d.data.status);
+            })
+            .style("stroke-width", function(d) {
+                if (d.data.status == statusFlag)
+                    return 1.5;
+            })
+            .style("opacity", function(d) {
+                if (d.data.status == statusFlag)
+                    return 1;
+                else
+                    return 0.5;
+            });
+
+        function usageArcTween(a) {
             var i = d3.interpolate(this._current, a);
             this._current = i(0);
             return function(t) {
@@ -789,33 +887,13 @@ function usageDial() {
             };
         }
 
-        if (dfUsageObj['used_perc'] < 75) {
-            status_flag = "Normal";
-        } else if (dfUsageObj['used_perc'] > 75 && dfUsageObj['used_perc'] < 90) {
-            status_flag = "Warning";
-            $("#df-used-perc").removeClass("usage-perc-label");
-            $("#df-used-perc").addClass("usage-perc-warn-label");
-        } else {
-            status_flag = "Critical";
-            $("#df-used-perc").removeClass("usage-perc-label");
-            $("#df-used-perc").addClass("usage-perc-crit-label");
+        function statusArcTween(a) {
+            var i = d3.interpolate(this._current, a);
+            this._current = i(0);
+            return function(t) {
+                return statusArc(i(t));
+            };
         }
-        this.statusPathGroup.transition().delay(function(d, i) {
-            return i * 500;
-        }).duration(1800)
-            .style("fill", function(d) {
-                return statusColorBright(d.data.name);
-            })
-            .style("stroke", function(d) {
-                if (d.data.name == status_flag) return statusColorBright(d.data.name);
-            })
-            .style("stroke-width", function(d) {
-                if (d.data.name == status_flag) return 1.5;
-            })
-            .style("opacity", function(d) {
-                if (d.data.name == status_flag) return 1;
-                else return 0.5;
-            });
     }
 }
 
@@ -938,7 +1016,8 @@ function statusDataRefresh() {
 
     getClusterHealthStatus();
     getClusterMonitorStatus();
-    getClusterDFStatus();
+    //getClusterDFStatus();
+    getClusterUsage();
     getClusterPools();
     getOSDsStatus();
     getClusterDiskActivity();
