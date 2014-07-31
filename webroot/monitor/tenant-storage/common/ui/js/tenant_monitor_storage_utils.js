@@ -171,6 +171,29 @@ var tenantStorageChartUtils = {
     },
     tickFormatIntFn: function(d){
         return d3.format(',0.0f')(d);
+    },
+    usageDialTooltipFn: function(currObj) {
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: 'Cluster ' + currObj['data']['name']
+        }];
+        $.each(currObj['data']['tooltip_data'], function(idx,lbl_val){
+            tooltipContents.push(lbl_val);
+        });
+        return tooltipContents;
+    },
+    statusDialTooltipFn: function(currObj) {
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: currObj['data']['name']
+        }, {
+            lbl: 'Status',
+            value: currObj['data']['status']
+        }];
+        $.each(currObj['data']['tooltip_data'], function(idx,lbl_val){
+            tooltipContents.push(lbl_val);
+        });
+        return tooltipContents;
     }
 }
 
@@ -304,6 +327,11 @@ function getHostStatusTmpl(obj) {
         return "<span> N/A</span>";
 }
 
+function formatSmallLblValueTooltip(infoObj) {
+    var tooltipTemplateSel = 'small-lblval-tooltip-template';
+    var tooltipTemplate = contrail.getTemplate4Id(tooltipTemplateSel);
+    return tooltipTemplate(infoObj);
+}
 
 function formatTreeLblValueTooltip(infoObj) {
     var tooltipTemplateSel = 'tree-lblval-tooltip-template';

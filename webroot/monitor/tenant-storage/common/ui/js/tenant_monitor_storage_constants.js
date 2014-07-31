@@ -26,6 +26,7 @@ var tenantMonitorStorageUrls = {
     CLUSTER_STATUS: '/api/tenant/storage/cluster/status',
     MONITORS_SUMMARY: '/api/tenant/storage/cluster/monitors/summary',
     DF_STATUS: '/api/tenant/storage/cluster/df/status',
+    CLUSTER_USAGE: '/api/tenant/storage/cluster/usage',
     POOLS_SUMMARY: '/api/tenant/storage/cluster/pools/summary',
     DISK_STATUS: '/api/tenant/storage/cluster/osd/status',
     DISK_DETAILS: '/api/tenant/storage/cluster/osd/details?name={0}',
