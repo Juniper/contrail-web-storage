@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 
-var storageConfig = require('../js/storage.config.global');
+var storageConfig = require('../config/storage.config.global');
 
 var storageApi= require('./storage.api.constants');
 
