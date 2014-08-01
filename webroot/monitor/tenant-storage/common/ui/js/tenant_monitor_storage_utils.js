@@ -194,6 +194,26 @@ var tenantStorageChartUtils = {
             tooltipContents.push(lbl_val);
         });
         return tooltipContents;
+    },
+    disksBarTooltipFn: function(e) {
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: e.point.label
+        }, {
+            lbl: e.series.key,
+            value: ("{0:Disk;Disks}").format(e.point.value)
+        }];
+        return tooltipContents;
+    },
+    poolsBarTooltipFn: function(e) {
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: e.series.key
+        }, {
+            lbl: e.point.label,
+            value: e.point.value
+        }];
+        return tooltipContents;
     }
 }
 
