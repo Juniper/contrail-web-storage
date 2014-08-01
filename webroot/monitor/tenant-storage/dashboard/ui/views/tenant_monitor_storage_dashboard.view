@@ -141,12 +141,14 @@
                     <div class="widget-body">
                         <div class="widget-main">
                             <div id="usage-dial">
-                                <div id="usage-labelbox">
+                                <div id="usage-perc-labelbox">
                                     <div>
-                                        <span id="df-used-perc" class="usage-perc-label"></span><br style="display: block; margin: 30px 0; line-height: 6">
-                                        <span class="df-used-label">Used: </span><span id="df-used"></span><br><br>
-                                        <span class="df-total-label">Total: </span><span id="df-total"></span>
+                                        <span id="df-used-perc" class="usage-perc-label"></span>
                                     </div>
+                                </div>
+                                <div id="usage-labelbox">
+                                    <span class="label df-used-label">&nbsp;&nbsp; </span><span id="df-used"></span>
+                                    <span class="label df-total-label">&nbsp;&nbsp; </span><span id="df-total"></span>
                                 </div>
                             </div>
                         </div>
