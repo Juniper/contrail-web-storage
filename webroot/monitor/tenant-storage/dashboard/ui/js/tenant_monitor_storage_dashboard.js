@@ -940,9 +940,8 @@ function poolsBarChart() {
             .tickPadding(12);
 
         chart.multibar.dispatch.on('elementMouseover.tooltip', function(e) {
-            e.pos = [e.e.x, e.e.y];
-            var content = '<h3> ' + e.series.key + ' </h3>' +
-                '<p>' + e.point.value + ' ' + e.point.label + '</p>';
+            e.pos = [d3.event.pageX, d3.event.pageY];
+            var content = formatSmallLblValueTooltip(tenantStorageChartUtils.poolsBarTooltipFn(e));
             nv.tooltip.show([e.pos[0], e.pos[1]], content, null, null, null);
         });
 
@@ -988,6 +987,12 @@ function disksBarChart() {
 
         chart.yAxis
             .tickFormat(d3.format('.0f'));
+
+        chart.multibar.dispatch.on('elementMouseover.tooltip', function(e) {
+            e.pos = [d3.event.pageX, d3.event.pageY];
+            var content = formatSmallLblValueTooltip(tenantStorageChartUtils.disksBarTooltipFn(e));
+            nv.tooltip.show([e.pos[0], e.pos[1]], content, null, null, null);
+        });
 
         this.chart = chart;
 
