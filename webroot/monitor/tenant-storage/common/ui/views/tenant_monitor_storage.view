@@ -70,6 +70,7 @@
             {{/each}}
         </div>
     </div>
+</script>
 
 <script type="text/x-handlebars-template" id="tree-lblval-tooltip-template">
 <div class="row-fluid chart-tooltip" style="width:250px;">
