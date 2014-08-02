@@ -296,8 +296,8 @@ function parseClusterUsageData(data) {
     if (data != null) {
         var osd_summary = data['usage_summary']['osd_summary'];
 
-        osd_summary['near_full_ratio'] = (osd_summary['near_full_ratio'] * 100).toFixed(2);
-        osd_summary['full_ratio'] = (osd_summary['full_ratio'] * 100).toFixed(2);
+        osd_summary['near_full_ratio'] = parseFloat((osd_summary['near_full_ratio'] * 100).toFixed(2));
+        osd_summary['full_ratio'] = parseFloat((osd_summary['full_ratio'] * 100).toFixed(2));
 
         retObj['usage_data'] = {
             kb_used: osd_summary['kb_used'],
@@ -306,7 +306,7 @@ function parseClusterUsageData(data) {
             total_used: formatBytes(osd_summary['kb_used'] * 1024),
             total_avail: formatBytes(osd_summary['kb_avail'] * 1024),
             total_space: formatBytes(osd_summary['kb'] * 1024),
-            used_perc: ((osd_summary['kb_used'] / osd_summary['kb']) * 100).toFixed(2)
+            used_perc: parseFloat(calcPercent(osd_summary['kb_used'] , osd_summary['kb']))
         }
         retObj['usage_perc_data'] = [{
             name: "Used",
