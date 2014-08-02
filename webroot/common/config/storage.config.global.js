@@ -6,7 +6,7 @@ var config = {};
 
 config.ceph={}
 /* Ceph Rest API default IP Address */
-var ipAddress = '127.0.0.1';
+var ipAddress = '10.87.140.134';
 config.ceph.enabled=true;
 
 /*Stroage Rest API Server and port */

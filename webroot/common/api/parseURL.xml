@@ -4,19 +4,9 @@
 
 <urlLists>
 
-      <require>
-        <define>longPoll</define>
-        <path>process.mainModule.exports["corePath"] + '/src/serverroot/web/core/longPolling.api'</path>
-     </require>
-
-     <require>
-        <define>cacheApi</define>
-        <path>process.mainModule.exports["corePath"] + '/src/serverroot/web/core/cache.api'</path>
-    </require>
-
     <require>
-        <define>rbac</define>
-        <path>process.mainModule.exports["corePath"] + '/src/serverroot/web/core/rbac.api'</path>
+        <define>parseURLReq</define>
+        <path>process.mainModule.exports["corePath"] + '/src/serverroot/common/parseURLRequire'</path>
     </require>
 
     <require>
@@ -112,7 +102,7 @@
         <url>/api/tenant/storage/cluster/health/status</url>
         <method>get</method>
         <feature>storage</feature>
-        <callback>storageDashboardApi.getStorageClusterStatus</callback>
+        <callback>storageDashboardApi.getStorageJobClusterStatus</callback>
     </item>
     
     <item>

@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 
-var storageGlobal = require('../../../common/js/storage.global');
+var storageGlobal = require('../../../common/config/storage.global');
 var storageApi= require('../../../common/api/storage.api.constants');
 
 var cacheApi = require(process.mainModule.exports["corePath"] +
@@ -11,7 +11,7 @@ var cacheApi = require(process.mainModule.exports["corePath"] +
     global = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/global'),
     config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
     logutils = require(process.mainModule.exports["corePath"] + '/src/serverroot/utils/log.utils'),
-    stMonUtils= require('../../../common/api/utils/storage.utils'),
+    stMonUtils= require('../../../common/utils/storage.utils'),
     commonUtils = require(process.mainModule.exports["corePath"] +
                         '/src/serverroot/utils/common.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
@@ -31,7 +31,7 @@ var redis = require("redis"),
 
 
 
-function getStorageClusterStatus(req, res ){
+function getStorageJobClusterStatus(req, res ){
     url = storageApi.url.status;//"/status";
     logutils.logger.debug("get data:"+url);
     cacheApi.queueDataFromCacheOrSendRequest(req, res, storageGlobal.STR_JOB_TYPE_CACHE,
@@ -560,7 +560,7 @@ function parseStorageOSDStatus(osdJSON){
 }
 
 /* List all public functions */
-exports.getStorageClusterStatus = getStorageClusterStatus;
+exports.getStorageJobClusterStatus = getStorageJobClusterStatus;
 exports.getStorageClusterDFStatus = getStorageClusterDFStatus;
 exports.getStorageClusterHealthStatus = getStorageClusterHealthStatus;
 exports.getStorageClusterOSDActivity = getStorageClusterOSDActivity;
