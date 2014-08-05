@@ -205,7 +205,7 @@ storageNodeView = function() {
 
             $("#storage-tabstrip").contrailTabs({
                 activate: function(e, ui) {
-                    var selTab = ui.newTab.context.innerText;
+                    var selTab = ifNull(ui.newTab.context.innerText, ui.newTab.context.innerHTML);
                     if (selTab == 'Disks') {
                         populateDisksSummaryTab(storNodeInfo);
                     } else if (selTab == 'Monitor') {
