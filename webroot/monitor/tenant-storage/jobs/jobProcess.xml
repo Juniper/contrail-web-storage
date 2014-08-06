@@ -14,13 +14,14 @@
 
   <require>
       <define>jobsProcess</define>
-      <path>../jobs/storage.jobsProcess.api</path>
+      <path>../../../common/jobs/storage.jobsProcess.api</path>
   </require>
 
      <!-- Storage cluster status -->
   <item>
     <jobName>getStorageClusterStatus</jobName>
     <callback>processStorageClusterStatusRequestByJob</callback>
-  </item>   
+  </item>
+
 </jobLists>
 

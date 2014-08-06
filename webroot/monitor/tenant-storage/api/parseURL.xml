@@ -10,24 +10,6 @@
     </require>
 
     <require>
-        <define>commonUtils</define>
-        <path>process.mainModule.exports["corePath"] + '/src/serverroot/utils/common.utils'</path>
-    </require>
-
-    <item>
-        <url>/api/service/networking/orchestration/model</url>
-        <method>get</method>
-        <feature>orchestration</feature>
-        <callback>commonUtils.getOrchestrationPluginModel</callback>
-    </item>
-    <item>
-        <url>/api/service/networking/web-server-info</url>
-        <method>get</method>
-        <feature>monitoring</feature>
-        <callback>commonUtils.getWebServerInfo</callback>
-    </item>
-    
-    <require>
         <define>timeout</define>
         <!-- Available tags for timeout
             timeout         - Request timeout in seconds
@@ -38,35 +20,32 @@
         <path>request-timeout</path>
     </require>
 
+
     <!--  Contrail Storage API  -->
-    <require>
-        <define>storageInfraApi</define>
-        <path>../../monitor/storage-infra/storagenode/api/storage.infra.api</path>
-    </require>
 
     <require>
         <define>storageDashboardApi</define>
-        <path>../../monitor/tenant-storage/api/storage.dashboard.api</path>
+        <path>./storage.dashboard.api</path>
     </require>
     
     <require>
         <define>storageMonsApi</define>
-        <path>../../monitor/tenant-storage/api/storage.mons.api</path>
+        <path>./storage.mons.api</path>
     </require>
 
     <require>
         <define>storageOsdsApi</define>
-        <path>../../monitor/tenant-storage/api/storage.osd.api</path>
+        <path>./storage.osd.api</path>
     </require>
     
     <require>
         <define>storagePGsApi</define>
-        <path>../../monitor/tenant-storage/api/storage.pg.api</path>
+        <path>./storage.pg.api</path>
     </require>    
 
     <require>
         <define>storagePoolsApi</define>
-        <path>../../monitor/tenant-storage/api/storage.pool.api</path>
+        <path>./storage.pool.api</path>
     </require>   
 
     <item>
@@ -246,6 +225,4 @@
 
     <!-- Contrail Storage -->
 
-
-   
 </urlLists>
