@@ -265,7 +265,7 @@ cephOSDsView = function() {
     }
 
     function onTabActivate(e, ui) {
-        selTab = ui.newTab.context.innerText;
+        selTab = ifNull(ui.newTab.context.innerText, ui.newTab.context.innerHTML);
         tenantStorageDisksView.currTab = selTab;
         if (selTab == "Scatter Plot") {
             if (tenantStorageChartsInitializationStatus['disks']) {
@@ -274,7 +274,7 @@ cephOSDsView = function() {
             } else {
                 populateOSDs();
             }
-        } else if (selTab == 'Host Tree') {
+        } else if (selTab == "Host Tree") {
             if (tenantStorageChartsInitializationStatus['host_tree']) {
                 if (tenantStorageDisksView.osdsTreeData == null)
                     getOSDsTree();
@@ -285,7 +285,7 @@ cephOSDsView = function() {
                     tenantStorageDisksView.osdsTree.init();
                 getOSDsTree();
             }
-        } else if (selTab == 'Details') {
+        } else if (selTab == "Details") {
             if(tenantStorageChartsInitializationStatus['thrptChart'])
                 updateStorageCharts.refreshView('#diskActivityThrptChart');
             if(tenantStorageChartsInitializationStatus['iopsChart'])

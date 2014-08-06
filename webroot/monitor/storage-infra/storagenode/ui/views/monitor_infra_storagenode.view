@@ -32,7 +32,6 @@
             <ul>
                 <li><a href="#mon-infra-storage-details-tab">Details</a></li>
                 <li><a href="#mon-infra-storage-disks-tab">Disks</a></li>
-                <li><a href="#mon-infra-storage-monitor-tab">Monitor</a></li>
             </ul>
             <div class="row-fluid" id="mon-infra-storage-details-tab">
                 <div id='storagenode-dashboard' class='span5'></div>
@@ -76,9 +75,6 @@
                     </div>
                 </div>
                 -->
-            </div>
-            <div id="mon-infra-storage-monitor-tab">
-                <div id="gridMonitor"></div>
             </div>
         </div>
     </div>
