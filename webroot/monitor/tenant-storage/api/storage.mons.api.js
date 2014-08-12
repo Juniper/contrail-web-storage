@@ -77,24 +77,40 @@ function consolidateMonitors(resultJSON){
     var emptyObj = {};  
         var monJSON = {};
         var monitor = jsonPath(resultJSON, "$..mons");
-         if(monitor.length >2){
-             var status= jsonPath(resultJSON, "$..overall_status")[0];
-                var monitors = monitor[0];
-                monitors.merge(monitor[2]);
-                
-                var jsonstr = JSON.stringify(monitor[1]);
-                var new_jsonstr = jsonstr.replace(/health/g, "act_health");
-                monitor[1] = JSON.parse(new_jsonstr);
+        var monCnt= monitor.length;
+        if(monitor.length >2){
+            var status= jsonPath(resultJSON, "$..overall_status")[0];
+            var monitors = monitor[0];
+            monitors.merge(monitor[1]);
+            monitors.merge(monitor[2]);
+            var jsonstr = JSON.stringify(monitor[1]);
+            var new_jsonstr = jsonstr.replace(/health/g, "act_health");
+            monitor[1] = JSON.parse(new_jsonstr);
+            monitors.merge(monitor[1]);
+            monitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
+            monJSON['overall_status'] = status;
+            monJSON['monitors'] = monitors;
+            return monJSON;
+        }else if(monitor.length >1){
+            var status= jsonPath(resultJSON, "$..overall_status")[0];
+            var monitors = monitor[0];
+            monitors.merge(monitor[1]);
+            var jsonstr = JSON.stringify(monitor[1]);
+            var new_jsonstr = jsonstr.replace(/health/g, "act_health");
+            monitor[1] = JSON.parse(new_jsonstr);
+            monitors.merge(monitor[1]);
+            monitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
+            monJSON['overall_status'] = status;
+            monJSON['monitors'] = monitors;
+            return monJSON;
+        }else{
+            var monitors = monitor[0];
+            monJSON['overall_status'] = status;
+            monJSON['monitors'] = monitors;
+            return monJSON;
+        }
 
-                monitors.merge(monitor[1]);
-                monitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
-                monJSON['overall_status'] = status;
-                monJSON['monitors'] = monitors;
-
-                return monJSON;
-         }
-
-     return emptyObj;
+    return emptyObj;
 }
 
 function getStorageDiskFlowSeries (req, res, appData) {
