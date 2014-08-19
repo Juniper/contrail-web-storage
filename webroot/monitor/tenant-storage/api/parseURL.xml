@@ -215,6 +215,14 @@
         <feature>storage</feature>
         <callback>storageOsdsApi.getStorageOSDFlowSeries</callback>
     </item>
+
+    <item>
+        <url>/api/tenant/storage/cluster/osd/avg-bw</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getStorageOSDAvgBW</callback>
+    </item>
+
     <!-- flow-series of disk data by name and host -->
     <item>
         <url>/api/tenant/storage/cluster/disk/flow-series</url>

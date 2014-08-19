@@ -8,6 +8,7 @@ storage.expireTimeSecs= 25;
 storage.url={};
 storage.url.health = "/health";
 storage.url.status = "/status";
+storage.url.monStatus = "/mon_status";
 storage.url.df = "/df";
 
 storage.url.pgDumpSummary = "/pg/dump?dumpcontents=summary";

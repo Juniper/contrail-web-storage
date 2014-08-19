@@ -25,16 +25,17 @@ var redis = require("redis"),
     redisClient = redis.createClient(redisServerPort, redisServerIP);
 
 function getMonitorSummary(req, res, appData){
-     urlMonStatus = storageApi.url.status;
-    redisClient.get(urlMonStatus, function(error, cachedJSONStr) {
+    urlMonStatus = storageApi.url.status;
+    cookieMonStatus= "/api/tenant/storage/cluster/monitors/summary";
+    redisClient.get(cookieMonStatus, function(error, cachedJSONStr) {
         if (error || cachedJSONStr == null) {
             storageRest.apiGet(urlMonStatus, appData, function (error, resultJSON) {
                 if(!error && (resultJSON)) {
-                    var resultJSON = parseMonitorSummary(resultJSON);
+                    var resultJSON = consolidateMonitors(resultJSON);
                     if(!resultJSON) {
                         resultJSON = [];
                     }
-                    redisClient.setex(urlMonStatus+"/monitor/summary", expireTime, JSON.stringify(resultJSON));
+                    redisClient.setex(cookieMonStatus, expireTime, JSON.stringify(resultJSON));
                     commonUtils.handleJSONResponse(null, res, resultJSON);
                 } else {
                     commonUtils.handleJSONResponse(error, res, null);
@@ -46,15 +47,11 @@ function getMonitorSummary(req, res, appData){
     });
 }
 
-function parseMonitorSummary(resultJSON){
-    return consolidateMonitors(resultJSON);;
-}
-
 function getMonitorDetails(req, res, appData){
     var mon_name = req.param('name');
     url = storageApi.url.status;
     storageRest.apiGet(url, appData,function (error, resultJSON) {
-        if(!error && (resultJSON)) {
+        if (error || cachedJSONStr == null) {
             var resultJSON = parseMonitorDetails(mon_name,resultJSON);
             commonUtils.handleJSONResponse(null, res, resultJSON);
         } else {
@@ -71,15 +68,16 @@ function parseMonitorDetails(name, resultJSON){
     return monJSON;
 }
 
-
-
 function consolidateMonitors(resultJSON){
-    var emptyObj = {};  
+    var emptyObj = {};
         var monJSON = {};
         var monitor = jsonPath(resultJSON, "$..mons");
         var monCnt= monitor.length;
+        var status = jsonPath(resultJSON, "$..health.overall_status")[0];
+        monJSON['overall_status'] = status;
+        var details= jsonPath(resultJSON, "$..details");
+        monJSON['details'] = details;
         if(monitor.length >2){
-            var status= jsonPath(resultJSON, "$..overall_status")[0];
             var monitors = monitor[0];
             monitors.merge(monitor[1]);
             monitors.merge(monitor[2]);
@@ -88,11 +86,8 @@ function consolidateMonitors(resultJSON){
             monitor[1] = JSON.parse(new_jsonstr);
             monitors.merge(monitor[1]);
             monitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
-            monJSON['overall_status'] = status;
             monJSON['monitors'] = monitors;
-            return monJSON;
         }else if(monitor.length >1){
-            var status= jsonPath(resultJSON, "$..overall_status")[0];
             var monitors = monitor[0];
             monitors.merge(monitor[1]);
             var jsonstr = JSON.stringify(monitor[1]);
@@ -100,17 +95,12 @@ function consolidateMonitors(resultJSON){
             monitor[1] = JSON.parse(new_jsonstr);
             monitors.merge(monitor[1]);
             monitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
-            monJSON['overall_status'] = status;
             monJSON['monitors'] = monitors;
-            return monJSON;
         }else{
             var monitors = monitor[0];
-            monJSON['overall_status'] = status;
             monJSON['monitors'] = monitors;
-            return monJSON;
         }
-
-    return emptyObj;
+    return monJSON;
 }
 
 function getStorageDiskFlowSeries (req, res, appData) {
