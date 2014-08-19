@@ -236,7 +236,14 @@ function parseStorageOSDTree(osdJSON, callback){
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
     var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     if (osds.length > 0) {
-        parseOSDVersion(osds[0].name, function(version){
+        var osdName='undefined';
+        for(i=0; i < osds.length;i++){
+            if(osds[i].status == "up"){
+                osdName= osds[i].name;
+                break;
+            }
+        }
+        parseOSDVersion(osdName, function(version){
             var osdMapJSON = new Object();
             parseOSDFromPG(osds,osdPG);
             parseOSDFromDump(osds,osdDump);
