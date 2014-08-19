@@ -71,29 +71,29 @@ var infraMonitorStorageUtils = {
 
         $.each(def_topology.hosts, function(idx, host) {
             var obj = {};
-            obj['available_perc'] = $.isNumeric(obj['x']) ? obj['x'].toFixed(2) : '-';
-            obj['total'] = formatBytes(host.kb_total * 1024);
+            obj['available_perc'] = $.isNumeric(host['avail_percent']) ? host['avail_percent'].toFixed(2) : '-';
+            obj['total'] = formatBytes(host['kb_total'] * 1024);
             obj['size'] = 1;
             obj['shape'] = 'circle';
             obj['type'] = 'storageNode';
             obj['display_type'] = 'Storage Node';
-            obj['name'] = host.name;
+            obj['name'] = host['name'];
             obj['isPartialUveMissing'] = false;
-            obj['osds'] = host.osds;
+            obj['osds'] = host['osds'];
             obj['osds_total'] = 0;
             obj['osds_used'] = 0;
             $.each(host.osds, function(idx, osd) {
                 if (osd.hasOwnProperty('kb') && osd.hasOwnProperty('kb_used')) {
-                    obj['osds_total'] += osd.kb * 1024;
-                    obj['osds_used'] += osd.kb_used * 1024;
+                    obj['osds_total'] += osd['kb'] * 1024;
+                    obj['osds_used'] += osd['kb_used'] * 1024;
                 }
             });
             obj['x'] = parseFloat(calcPercent((obj['osds_total'] - obj['osds_used']), obj['osds_total']));
             obj['y'] = parseFloat(byteToGB(obj['osds_total']));
             obj['osds_total'] = formatBytes(obj['osds_total']);
             obj['osds_used'] = formatBytes(obj['osds_used']);
-            obj['monitor'] = host.monitor;
-            obj['status'] = host.status;
+            obj['monitor'] = host['monitor'];
+            obj['status'] = host['status'];
             obj['color'] = getStorageNodeColor(host, obj);
             obj['downNodeCnt'] = 0;
             //initialize for alerts
