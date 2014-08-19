@@ -54,12 +54,23 @@ var infraMonitorStorageUtils = {
      * Parses Storage Nodes data
      */
     parseStorageNodesDashboardData: function(result) {
-        var retArr = [];
-        var hosts = result.topology.hosts;
-        $.each(hosts, function(idx, host) {
+        var retArr = [],
+            def_topology = {};
+
+        /*
+        * with multi-backend support, there are different topology output in response.
+        * currently only using 'default' type which is the common pool.
+         */
+        $.each(result.topology, function(idx, topology) {
+           if (topology['name'] == 'default') {
+               def_topology = topology;
+           } else {
+               def_topology['hosts'] = [];
+           }
+        });
+
+        $.each(def_topology.hosts, function(idx, host) {
             var obj = {};
-            obj['x'] = parseFloat(host.avail_percent);
-            obj['y'] = parseFloat((host.kb_total / 1048576).toFixed(2));
             obj['available_perc'] = $.isNumeric(obj['x']) ? obj['x'].toFixed(2) : '-';
             obj['total'] = formatBytes(host.kb_total * 1024);
             obj['size'] = 1;
@@ -77,6 +88,8 @@ var infraMonitorStorageUtils = {
                     obj['osds_used'] += osd.kb_used * 1024;
                 }
             });
+            obj['x'] = parseFloat(calcPercent((obj['osds_total'] - obj['osds_used']), obj['osds_total']));
+            obj['y'] = parseFloat(byteToGB(obj['osds_total']));
             obj['osds_total'] = formatBytes(obj['osds_total']);
             obj['osds_used'] = formatBytes(obj['osds_used']);
             obj['monitor'] = host.monitor;
@@ -114,6 +127,14 @@ var infraMonitorStorageUtils = {
         storageConsoleTimer = [];
     }
 };
+
+function byteToGB(bytes) {
+    return (bytes / 1073741824).toFixed(2);
+}
+
+function calcPercent(val1, val2) {
+    return ((val1 / val2) * 100).toFixed(2);
+}
 
 /**
  * populateFn for storageDS
