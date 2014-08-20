@@ -48,14 +48,14 @@ function tenantStorageDashboardClass() {
     }
     this.setClusterHealthData = function(data) {
         healthStatusObj = data;
-        //healthStatusRefresh();
+        healthStatusRefresh();
     }
     this.getClusterMonitorData = function() {
         return healthStatusObj;
     }
     this.setClusterMonitorData = function(data) {
         healthStatusObj = data;
-        monitorStatusRefresh();
+        //monitorStatusRefresh();
     }
     this.getClusterActivityData = function() {
         return actStatusObj;
@@ -132,7 +132,7 @@ function tenantStorageDashboardClass() {
     }
     this.updateClusterDashboard = function() {
         $('#dashHealthBox .widget-header').initWidgetHeader({
-            title: 'Monitor Health',
+            title: 'Cluster Health',
             widgetBoxId: 'dashHealth'
         });
         $('#dashUsageBox .widget-header').initWidgetHeader({
@@ -266,13 +266,8 @@ var tenantStorageDashboardView = new tenantStorageDashboardClass();
 function parseClusterHealthData(result) {
     var retObj = {};
     if (result != null) {
-        var status = result['cluster_status']['overall_status'];
-        if (status == 'HEALTH_WARN')
-            retObj['health-status'] = 'WARN';
-        else if (status == 'HEALTH_OK')
-            retObj['health-status'] = 'OK';
-        else
-            retObj['health-status'] = status;
+        retObj['health-status'] =  getHealthLbl(result['cluster_status']['overall_status']);
+        retObj['health'] = result['cluster_status']['health'];
     }
     tenantStorageDashboardView.setClusterHealthData(retObj);
 }
@@ -326,7 +321,7 @@ function parseClusterUsageData(data) {
                 value: retObj['usage_data']['total_avail']
             }, {
                 lbl: "Percentage",
-                value: (100 - retObj['usage_data']['used_perc']) + "%"
+                value: (100 - retObj['usage_data']['used_perc']).toFixed(2) + "%"
             }]
         }];
 
@@ -686,9 +681,44 @@ function getClusterDiskActivity(obj) {
 
 function healthStatusRefresh() {
     var healthStatusObj = tenantStorageDashboardView.getClusterHealthData();
-    $("#health-status").text(healthStatusObj['health-status']);
-    $("#health-status-icon").addClass(getIconClass(healthStatusObj['health-status']));
-    $("#health-status-icon").addClass(getIconColorClass(healthStatusObj['health-status']));
+    var healthStatus = healthStatusObj['health-status'];
+    $("#health-status").text(healthStatus);
+    $("#health-status-icon").attr('class', 'icon-status ' +
+        getIconClass(healthStatus) + ' ' +
+        getIconColorClass(healthStatus)
+    );
+    $("#health-status").parent().on("click", function() {
+        //Handle click to popup alerts
+        nv.tooltip.cleanup();
+        layoutHandler.setURLHashObj({
+            p: 'mon_storage_monitor'
+        });
+    });
+    $("#health-status").parent().on("mouseover", function(e) {
+        pos = [e.pageX + 10, e.pageY - 10];
+        var tooltipContents = [{
+            lbl: 'Name',
+            value: 'Cluster Health'
+        }, {
+            lbl: 'Overall Status',
+            value: healthStatus
+        }];
+
+        $.each(healthStatusObj['health']['summary'], function(idx, event) {
+            tooltipContents.push({
+                lbl: 'Event',
+                value: '[ ' + getHealthLbl(event['severity']).toLowerCase() + ' ]' + event['summary']
+            });
+        });
+
+        var content = formatLblValueTooltip(tooltipContents);
+        nv.tooltip.show([pos[0], pos[1]], content, null, null, null);
+    });
+    $("#health-status").parent().on("mouseout", function(e) {
+        nv.tooltip.cleanup();
+    });
+
+
 }
 
 function activityStatusRefresh() {
@@ -1020,7 +1050,7 @@ function disksBarChart() {
 function statusDataRefresh() {
 
     getClusterHealthStatus();
-    getClusterMonitorStatus();
+    //getClusterMonitorStatus();
     //getClusterDFStatus();
     getClusterUsage();
     getClusterPools();
