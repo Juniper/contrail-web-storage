@@ -40,8 +40,9 @@ function getStorageJobClusterStatus(req, res ){
 }
 
 function getStorageClusterHealthStatus(req, res, appData){
-    var urlHealth = storageApi.url.health;//"/health";
-    redisClient.get(urlHealth, function(error, cachedJSONStr) {
+    var urlHealth = storageApi.url.status;
+    cookieClusterStatus= "/api/tenant/storage/cluster/status";
+    redisClient.get(cookieClusterStatus, function(error, cachedJSONStr) {
         if (error || cachedJSONStr == null) {
             storageRest.apiGet(urlHealth, appData, function (error, resultJSON) {
                 if(!error && (resultJSON)) {
@@ -49,7 +50,7 @@ function getStorageClusterHealthStatus(req, res, appData){
                     if(!resultJSON) {
                         resultJSON = [];
                     }
-                    redisClient.setex(urlHealth, expireTime, JSON.stringify(resultJSON));
+                    redisClient.setex(cookieClusterStatus, expireTime, JSON.stringify(resultJSON));
                     commonUtils.handleJSONResponse(null, res, resultJSON);
                 } else {
                     commonUtils.handleJSONResponse(error, res, null);
@@ -64,15 +65,18 @@ function getStorageClusterHealthStatus(req, res, appData){
 function parseStorageHealthStatusData(resultJSON){
     var emptyObj = {};  
         var healthJSON = {};
-        var status = jsonPath(resultJSON, "$..status");
+        var status = jsonPath(resultJSON, "$..health.overall_status");
         var summary= jsonPath(resultJSON, "$..summary");
         var details= jsonPath(resultJSON, "$..detail");
+        var pgmap= jsonPath(resultJSON, "$..pgmap");
         if (status.length > 0 ) {
             var temp = new Object();
             temp['last_updated_time']= new Date();
             temp["overall_status"] = status[0];
-            temp["details"] = details[0];
-            temp["summary"] = summary[0];
+            temp["health"]={};
+            temp["health"]["details"] = details[0];
+            temp["health"]["summary"] = summary[0];
+            temp["pgmap"] = pgmap[0];
             healthJSON['cluster_status']= temp;
             return healthJSON;
         }
@@ -255,10 +259,17 @@ function formatOsdSeriesLoadXMLData(resultJSON){
             var count = resultJSON[i]['COUNT(info_stats)'];
             results[i]['MessageTS'] = resultJSON[i]['T='];
             results[i]['sampleCnt'] = count;
-            results[i]['reads'] = resultJSON[i]['SUM(info_stats.reads)'];
-            results[i]['writes'] = resultJSON[i]['SUM(info_stats.writes)'];
-            results[i]['reads_kbytes'] = resultJSON[i]['SUM(info_stats.read_kbytes)'];
-            results[i]['writes_kbytes'] = resultJSON[i]['SUM(info_stats.write_kbytes)'];
+            var reads = resultJSON[i]['SUM(info_stats.reads)'];
+            results[i]['reads'] = reads/count;
+
+            var writes= resultJSON[i]['SUM(info_stats.writes)'];
+            results[i]['writes'] = writes/count;
+
+            var reads_kbytes= resultJSON[i]['SUM(info_stats.read_kbytes)'];
+            results[i]['reads_kbytes'] = reads_kbytes/count;
+
+            var writes_kbytes= resultJSON[i]['SUM(info_stats.write_kbytes)'];
+            results[i]['writes_kbytes'] = writes_kbytes/count;
 
             var op_r_latency = resultJSON[i]['SUM(info_stats.op_r_latency)'];
             results[i]['op_r_latency'] = op_r_latency/count;
@@ -568,3 +579,4 @@ exports.getStorageClusterPoolActivity = getStorageClusterPoolActivity;
 exports.getStorageClusterDiskActivity = getStorageClusterDiskActivity;
 exports.getSources = getSources;
 exports.getStorageClusterUsage= getStorageClusterUsage;
+exports.parseStorageHealthStatusData = parseStorageHealthStatusData;
