@@ -8,20 +8,24 @@ var infraMonitorStorageAlertUtils = {
             ip: obj['ip']
         };
 
+        /*
+        * leading spaces are added to list so that while tooltips are
+        * displayed it can wrap for longer entries if any.
+         */
         $.each(obj['osds'], function(idx, osd) {
             if (osd['status'] == 'down') {
                 if (!obj['isDiskDown']) {
                     obj['disk_down_list'] = []
                     obj['isDiskDown'] = true
                 }
-                obj['disk_down_list'].push(osd['name'])
+                obj['disk_down_list'].push(' ' + osd['name'])
             }
             if (osd['cluster_status'] == 'out') {
                 if (!obj['isDiskOut']) {
                     obj['disk_out_list'] = []
                     obj['isDiskOut'] = true
                 }
-                obj['disk_out_list'].push(osd['name'])
+                obj['disk_out_list'].push(' ' + osd['name'])
             }
         });
 
