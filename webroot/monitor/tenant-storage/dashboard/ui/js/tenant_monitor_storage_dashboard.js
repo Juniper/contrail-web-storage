@@ -321,7 +321,7 @@ function parseClusterUsageData(data) {
                 value: retObj['usage_data']['total_avail']
             }, {
                 lbl: "Percentage",
-                value: (100 - retObj['usage_data']['used_perc']) + "%"
+                value: (100 - retObj['usage_data']['used_perc']).toFixed(2) + "%"
             }]
         }];
 
