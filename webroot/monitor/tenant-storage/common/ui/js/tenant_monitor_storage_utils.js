@@ -25,6 +25,18 @@ function calcPercent(val1, val2) {
     return ((val1 / val2) * 100).toFixed(2);
 }
 
+function getHealthLbl(status) {
+    if (status == 'HEALTH_WARN')
+        retStatus = 'WARN';
+    else if (status == 'HEALTH_OK' || status == 'OK')
+        retStatus = 'OK';
+    else if (status == 'HEALTH_CRIT' || status == 'HEALTH_ERR')
+        retStatus = 'CRITICAL';
+    else
+        retStatus = status;
+    return retStatus;
+}
+
 function getLabelClass(status) {
     var labelClass;
     if (status == 'OK')
@@ -43,7 +55,7 @@ function getIconClass(status) {
     var labelClass;
     if (status == 'OK')
         labelClass = "icon-arrow-up";
-    else if (status == 'WARN')
+    else if (status == 'WARN' || status == 'CRITICAL')
         labelClass = "icon-warning-sign";
     else if (status == 'DOWN')
         labelClass = "icon-arrow-down";
@@ -61,7 +73,7 @@ function getIconColorClass(status) {
         labelClass = "success-color";
     else if (status == 'WARN')
         labelClass = "warning-color";
-    else if (status == 'DOWN')
+    else if (status == 'DOWN' || status == 'CRITICAL')
         labelClass = "down-color";
     else {
         labelClass = "info-color";

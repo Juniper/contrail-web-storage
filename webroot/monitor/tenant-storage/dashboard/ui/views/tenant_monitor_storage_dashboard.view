@@ -114,22 +114,21 @@
                 <div id="dashHealthBox" class="widget-box transparent">
                     <div class="widget-header"></div>
                     <div class="widget-body monitor-status">
+                        <!--
                         <div class="widget-main">
                             <span class="label label-status">
                                 <span id="monitor-status" class="status-message"></span>
                                 <i id="monitor-status-icon" class="icon-status"></i>
                             </span>
                         </div>
-                        <!--
+                        -->
                         <div class="widget-main">
-                            <div class="info-color">
-                                <ul>Cluster</ul>
-                            </div>
                             <span class="label label-status">
                                 <span id="health-status" class="status-message"></span>
                                 <i id="health-status-icon" class="icon-status"></i>
                             </span>
                         </div>
+                        <!--
                          <div class="widget-main">
                             <div class="info-color">
                                 <ul>Monitor</ul>
