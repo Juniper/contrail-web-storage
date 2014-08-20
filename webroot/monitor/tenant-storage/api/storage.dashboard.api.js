@@ -579,3 +579,4 @@ exports.getStorageClusterPoolActivity = getStorageClusterPoolActivity;
 exports.getStorageClusterDiskActivity = getStorageClusterDiskActivity;
 exports.getSources = getSources;
 exports.getStorageClusterUsage= getStorageClusterUsage;
+exports.parseStorageHealthStatusData = parseStorageHealthStatusData;
