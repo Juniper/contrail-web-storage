@@ -12,6 +12,7 @@ var
     jsonPath = require('JSONPath').eval,
     osdApi= require('../../../tenant-storage/api/storage.osd.api'),
     monsApi= require('../../../tenant-storage/api/storage.mons.api'),
+    dashApi= require('../../../tenant-storage/api/storage.dashboard.api'),
     storageInfraApi = module.exports;
 
 var  expireTime= storageApi.expireTimeSecs;
@@ -87,6 +88,7 @@ function parseStorageTopologyTree(osdJSON, callback){
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
             hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
             osdList.topology = parseRootFromHost(rootMap, hostMap);
+            osdList.cluster_status = dashApi.parseStorageHealthStatusData(status);
             callback(osdList);
         });
     }
