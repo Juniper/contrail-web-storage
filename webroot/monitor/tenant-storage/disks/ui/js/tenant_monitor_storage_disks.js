@@ -138,6 +138,7 @@ cephOSDsView = function() {
                 options: {
                     autoHeight: true,
                     checkboxSelectable: false,
+                    lazyLoading: true,
                     enableAsyncPostRender: true,
                     forceFitColumns: true,
                     detail: {
@@ -199,7 +200,13 @@ cephOSDsView = function() {
                     }
                 },
                 dataSource: {
-                    dataView: osdsDV
+                    dataView: osdsDV,
+                    events: {
+                        onUpdateDataCB: function() {
+                            var dvGrid = $('#gridOSDs').data('contrailGrid');
+                            dvGrid.removeGridLoading();
+                        }
+                    }
                 },
                 statusMessages: {
                     loading: {
