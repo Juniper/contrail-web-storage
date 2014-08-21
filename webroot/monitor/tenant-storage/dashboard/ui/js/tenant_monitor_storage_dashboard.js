@@ -268,6 +268,7 @@ function parseClusterHealthData(result) {
     if (result != null) {
         retObj['health-status'] =  getHealthLbl(result['cluster_status']['overall_status']);
         retObj['health'] = result['cluster_status']['health'];
+        retObj['alerts'] = tenantStorageAlertUtils.processStorageHealthAlerts(result['cluster_status']);
     }
     tenantStorageDashboardView.setClusterHealthData(retObj);
 }
@@ -689,10 +690,7 @@ function healthStatusRefresh() {
     );
     $("#health-status").parent().on("click", function() {
         //Handle click to popup alerts
-        nv.tooltip.cleanup();
-        layoutHandler.setURLHashObj({
-            p: 'mon_storage_monitor'
-        });
+        showStorageAlertsPopup(healthStatusObj['alerts']);
     });
     $("#health-status").parent().on("mouseover", function(e) {
         pos = [e.pageX + 10, e.pageY - 10];
@@ -704,10 +702,26 @@ function healthStatusRefresh() {
             value: healthStatus
         }];
 
+        var details = [];
+        $.each(healthStatusObj['health']['details'], function(idx, event) {
+            details.push(' [ ' + ++idx + ' ] ' + event )
+        });
+        /*
+        * only display one detail message. show rest in popup
+         */
+        if (details.length > 1) {
+            details = details.slice(0, 1);
+            details.push(' ...');
+        }
+        tooltipContents.push({
+            lbl: 'Details',
+            value: details
+        });
+
         $.each(healthStatusObj['health']['summary'], function(idx, event) {
             tooltipContents.push({
                 lbl: 'Event',
-                value: '[ ' + getHealthLbl(event['severity']).toLowerCase() + ' ]' + event['summary']
+                value: '[ ' + getHealthLbl(event['severity']).toLowerCase() + ' ] ' + event['summary']
             });
         });
 
