@@ -224,7 +224,7 @@ var tenantStorageChartUtils = {
             value: e.point.label
         }, {
             lbl: e.series.key,
-            value: ("{0:Disk;Disks}").format(e.point.value)
+            value: ("{0:Disk;Disks}").format(Math.abs(e.point.value))
         }];
         return tooltipContents;
     },
