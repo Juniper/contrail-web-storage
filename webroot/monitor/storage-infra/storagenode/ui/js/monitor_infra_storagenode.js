@@ -811,8 +811,8 @@ storageNodeView = function() {
             $.each(osds, function(idx, osd) {
                 osd['x'] = parseFloat(((osd.kb_avail / osd.kb) * 100).toFixed(2));
                 osd['y'] = parseFloat((osd.kb / 1048576).toFixed(2));
-                osd['available_perc'] = $.isNumeric(osd['x']) ? osd['x'] : '-';
-                osd['total'] = formatBytes(osd.kb * 1024);
+                osd['available_perc'] = $.isNumeric(osd['x']) ? osd['x'] : 'N/A';
+                osd['total'] = osd.hasOwnProperty('kb') ? formatBytes(osd.kb * 1024) : 'N/A';
                 osd['size'] = 1;
                 osd['shape'] = 'circle';
                 osd['type'] = 'disk';
