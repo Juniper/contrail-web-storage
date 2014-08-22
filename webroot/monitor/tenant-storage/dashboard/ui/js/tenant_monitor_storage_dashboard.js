@@ -390,14 +390,14 @@ function parseCephPoolsData(result) {
             obj1['label'] = 'GB Used';
             obj1['value'] = parseFloat(byteToGB(item['stats']['bytes_used']));
             values1.push(obj1);
-            key1['key'] = item['name'];
+            key1['key'] = item['pool_name'];
             key1['values'] = values1;
             gbUsedKeys.push(key1);
 
             obj2['label'] = 'Objects';
             obj2['value'] = item['stats']['objects'];
             values2.push(obj2);
-            key2['key'] = item['name'];
+            key2['key'] = item['pool_name'];
             key2['values'] = values2;
             objectsKeys.push(key2);
         });
