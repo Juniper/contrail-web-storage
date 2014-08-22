@@ -26,7 +26,15 @@ function addStorageTabs() {
                 return infraMonitorStorageUtils.getDownNodeCnt(self.data());
             });
             self.upCnt = ko.computed(function() {
-                return self.data().length - self.downCnt();
+                /*
+                * parsed data includes cluster wide health data and this is not a node level info.
+                * total count of storagenodes = self.data() - 1
+                * Only subtract 1 if the array length is > 0 otherwise infobox will show -1 on 0 storage nodes.
+                 */
+                var nodeCnt = self.data().length;
+                if (nodeCnt != 0)
+                    nodeCnt -= 1;
+                return (nodeCnt - self.downCnt());
             });
             self.totalCnt = ko.computed(function() {
                 return self.upCnt() === '' ? '' : self.upCnt() + self.downCnt();
@@ -38,6 +46,11 @@ function addStorageTabs() {
         })
 
         var updateView = function(data) {
+            var nodeData = $.map(data, function(val, idx) {
+               if (val['name'] != 'CLUSTER_HEALTH')
+                    return val;
+            });
+
             if (!isScatterChartInitialized('#storageNode-bubble')) {
                 $('#storageNodeStats-header').initWidgetHeader({
                     title: 'Storage Nodes',
@@ -62,17 +75,16 @@ function addStorageTabs() {
                     },
                     d: [{
                         key: 'Storage Nodes',
-                        values: data
+                        values: nodeData
                     }]
                 };
                 $('#storageNode-bubble').initScatterChart(chartsData);
             } else {}
-            self.updateStorageInfoBoxes();
+            self.updateStorageInfoBoxes(nodeData);
         }
 
-        this.updateStorageInfoBoxes = function() {
+        this.updateStorageInfoBoxes = function(data) {
 
-            var data = viewModel.data();
             var diskBuckets;
             var diskCnt = 0,
                 disks = [];

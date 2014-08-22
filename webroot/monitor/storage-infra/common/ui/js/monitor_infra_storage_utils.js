@@ -8,17 +8,14 @@ var infraMonitorStorageAlertUtils = {
             ip: obj['ip']
         };
 
-        /*
-        * leading spaces are added to list so that while tooltips are
-        * displayed it can wrap for longer entries if any.
-         */
         $.each(obj['osds'], function(idx, osd) {
             if (osd['status'] == 'down') {
-                if (!obj['isDiskDown']) {
-                    obj['disk_down_list'] = []
-                    obj['isDiskDown'] = true
-                }
-                obj['disk_down_list'].push(' ' + osd['name'])
+                alertsList.push($.extend({}, {
+                    ip: osd['public_addr'],
+                    sevLevel: sevLevels['ERROR'],
+                    msg: (storageInfraAlertMsgs['DISK_DOWN_LIST']).format(osd['name']),
+                    timeStamp: new Date(osd['osd_xinfo']['down_stamp']).getTime() * 1000
+                }, infoObj));
             }
             if (osd['cluster_status'] == 'out') {
                 if (!obj['isDiskOut']) {
@@ -28,12 +25,6 @@ var infraMonitorStorageAlertUtils = {
                 obj['disk_out_list'].push(' ' + osd['name'])
             }
         });
-
-        if (obj['isDiskDown'] == true)
-            alertsList.push($.extend({}, {
-                sevLevel: sevLevels['ERROR'],
-                msg: (storageInfraAlertMsgs['DISK_DOWN']).format(obj['disk_down_list'].length, obj['disk_down_list'])
-            }, infoObj));
 
         if (obj['isDiskOut'] == true)
             alertsList.push($.extend({}, {
@@ -49,6 +40,44 @@ var infraMonitorStorageAlertUtils = {
                 }, infoObj));
             });
         }
+        return alertsList.sort(dashboardUtils.sortInfraAlerts);
+    },
+    processStorageHealthAlerts: function(obj) {
+        var alertsList = [];
+        var timeStamp = new Date(obj['last_updated_time']).getTime() * 1000;
+        var defInfoObj = {
+            name: 'Storage Cluster',
+            type: 'Storage',
+            ip: '',
+            timeStamp: timeStamp
+        };
+
+        $.each(obj['health']['details'], function(idx, msg) {
+            var msgArr = msg.split(" ");
+            if (msgArr.slice(0,1)[0].indexOf("mon") > -1) {
+                alertsList.push({
+                    name: msgArr[0].split(".")[1],
+                    type: 'Storage Monitor',
+                    ip: msgArr[2],
+                    sevLevel: sevLevels['WARNING'],
+                    msg: msgArr.slice(3).join(" "),
+                    timeStamp: timeStamp
+                });
+            } else {
+                alertsList.push($.extend({}, {
+                    sevLevel: sevLevels['INFO'],
+                    msg: msg
+                }, defInfoObj));
+            }
+        });
+
+        $.each(obj['health']['summary'], function(idx, msg) {
+            alertsList.push($.extend({}, {
+                sevLevel: sevLevels[infraMonitorStorageUtils.getHealthSevLevelLbl(msg['severity'])],
+                msg: msg['summary']
+            }, defInfoObj));
+        });
+
         return alertsList.sort(dashboardUtils.sortInfraAlerts);
     }
 };
@@ -114,6 +143,20 @@ var infraMonitorStorageUtils = {
             }
             retArr.push(obj);
         });
+
+        /*
+        * Cluster health is getting passed from storage nodes summary API.
+        * separate object entry is created with name CLUSTER_HEALTH so it can be filtered out
+        * for charts and other cases that only require storage node details.
+         */
+        var clusterObj = {};
+        clusterObj['name'] = 'CLUSTER_HEALTH';
+        clusterObj['nodeAlerts'] = infraMonitorStorageAlertUtils.processStorageHealthAlerts(result['cluster_status']);
+        clusterObj['alerts'] = clusterObj['nodeAlerts'].sort(dashboardUtils.sortInfraAlerts);
+        clusterObj['processAlerts'] = [];
+        //adding clusterObj to the top of the returned array
+        retArr.unshift(clusterObj);
+
         retArr.sort(dashboardUtils.sortNodesByColor);
         return retArr;
     },
@@ -129,6 +172,16 @@ var infraMonitorStorageUtils = {
             clearTimeout(value)
         });
         storageConsoleTimer = [];
+    },
+    getHealthSevLevelLbl: function(obj) {
+        if(obj == 'HEALTH_OK' || obj == 'OK')
+            return 'INFO';
+        else if (obj == 'HEALTH_WARN')
+            return 'WARNING';
+        else if(obj == 'HEALTH_ERR' || obj == 'HEALTH_CRIT')
+            return 'ERROR';
+        else
+            return 'NOTICE';
     }
 };
 
