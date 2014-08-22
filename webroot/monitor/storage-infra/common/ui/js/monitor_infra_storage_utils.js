@@ -176,11 +176,11 @@ var infraMonitorStorageUtils = {
         storageConsoleTimer = [];
     },
     getHealthSevLevelLbl: function(obj) {
-        if(obj == 'HEALTH_OK' || obj == 'OK')
+        if(obj == 'HEALTH_OK' || obj == 'OK' || obj == 'up')
             return 'INFO';
-        else if (obj == 'HEALTH_WARN')
+        else if (obj == 'HEALTH_WARN' || obj == 'warn')
             return 'WARNING';
-        else if(obj == 'HEALTH_ERR' || obj == 'HEALTH_CRIT')
+        else if(obj == 'HEALTH_ERR' || obj == 'HEALTH_CRIT' || obj == 'down')
             return 'ERROR';
         else
             return 'NOTICE';
@@ -227,6 +227,11 @@ function getStorageNodeStatusTmpl(obj) {
             sevLevel: sevLevels['INFO'],
             sevLevels: sevLevels
         }) + " up</span>";
+    else if (obj == "warn")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['WARNING'],
+            sevLevels: sevLevels
+        }) + " warn</span>";
     else if (obj == "down")
         return "<span> " + statusTmpl({
             sevLevel: sevLevels['ERROR'],

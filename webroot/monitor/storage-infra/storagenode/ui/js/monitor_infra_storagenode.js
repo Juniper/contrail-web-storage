@@ -105,7 +105,7 @@ storageNodesView = function() {
                         return cellTemplateLinks({
                             cellText: 'name',
                             name: 'name',
-                            statusBubble: true,
+                            statusBubble: false,
                             rowData: dc
                         });
                     },
