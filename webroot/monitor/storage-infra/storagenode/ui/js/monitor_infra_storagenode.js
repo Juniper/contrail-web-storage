@@ -35,17 +35,27 @@ storageNodesView = function() {
         storageSummaryChartsInitializationStatus['storageNode'] = false;
         var storNodesTemplate = contrail.getTemplate4Id("storagenodes-template");
         $(pageContainer).html(storNodesTemplate({}));
-        var storageNodeDS = new SingleDataSource('storageNodeDS');
-        var storageNodesResult = storageNodeDS.getDataSourceObj();
-        var storageNodesDataSource = storageNodesResult['dataSource'];
-        var storageDeferredObj = storageNodesResult['deferredObj'];
+
+        var storageNodeDS = new SingleDataSource('storageNodeDS'),
+            storageNodesDSObj = storageNodeDS.getDataSourceObj(),
+            storageNodesDV = new ContrailDataView(),
+            storageNodesDataSource,
+            storageNodesDeferredObj = $.Deferred();
+
         //Initialize widget header
         $('#storageNodes-header').initWidgetHeader({
             title: 'Storage Nodes',
             widgetBoxId: 'recent'
         });
         $(storageNodeDS).on('change', function() {
-            updateStorageChartsForSummary(storageNodesDataSource.getItems(), 'storageNodes');
+            storageNodesDataSource = storageNodesDSObj['dataSource'];
+            storageNodesDeferredObj = storageNodesDSObj['deferredObj'];
+            var nodeData = $.map(storageNodesDataSource.getItems(), function(val, idx) {
+                if (val['name'] != 'CLUSTER_HEALTH')
+                    return val;
+            });
+            storageNodesDV.setData(nodeData);
+            updateStorageChartsForSummary(nodeData, 'storageNodes');
         });
         $('#gridStorageNodes').contrailGrid({
             header: {
@@ -63,7 +73,7 @@ storageNodesView = function() {
                     forceFitColumns: true
                 },
                 dataSource: {
-                    dataView: storageNodesDataSource
+                    dataView: storageNodesDV
                 },
                 statusMessages: {
                     loading: {
@@ -140,13 +150,14 @@ storageNodesView = function() {
             }
         });
         var storNodesGrid = $('#gridStorageNodes').data('contrailGrid');
-        storageDeferredObj.done(function() {
+        storageNodesDeferredObj.done(function() {
             storNodesGrid.removeGridLoading();
         });
-        storageDeferredObj.fail(function() {
+        storageNodesDeferredObj.fail(function() {
             storNodesGrid.showGridMessage('errorGettingData');
         });
-        if (storageNodesResult['lastUpdated'] != null && (storageNodesResult['error'] == null || storageNodesResult['error']['errTxt'] == 'abort')) {
+        if (storageNodesDSObj['lastUpdated'] != null &&
+            (storageNodesDSObj['error'] == null || storageNodesDSObj['error']['errTxt'] == 'abort')) {
             triggerDatasourceEvents(storageNodeDS);
         } else {
             storNodesGrid.showGridMessage('loading');
@@ -154,7 +165,6 @@ storageNodesView = function() {
     }
 
     function onStorNodeRowSelChange(dc) {
-        var storNodesGrid = $('#gridStorageNodes').data('contrailGrid');
         storNodeView.load({
             name: dc['name']
         });
@@ -170,7 +180,8 @@ storageNodeView = function() {
     this.load = function(obj) {
         pushBreadcrumb([obj['name']]);
         storNodeInfo = obj;
-        if ((storNodeInfo == null || storNodeInfo.name == null || storNodeInfo.name == '') && storNodeInfo.name != null) {
+        if ((storNodeInfo == null || storNodeInfo.name == null || storNodeInfo.name == '') &&
+            storNodeInfo.name != null) {
             var storageNodeDeferredObj = $.Deferred();
             self.getStorageNodeDetails(storageNodeDeferredObj, storNodeInfo);
             storageNodeDeferredObj.done(function(data) {
@@ -800,8 +811,8 @@ storageNodeView = function() {
             $.each(osds, function(idx, osd) {
                 osd['x'] = parseFloat(((osd.kb_avail / osd.kb) * 100).toFixed(2));
                 osd['y'] = parseFloat((osd.kb / 1048576).toFixed(2));
-                osd['available_perc'] = $.isNumeric(osd['x']) ? osd['x'] : '-';
-                osd['total'] = formatBytes(osd.kb * 1024);
+                osd['available_perc'] = $.isNumeric(osd['x']) ? osd['x'] : 'N/A';
+                osd['total'] = osd.hasOwnProperty('kb') ? formatBytes(osd.kb * 1024) : 'N/A';
                 osd['size'] = 1;
                 osd['shape'] = 'circle';
                 osd['type'] = 'disk';

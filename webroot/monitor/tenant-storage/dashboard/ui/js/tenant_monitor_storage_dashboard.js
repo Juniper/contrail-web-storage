@@ -268,6 +268,7 @@ function parseClusterHealthData(result) {
     if (result != null) {
         retObj['health-status'] =  getHealthLbl(result['cluster_status']['overall_status']);
         retObj['health'] = result['cluster_status']['health'];
+        retObj['alerts'] = tenantStorageAlertUtils.processStorageHealthAlerts(result['cluster_status']);
     }
     tenantStorageDashboardView.setClusterHealthData(retObj);
 }
@@ -389,14 +390,14 @@ function parseCephPoolsData(result) {
             obj1['label'] = 'GB Used';
             obj1['value'] = parseFloat(byteToGB(item['stats']['bytes_used']));
             values1.push(obj1);
-            key1['key'] = item['name'];
+            key1['key'] = item['pool_name'];
             key1['values'] = values1;
             gbUsedKeys.push(key1);
 
             obj2['label'] = 'Objects';
             obj2['value'] = item['stats']['objects'];
             values2.push(obj2);
-            key2['key'] = item['name'];
+            key2['key'] = item['pool_name'];
             key2['values'] = values2;
             objectsKeys.push(key2);
         });
@@ -689,10 +690,7 @@ function healthStatusRefresh() {
     );
     $("#health-status").parent().on("click", function() {
         //Handle click to popup alerts
-        nv.tooltip.cleanup();
-        layoutHandler.setURLHashObj({
-            p: 'mon_storage_monitor'
-        });
+        showStorageAlertsPopup(healthStatusObj['alerts']);
     });
     $("#health-status").parent().on("mouseover", function(e) {
         pos = [e.pageX + 10, e.pageY - 10];
@@ -704,10 +702,26 @@ function healthStatusRefresh() {
             value: healthStatus
         }];
 
+        var details = [];
+        $.each(healthStatusObj['health']['details'], function(idx, event) {
+            details.push(' [ ' + ++idx + ' ] ' + event )
+        });
+        /*
+        * only display one detail message. show rest in popup
+         */
+        if (details.length > 1) {
+            details = details.slice(0, 1);
+            details.push(' ...');
+        }
+        tooltipContents.push({
+            lbl: 'Details',
+            value: details
+        });
+
         $.each(healthStatusObj['health']['summary'], function(idx, event) {
             tooltipContents.push({
                 lbl: 'Event',
-                value: '[ ' + getHealthLbl(event['severity']).toLowerCase() + ' ]' + event['summary']
+                value: '[ ' + getHealthLbl(event['severity']).toLowerCase() + ' ] ' + event['summary']
             });
         });
 
@@ -1016,7 +1030,9 @@ function disksBarChart() {
             .showControls(false);
 
         chart.yAxis
-            .tickFormat(d3.format('.0f'));
+            .tickFormat(function(d) {
+                return Math.abs(d3.format('.0f')(d));
+            });
 
         chart.multibar.dispatch.on('elementMouseover.tooltip', function(e) {
             e.pos = [d3.event.pageX, d3.event.pageY];

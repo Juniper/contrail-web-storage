@@ -24,21 +24,24 @@ function getStoragePGPoolsSummary(req, res, appData){
 
     var dataObjArr = [];
     var resultJSON = [];
-    urlPools = storageApi.url.pgDumpPools; //"/pg/dump_pools_json";
-    commonUtils.createReqObj(dataObjArr, urlPools, null, null, 
-                                         null, null, appData);
+
+    urlOSDDump = storageApi.url.osdDump;//"/osd/dump";
+    commonUtils.createReqObj(dataObjArr, urlOSDDump, null, null,
+        null, null, appData);
 
     urlDF = storageApi.url.df;
-    commonUtils.createReqObj(dataObjArr, urlDF, null, null, 
+    commonUtils.createReqObj(dataObjArr, urlDF, null, null,
                                          null, null, appData);
+    cookieURL = "/api/tenant/storage/cluster/pools/summary";
 
-    redisClient.get(urlPools, function(error, cachedJSONStr) {
+
+    redisClient.get(cookieURL, function(error, cachedJSONStr) {
         if (error || cachedJSONStr == null) {
             async.map(dataObjArr,
                 commonUtils.getAPIServerResponse(storageRest.apiGet, true),
                 function(err, data) {
                     resultJSON = parseStoragePGPoolsData(data);
-                    redisClient.setex(urlPools, expireTime, JSON.stringify(resultJSON));
+                    redisClient.setex(cookieURL, expireTime, JSON.stringify(resultJSON));
                     commonUtils.handleJSONResponse(err, res, resultJSON);
                 });
         } else {
@@ -49,10 +52,10 @@ function getStoragePGPoolsSummary(req, res, appData){
 
 function parseStoragePGPoolsData(poolJSON){
     var resultJSON = {};
-    var pools= jsonPath(poolJSON[0],"$.output")[0];
+    var pools= jsonPath(poolJSON[0],"$..pools")[0];
     var odf= poolJSON[1];
     var poolMapJSON = new Object();
-    poolMapJSON['pools']= parsePoolsData(pools, odf);
+    poolMapJSON.pools= parsePoolsData(pools, odf);
     resultJSON = poolMapJSON;
     return resultJSON;
 }
@@ -60,7 +63,7 @@ function parseStoragePGPoolsData(poolJSON){
 function parsePoolsData(pools, odf){
     var nodeCnt= pools.length;
     for (i = 0; i < nodeCnt; i++) { 
-        var pId=jsonPath(pools,"$["+i+"].poolid")[0];
+        var pId=jsonPath(pools,"$["+i+"].pool")[0];
         var dfCnt = jsonPath(odf,"$.output.pools.length")[0];
         for(j=0; j< dfCnt; j++){
             var dfPoolId= jsonPath(odf,"$.output.pools["+j+"].id")[0];

@@ -37,6 +37,17 @@ function getHealthLbl(status) {
     return retStatus;
 }
 
+function getHealthSevLevelLbl(obj) {
+    if(obj == 'HEALTH_OK' || obj == 'OK')
+        return 'INFO';
+    else if (obj == 'HEALTH_WARN')
+        return 'WARNING';
+    else if(obj == 'HEALTH_ERR' || obj == 'HEALTH_CRIT')
+        return 'ERROR';
+    else
+        return 'NOTICE';
+}
+
 function getLabelClass(status) {
     var labelClass;
     if (status == 'OK')
@@ -105,10 +116,20 @@ var tenantStorageChartUtils = {
     },
     diskTooltipFn: function(currObj) {
         var tooltipContents = [{
+            lbl: 'Host Name',
+            value: currObj['name']
+        }, {
+            lbl: 'Total Space',
+            value: currObj['total']
+        }, {
+            lbl: 'Available',
+            value: formatBytes((currObj['kb'] - currObj['kb_used']) * 1024) +
+                ' [ ' + currObj['available_perc'] + '%' + ' ]'
+        }, {
             lbl: 'Status',
             value: currObj['status'] + '&' + currObj['cluster_status']
         }];
-        return getStorageNodeTooltipContents(currObj).concat(tooltipContents);
+        return tooltipContents;
     },
     getTooltipContents: function(e) {
         //Get the count of overlapping bubbles
@@ -213,7 +234,7 @@ var tenantStorageChartUtils = {
             value: e.point.label
         }, {
             lbl: e.series.key,
-            value: ("{0:Disk;Disks}").format(e.point.value)
+            value: ("{0:Disk;Disks}").format(Math.abs(e.point.value))
         }];
         return tooltipContents;
     },
@@ -502,6 +523,107 @@ var updateStorageCharts = {
         }
     }
 };
+
+var tenantStorageAlertUtils = {
+    processStorageHealthAlerts: function(obj) {
+        var alertsList = [];
+        var timeStamp = new Date(obj['last_updated_time']).getTime() * 1000;
+        var defInfoObj = {
+            name: 'Storage Cluster',
+            type: 'Storage',
+            ip: '',
+            timeStamp: timeStamp
+        };
+
+        $.each(obj['health']['details'], function(idx, msg) {
+            var msgArr = msg.split(" ");
+            if (msgArr.slice(0,1)[0].indexOf("mon") > -1) {
+                alertsList.push({
+                    name: msgArr[0].split(".")[1],
+                    type: 'Storage Monitor',
+                    ip: msgArr[2],
+                    sevLevel: sevLevels['WARNING'],
+                    msg: msgArr.slice(3).join(" "),
+                    timeStamp: timeStamp
+                });
+            } else {
+                alertsList.push($.extend({}, {
+                    sevLevel: sevLevels['INFO'],
+                    msg: msg
+                }, defInfoObj));
+            }
+        });
+
+        $.each(obj['health']['summary'], function(idx, msg) {
+            alertsList.push($.extend({}, {
+                sevLevel: sevLevels[getHealthSevLevelLbl(msg['severity'])],
+                msg: msg['summary']
+            }, defInfoObj));
+        });
+
+        return alertsList.sort(dashboardUtils.sortInfraAlerts);
+    }
+};
+
+function showStorageAlertsPopup(data) {
+    var alerts = [];
+    $.each(data, function(idx, alert) {
+        alerts.push({
+            nName: alert['name'],
+            pName: alert['type'],
+            sevLevel: alert['sevLevel'],
+            timeStamp: alert['timeStamp'],
+            msg: alert['msg']});
+    });
+
+    if (! globalObj['dataSources'].hasOwnProperty('alertsDS')) {
+        globalObj['dataSources']['alertsDS'] = {
+            dataSource: new ContrailDataView(),
+            //depends: ['storageNodeDS'],
+            deferredObj: $.Deferred()
+        };
+    }
+    var alertsDS = globalObj['dataSources']['alertsDS'];
+
+    /*
+    * will create alerts only from cluster health. will not append to existing msgs.
+     */
+    /*
+    var origAlerts = alertsDS['dataSource'].getItems();
+    $.each(alerts, function(idx, alert) {
+        origAlerts.push(alert);
+    });
+    */
+    alertsDS['dataSource'].setData(alerts);
+    loadAlertsContent();
+}
+
+/*
+* following taken from infra_utils. will keep until function gets moved to core.
+ */
+function getFormattedDate(timeStamp){
+    if(!$.isNumeric(timeStamp))
+        return '';
+    else{
+        var date=new Date(timeStamp),fmtDate="",mnth,hrs,mns,secs,dte;
+        dte=date.getDate()+"";
+        if(dte.length==1)
+            dte="0"+dte;
+        mnth=parseInt(date.getMonth()+1)+"";
+        if(mnth.length==1)
+            mnth="0"+mnth;
+        hrs=parseInt(date.getHours())+"";
+        if(hrs.length==1)
+            hrs="0"+hrs;
+        mns=date.getMinutes()+"";
+        if(mns.length==1)
+            mns="0"+mns;
+        secs=date.getSeconds()+"";
+        if(secs.length==1)
+            secs="0"+secs;
+        fmtDate=date.getFullYear()+"-"+mnth+"-"+dte+"  "+hrs+":"+mns+":"+secs;
+        return fmtDate;}
+}
 
 (function($) {
     $.extend($.fn, {
