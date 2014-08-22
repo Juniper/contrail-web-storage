@@ -428,3 +428,24 @@ var storageChartUtils = {
         return tooltipContents;
     }
 };
+
+String.prototype.newFormat = function() {
+    var args = arguments;
+    var retStr = this.toString();
+    var formatHolders = this.toString().match(/{[a-zA-Z0-9<>/:; ]*}/g);
+    for(var argIdx=0; argIdx < args.length ; argIdx++) {
+        if(formatHolders[argIdx] == null)
+            continue;
+        var currHolder = formatHolders[argIdx].replace(/[{}\d:]+/g,'');
+        var currValue = args[argIdx];
+        var strVariants = currHolder.split(';');
+        if((currHolder.length > 0) && (strVariants.length > 0)) {
+            if(args[argIdx] > 1)
+                currValue += ' ' + strVariants[1];
+            else
+                currValue += ' ' + strVariants[0];
+        }
+        retStr = retStr.replace(formatHolders[argIdx],currValue);
+    }
+    return retStr;
+};
