@@ -1030,7 +1030,9 @@ function disksBarChart() {
             .showControls(false);
 
         chart.yAxis
-            .tickFormat(d3.format('.0f'));
+            .tickFormat(function(d) {
+                return Math.abs(d3.format('.0f')(d));
+            });
 
         chart.multibar.dispatch.on('elementMouseover.tooltip', function(e) {
             e.pos = [d3.event.pageX, d3.event.pageY];

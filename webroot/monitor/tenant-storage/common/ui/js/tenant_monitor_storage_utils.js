@@ -116,10 +116,20 @@ var tenantStorageChartUtils = {
     },
     diskTooltipFn: function(currObj) {
         var tooltipContents = [{
+            lbl: 'Host Name',
+            value: currObj['name']
+        }, {
+            lbl: 'Total Space',
+            value: currObj['total']
+        }, {
+            lbl: 'Available',
+            value: formatBytes((currObj['kb'] - currObj['kb_used']) * 1024) +
+                ' [ ' + currObj['available_perc'] + '%' + ' ]'
+        }, {
             lbl: 'Status',
             value: currObj['status'] + '&' + currObj['cluster_status']
         }];
-        return getStorageNodeTooltipContents(currObj).concat(tooltipContents);
+        return tooltipContents;
     },
     getTooltipContents: function(e) {
         //Get the count of overlapping bubbles
@@ -224,7 +234,7 @@ var tenantStorageChartUtils = {
             value: e.point.label
         }, {
             lbl: e.series.key,
-            value: ("{0:Disk;Disks}").format(e.point.value)
+            value: ("{0:Disk;Disks}").format(Math.abs(e.point.value))
         }];
         return tooltipContents;
     },

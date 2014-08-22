@@ -232,7 +232,11 @@ cephOSDsView = function() {
             }
         });
 
-        getOSDs();
+        if(osdsDV.getItems().length == 0) {
+            getOSDs();
+        } else {
+            osdsDV.updateData(self.getOSDsData());
+        }
         tenantStorageChartsInitializationStatus['disks'] = true;
     }
 
