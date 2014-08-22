@@ -121,8 +121,10 @@ var infraMonitorStorageUtils = {
                     obj['osds_used'] += osd['kb_used'] * 1024;
                 }
             });
-            obj['x'] = parseFloat(calcPercent((obj['osds_total'] - obj['osds_used']), obj['osds_total']));
+            obj['osds_available_perc'] = calcPercent((obj['osds_total'] - obj['osds_used']), obj['osds_total']);
+            obj['x'] = parseFloat(obj['osds_available_perc']);
             obj['y'] = parseFloat(byteToGB(obj['osds_total']));
+            obj['osds_available'] = formatBytes(obj['osds_total'] - obj['osds_used']);
             obj['osds_total'] = formatBytes(obj['osds_total']);
             obj['osds_used'] = formatBytes(obj['osds_used']);
             obj['monitor'] = host['monitor'];
@@ -335,10 +337,10 @@ function getStorageNodeTooltipContents(currObj) {
         value: currObj['name']
     }, {
         lbl: 'Total Space',
-        value: currObj['total']
+        value: currObj['osds_total']
     }, {
         lbl: 'Available',
-        value: $.isNumeric(currObj['available_perc']) ? currObj['available_perc'] + '%' : currObj['available_perc']
+        value: currObj['osds_available'] + ' [ ' + currObj['osds_available_perc'] + '%' + ' ]'
     }];
     return tooltipContents;
 }
