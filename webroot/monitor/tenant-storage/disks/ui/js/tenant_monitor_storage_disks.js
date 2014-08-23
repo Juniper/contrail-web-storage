@@ -894,7 +894,13 @@ function getOSDsTree() {
 
 function getHostColor(osdColorArr) {
     var host_color = color_info;
+    var colorCount = {};
+    var osdColorCount = osdColorArr.length;
     $.each(osdColorArr, function(idx, color) {
+        /*
+        * Old way of calculating host color.
+        * if atleast one disk is down, the host is down
+
         if (color == color_imp) {
             host_color = color_imp;
             return;
@@ -903,17 +909,28 @@ function getHostColor(osdColorArr) {
         } else if (color == color_success && host_color != color_warn && host_color != color_imp) {
             host_color = color_success;
         } else {}
+        */
+        colorCount[color] = (colorCount[color] || 0) + 1;
     });
+    colorKeyCount = Object.keys(colorCount).length;
+    if (colorKeyCount == 1) {
+        host_color = osdColorArr[0]; //all colors are same
+    } else if (colorKeyCount == 3 || colorKeyCount == 2) {
+        host_color = color_warn; //all possible colors or two colors; return warn color
+    } else {
+
+    }
     return host_color;
 }
 
 function getHostStatus(statusArr) {
     var host_status = 'up';
+    var downCnt = 0
     $.each(statusArr, function(idx, status) {
         // Following checks for OSD status [in, out, down]
         if (status == 'down') {
-            host_status = 'critical';
-            return;
+            //host_status = 'critical';
+            downCnt++;
         } else if (status == 'out' && host_status != 'critical') {
             host_status = 'warn';
         } else if (status == 'in' && host_status != 'warn' && host_status != 'critical') {
@@ -928,6 +945,9 @@ function getHostStatus(statusArr) {
             host_status = 'active';
         } else {}
     });
+    if (downCnt == statusArr.length / 2)
+        host_status = 'critical';
+
     return host_status;
 }
 
