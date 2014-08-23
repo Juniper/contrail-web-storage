@@ -176,11 +176,11 @@ var infraMonitorStorageUtils = {
         storageConsoleTimer = [];
     },
     getHealthSevLevelLbl: function(obj) {
-        if(obj == 'HEALTH_OK' || obj == 'OK')
+        if(obj == 'HEALTH_OK' || obj == 'OK' || obj == 'up')
             return 'INFO';
-        else if (obj == 'HEALTH_WARN')
+        else if (obj == 'HEALTH_WARN' || obj == 'warn')
             return 'WARNING';
-        else if(obj == 'HEALTH_ERR' || obj == 'HEALTH_CRIT')
+        else if(obj == 'HEALTH_ERR' || obj == 'HEALTH_CRIT' || obj == 'down')
             return 'ERROR';
         else
             return 'NOTICE';
@@ -227,6 +227,11 @@ function getStorageNodeStatusTmpl(obj) {
             sevLevel: sevLevels['INFO'],
             sevLevels: sevLevels
         }) + " up</span>";
+    else if (obj == "warn")
+        return "<span> " + statusTmpl({
+            sevLevel: sevLevels['WARNING'],
+            sevLevels: sevLevels
+        }) + " warn</span>";
     else if (obj == "down")
         return "<span> " + statusTmpl({
             sevLevel: sevLevels['ERROR'],
@@ -427,4 +432,25 @@ var storageChartUtils = {
         }
         return tooltipContents;
     }
+};
+
+String.prototype.newFormat = function() {
+    var args = arguments;
+    var retStr = this.toString();
+    var formatHolders = this.toString().match(/{[a-zA-Z0-9<>/:; ]*}/g);
+    for(var argIdx=0; argIdx < args.length ; argIdx++) {
+        if(formatHolders[argIdx] == null)
+            continue;
+        var currHolder = formatHolders[argIdx].replace(/[{}\d:]+/g,'');
+        var currValue = args[argIdx];
+        var strVariants = currHolder.split(';');
+        if((currHolder.length > 0) && (strVariants.length > 0)) {
+            if(args[argIdx] > 1)
+                currValue += ' ' + strVariants[1];
+            else
+                currValue += ' ' + strVariants[0];
+        }
+        retStr = retStr.replace(formatHolders[argIdx],currValue);
+    }
+    return retStr;
 };

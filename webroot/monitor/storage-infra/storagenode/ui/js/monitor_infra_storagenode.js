@@ -105,7 +105,7 @@ storageNodesView = function() {
                         return cellTemplateLinks({
                             cellText: 'name',
                             name: 'name',
-                            statusBubble: true,
+                            statusBubble: false,
                             rowData: dc
                         });
                     },
@@ -845,10 +845,10 @@ storageNodeView = function() {
              the min values of series and tooltip info is returned to --
              */
             var xscale = d3.extent(xvals);
-            xscale[0] = xscale[0] - 0.2;
+            xscale[0] = (xscale[0] <= 5) ? 0.0 : xscale[0] - 0.2;
             xscale[1] = (xscale[1] >= 95.5) ? 100.00 : xscale[1] + 0.5;
             var yscale = d3.extent(yvals);
-            yscale[0] = yscale[0] - 150;
+            yscale[0] = (yscale[0] <= 150) ? 0 : yscale[0] - 150;
             yscale[1] = yscale[1] + 150;
 
             $.each(retArr, function(idx, osd) {

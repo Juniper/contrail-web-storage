@@ -124,7 +124,7 @@
 
 #usage-dial {
     width: 150px;
-    height: 190px;
+    height: 170px;
     position: relative;
 }
 .usage-arc path {
@@ -184,6 +184,13 @@
     font-weight: 400;
     background-color: #C6DBEF;
 }
+.df-avail-label{
+    margin-left: 2px;
+    line-height: 9px;
+    font-family: Open Sans;
+    font-weight: 400;
+    background-color: #C6DBEF;
+}
 #df-used{
     margin-left: 2px;
     font-size: 12px;
@@ -193,6 +200,18 @@
     margin-left: 2px;
     font-size: 12px;
     font-weight: 400;
+}
+#df-available{
+    margin-left: 2px;
+    font-size: 12px;
+    font-weight: 400;
+}
+#cluster-replica-factor{
+    font-size: 10px;
+    display:block;
+    width:140px;
+    height: 100%;
+    margin: 0 auto;
 }
 .infra-stor-chart .key {
     font-weight: normal;

@@ -149,8 +149,11 @@
                                 </div>
                                 <div id="usage-labelbox">
                                     <span class="label df-used-label">&nbsp;&nbsp; </span><span id="df-used"></span>
-                                    <span class="label df-total-label">&nbsp;&nbsp; </span><span id="df-total"></span>
+                                    <span class="label df-avail-label">&nbsp;&nbsp; </span><span id="df-available"></span>
                                 </div>
+                            </div>
+                            <div>
+                                <span id="clusterReplicaFactor" class="cluster-replica-factor"></span>
                             </div>
                         </div>
                     </div>
