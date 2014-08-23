@@ -260,22 +260,22 @@ function formatOsdSeriesLoadXMLData(resultJSON){
             results[i]['MessageTS'] = resultJSON[i]['T='];
             results[i]['sampleCnt'] = count;
             var reads = resultJSON[i]['SUM(info_stats.reads)'];
-            results[i]['reads'] = reads/count;
+            results[i]['reads'] =  Math.round(reads/count*100)/100;
 
             var writes= resultJSON[i]['SUM(info_stats.writes)'];
-            results[i]['writes'] = writes/count;
+            results[i]['writes'] = Math.round(writes/count*100)/100;
 
             var reads_kbytes= resultJSON[i]['SUM(info_stats.read_kbytes)'];
-            results[i]['reads_kbytes'] = reads_kbytes/count;
+            results[i]['reads_kbytes'] = Math.round(reads_kbytes/count*100)/100;
 
             var writes_kbytes= resultJSON[i]['SUM(info_stats.write_kbytes)'];
-            results[i]['writes_kbytes'] = writes_kbytes/count;
+            results[i]['writes_kbytes'] = Math.round(writes_kbytes/count*100)/100;
 
             var op_r_latency = resultJSON[i]['SUM(info_stats.op_r_latency)'];
-            results[i]['op_r_latency'] = op_r_latency/count;
+            results[i]['op_r_latency'] = Math.round(op_r_latency/count*100)/100;
 
             var op_w_latency = resultJSON[i]['SUM(info_stats.op_w_latency)'];
-            results[i]['op_w_latency'] = op_w_latency/count;
+            results[i]['op_w_latency'] = Math.round(op_w_latency/count*100)/100;
         }
         return results;
     } catch (e) {
