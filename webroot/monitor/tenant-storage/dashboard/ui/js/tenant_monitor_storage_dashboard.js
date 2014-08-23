@@ -6,7 +6,7 @@ function tenantStorageDashboardClass() {
     var self = this,
         currPage,
         dfUsageObj = {},
-        clusterUsageObj = {},
+        clusterUsageObj = {}, clusterReplicaFactor,
         healthStatusObj = {},
         actStatusObj = {},
         monStatusObj = {},
@@ -102,6 +102,14 @@ function tenantStorageDashboardClass() {
         clusterUsageObj = data;
         this.clusterUsageDial.refresh();
     }
+    this.getClusterReplicaFactor = function(data) {
+        return clusterReplicaFactor;
+    }
+    this.setClusterReplicaFactor = function(data) {
+        clusterReplicaFactor = data;
+        this.clusterReplicaDefrredObj.resolve();
+    }
+    this.clusterReplicaDefrredObj = $.Deferred();
     this.setPoolsBarGbData = function(data) {
         poolsBarGbData = data;
         this.clusterPoolsGbChart.refresh(data);
@@ -290,76 +298,103 @@ function parseClusterMonitorData(result) {
 function parseClusterUsageData(data) {
     var retObj = {};
     if (data != null) {
-        var osd_summary = data['usage_summary']['osd_summary'];
+        $.when(tenantStorageDashboardView.clusterReplicaDefrredObj).done(function() {
+            var replicaFactor = tenantStorageDashboardView.getClusterReplicaFactor();
 
-        osd_summary['near_full_ratio'] = parseFloat((osd_summary['near_full_ratio'] * 100).toFixed(2));
-        osd_summary['full_ratio'] = parseFloat((osd_summary['full_ratio'] * 100).toFixed(2));
+            var osd_summary = data['usage_summary']['osd_summary'];
+            osd_summary['kb'] = osd_summary['kb'] / replicaFactor;
+            osd_summary['kb_used'] = osd_summary['kb_used'] / replicaFactor;
+            osd_summary['kb_avail'] = osd_summary['kb_avail'] / replicaFactor;
 
-        retObj['usage_data'] = {
-            kb_used: osd_summary['kb_used'],
-            kb_avail: osd_summary['kb_avail'],
-            kb_total: osd_summary['kb'],
-            total_used: formatBytes(osd_summary['kb_used'] * 1024),
-            total_avail: formatBytes(osd_summary['kb_avail'] * 1024),
-            total_space: formatBytes(osd_summary['kb'] * 1024),
-            used_perc: parseFloat(calcPercent(osd_summary['kb_used'] , osd_summary['kb']))
-        }
-        retObj['usage_perc_data'] = [{
-            name: "Used",
-            value: Math.ceil(retObj['usage_data']['used_perc']),
-            tooltip_data: [{
-                lbl: "Used",
-                value: retObj['usage_data']['total_used']
-            }, {
-                lbl: "Percentage",
-                value: retObj['usage_data']['used_perc'] + "%"
-            }]
-        }, {
-            name: "Available",
-            value: 100 - Math.ceil(retObj['usage_data']['used_perc']),
-            tooltip_data: [{
-                lbl: "Available",
-                value: retObj['usage_data']['total_avail']
-            }, {
-                lbl: "Percentage",
-                value: (100 - retObj['usage_data']['used_perc']).toFixed(2) + "%"
-            }]
-        }];
+            osd_summary['near_full_ratio'] = parseFloat((osd_summary['near_full_ratio'] * 100).toFixed(2));
+            osd_summary['full_ratio'] = parseFloat((osd_summary['full_ratio'] * 100).toFixed(2));
 
-        retObj['status_data'] = [{
-            name: "Normal Ratio",
-            status: "Normal",
-            value: parseInt(osd_summary['near_full_ratio']),
-            tooltip_data: [{
-                lbl: "Range",
-                value: '0 - ' + osd_summary['near_full_ratio'] + ' %'
-            }]
-        }, {
-            name: "Near Full Ratio",
-            status: "Warning",
-            value: parseInt(osd_summary['full_ratio'] - osd_summary['near_full_ratio']),
-            tooltip_data: [{
-                lbl: "Range",
-                value: osd_summary['near_full_ratio'] + ' - ' + osd_summary['full_ratio'] + ' %'
-            }]
-        }, {
-            name: "Full Ratio",
-            status: "Critical",
-            value: parseInt(100 - osd_summary['full_ratio']),
-            tooltip_data: [{
-                lbl: "Range",
-                value: osd_summary['full_ratio'] + ' - 100 %'
-            }]
-        }];
+            retObj['usage_data'] = {
+                kb_used: osd_summary['kb_used'],
+                kb_avail: osd_summary['kb_avail'],
+                kb_total: osd_summary['kb'],
+                total_used: formatBytes(osd_summary['kb_used'] * 1024),
+                total_avail: formatBytes(osd_summary['kb_avail'] * 1024),
+                total_space: formatBytes(osd_summary['kb'] * 1024),
+                used_perc: parseFloat(calcPercent(osd_summary['kb_used'], osd_summary['kb']))
+            }
+            retObj['usage_perc_data'] = [
+                {
+                    name: "Used",
+                    value: Math.ceil(retObj['usage_data']['used_perc']),
+                    tooltip_data: [
+                        {
+                            lbl: "Used",
+                            value: retObj['usage_data']['total_used']
+                        },
+                        {
+                            lbl: "Percentage",
+                            value: retObj['usage_data']['used_perc'] + "%"
+                        }
+                    ]
+                },
+                {
+                    name: "Available",
+                    value: 100 - Math.ceil(retObj['usage_data']['used_perc']),
+                    tooltip_data: [
+                        {
+                            lbl: "Available",
+                            value: retObj['usage_data']['total_avail']
+                        },
+                        {
+                            lbl: "Percentage",
+                            value: (100 - retObj['usage_data']['used_perc']).toFixed(2) + "%"
+                        }
+                    ]
+                }
+            ];
 
-        if (retObj['usage_data']['used_perc'] < osd_summary['near_full_ratio']) {
-            retObj['status_flag'] = "Normal";
-        } else if (retObj['usage_data']['used_perc'] > osd_summary['near_full_ratio'] &&
-            retObj['usage_data']['used_perc'] < osd_summary['full_ratio']) {
-            retObj['status_flag'] = "Warning";
-        } else {
-            retObj['status_flag'] = "Critical";
-        }
+            retObj['status_data'] = [
+                {
+                    name: "Normal Ratio",
+                    status: "Normal",
+                    value: parseInt(osd_summary['near_full_ratio']),
+                    tooltip_data: [
+                        {
+                            lbl: "Range",
+                            value: '0 - ' + osd_summary['near_full_ratio'] + ' %'
+                        }
+                    ]
+                },
+                {
+                    name: "Near Full Ratio",
+                    status: "Warning",
+                    value: parseInt(osd_summary['full_ratio'] - osd_summary['near_full_ratio']),
+                    tooltip_data: [
+                        {
+                            lbl: "Range",
+                            value: osd_summary['near_full_ratio'] + ' - ' + osd_summary['full_ratio'] + ' %'
+                        }
+                    ]
+                },
+                {
+                    name: "Full Ratio",
+                    status: "Critical",
+                    value: parseInt(100 - osd_summary['full_ratio']),
+                    tooltip_data: [
+                        {
+                            lbl: "Range",
+                            value: osd_summary['full_ratio'] + ' - 100 %'
+                        }
+                    ]
+                }
+            ];
+
+            if (retObj['usage_data']['used_perc'] < osd_summary['near_full_ratio']) {
+                retObj['status_flag'] = "Normal";
+            } else if (retObj['usage_data']['used_perc'] > osd_summary['near_full_ratio'] &&
+                retObj['usage_data']['used_perc'] < osd_summary['full_ratio']) {
+                retObj['status_flag'] = "Warning";
+            } else {
+                retObj['status_flag'] = "Critical";
+            }
+        });
+
     }
     tenantStorageDashboardView.setClusterUsageData(retObj);
 }
@@ -376,8 +411,9 @@ function parseCephClusterDFData(result) {
 }
 
 function parseCephPoolsData(result) {
-    var gbUsedKeys = [];
-    var objectsKeys = [];
+    var gbUsedKeys = [],
+        objectsKeys = [],
+        replicaArr = [];
 
     if (result != null) {
         $.each(result, function(idx, item) {
@@ -388,7 +424,7 @@ function parseCephPoolsData(result) {
                 values1 = [],
                 values2 = [];
             obj1['label'] = 'GB Used';
-            obj1['value'] = parseFloat(byteToGB(item['stats']['bytes_used']));
+            obj1['value'] = parseFloat(byteToGB(item['stats']['bytes_used'] / item['size']));
             values1.push(obj1);
             key1['key'] = item['pool_name'];
             key1['values'] = values1;
@@ -400,10 +436,14 @@ function parseCephPoolsData(result) {
             key2['key'] = item['pool_name'];
             key2['values'] = values2;
             objectsKeys.push(key2);
+
+            replicaArr.push(item['size']);
         });
     }
     tenantStorageDashboardView.setPoolsBarGbData(gbUsedKeys);
     //tenantStorageDashboardView.setPoolsBarObjData(objectsKeys);
+
+    tenantStorageDashboardView.setClusterReplicaFactor(getMaxNumericValueInArray(replicaArr));
 }
 
 function parseOSDsStatusData(result) {
@@ -881,6 +921,7 @@ function usageDial() {
 
     this.refresh = function(data) {
         var clusterUsageObj = ifNull(data, tenantStorageDashboardView.getClusterUsageData());
+
         var usageData = clusterUsageObj['usage_perc_data'];
         var statusData = clusterUsageObj['status_data'];
         var statusFlag = clusterUsageObj['status_flag'];
@@ -890,7 +931,10 @@ function usageDial() {
 
         $("#df-used-perc").text(clusterUsageObj['usage_data']['used_perc'] + "%");
         $("#df-used").text(clusterUsageObj['usage_data']['total_used']);
-        $("#df-total").text(clusterUsageObj['usage_data']['total_space']);
+        //$("#df-total").text(clusterUsageObj['usage_data']['total_space']);
+        $("#df-available").text(clusterUsageObj['usage_data']['total_avail']);
+        $("#clusterReplicaFactor").text("Cluster Replication Factor: " +
+            tenantStorageDashboardView.getClusterReplicaFactor());
 
         this.usagePathGroup = this.usagePathGroup.data(this.pie(usageData));
         this.usagePathGroup.transition().duration(750).attrTween("d", usageArcTween);
@@ -1068,8 +1112,8 @@ function statusDataRefresh() {
     getClusterHealthStatus();
     //getClusterMonitorStatus();
     //getClusterDFStatus();
-    getClusterUsage();
     getClusterPools();
+    getClusterUsage();
     getOSDsStatus();
     getClusterDiskActivity();
 

@@ -143,6 +143,8 @@ function parseRootFromHost(rootJSON, hostJSON){
    for(q=0;q<rootCnt; q++) {
        var total_up_node =0;
        var total_down_node =0;
+       var total_warn_node =0;
+
        var chldCnt = rootJSON[q].children.length;
        for (i = 0; i < chldCnt; i++) {
            var chldId = rootJSON[q].children[i];
@@ -153,24 +155,34 @@ function parseRootFromHost(rootJSON, hostJSON){
                    rootJSON[q].children[i] = hostJSON[j];
                    var osdStatusJSON = jsonPath(hostJSON[j], "$.osds[*].status");
                    var osdCnt = osdStatusJSON.length
-                   var hostStatus = "up";
-
+                   var hostStatus = "warn";
+                   var osdUp = 0, osdDown = 0;
                    for (k = 0; k < osdCnt; k++) {
                        var osdStatus = osdStatusJSON[k];
                        if (osdStatus == "down") {
-                           hostStatus = "down";
+                           osdDown = osdDown+1;
+                       }else if(osdStatus=="up"){
+                           osdUp= osdUp+1;
                        }
+                   }
+                   if(osdDown == 0){
+                       hostStatus = "up";
+                   } else if(osdCnt ==osdDown){
+                       hostStatus = "down";
                    }
                    hostJSON[j].status = hostStatus;
                    if (hostStatus == "up") {
                        total_up_node = total_up_node + 1;
-                   } else {
+                   } else if (hostStatus == "warn") {
+                       total_warn_node = total_warn_node + 1;
+                   } else{
                        total_down_node = total_down_node + 1;
                    }
                }
            }
            rootJSON[q].total_node = chldCnt;
            rootJSON[q].total_up_node = total_up_node;
+           rootJSON[q].total_warn_node = total_warn_node;
            rootJSON[q].total_down_node = total_down_node;
        }
    }
