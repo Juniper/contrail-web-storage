@@ -85,20 +85,35 @@ function addStorageTabs() {
 
         this.updateStorageInfoBoxes = function(data) {
 
-            var diskBuckets;
-            var diskCnt = 0,
-                disks = [];
+            var diskBuckets,
+                monBuckets,
+                diskCnt = 0,
+                monCnt = 0;
+
             var storageCF = crossfilter(data);
             $.each(data, function(idx, obj) {
                 diskCnt += obj['osds'].length;
                 obj.diskCnt = obj['osds'].length;
+                if (obj.hasOwnProperty('monitor')) {
+                    if (!isEmptyObject(obj['monitor'])) {
+                        monCnt += 1;
+                        obj['monCnt'] = 1;
+                    }
+                }
             });
             diskBuckets = bucketizeCFData(storageCF, function(d) {
                 return d.diskCnt
             });
+            monBuckets = bucketizeCFData(storageCF, function(d) {
+                return d.monCnt;
+            })
             var sparklinesStorData = {
                 disks: {
                     title: 'Disks',
+                    data: []
+                },
+                mons: {
+                    title: 'Monitor',
                     data: []
                 }
             };
@@ -107,15 +122,27 @@ function addStorageTabs() {
                 sparklinesStorData['disks']['data'].push(val);
             });
 
+            $.each(ifNull(monBuckets['data'], []), function(key, val) {
+                sparklinesStorData['mons']['data'].push(val);
+            });
+
             $('#sparkLineStorageStats').html('');
             var sparkLineTemplate = contrail.getTemplate4Id('sparkline-template');
+
             var diskElem = $('<div></div>').html(sparkLineTemplate({
                 title: 'Disks',
                 totalCnt: diskCnt,
                 id: 'infobox-disks'
             }));
+            var monElem = $('<div></div>').html(sparkLineTemplate({
+                title: monCnt > 1 ? 'Monitors':'Monitor',
+                totalCnt: monCnt,
+                id: 'infobox-mons'
+            }));
 
             $('#sparkLineStorageStats').append(diskElem);
+            $('#sparkLineStorageStats').append(monElem);
+
             $.each(sparklinesStorData, function(key, val) {
                 drawSparkLineBar('#infobox-' + key + ' .sparkline', val);
             })
@@ -129,13 +156,37 @@ function addStorageTabs() {
 
                     div.transition().duration(10);
 
-                    div.html('<span class="lbl">' + parseInt(d.value) + '</span> Hosts with <span class="lbl">' + d.name + '</span> ' + sparklinesStorData.disks.title)
+                    div.html('<span class="lbl">' +
+                        '{0:</span> Host;</span> Hosts}'.newFormat(d.value) + ' with <span class="lbl">' +
+                        d.name + '</span> ' + sparklinesStorData.disks.title)
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 })
                 .on("mouseout", function(d) {
                     $('body').find('.nvtooltip').remove();
                 });
+
+            d3.select('#infobox-mons .sparkline')
+                .selectAll("rect")
+                .on("mouseover", function(d, i) {
+                    $('body').find('.nvtooltip').remove();
+                    var div = d3.select('body').append("div")
+                        .attr("class", "nvtooltip");
+
+                    div.transition().duration(10);
+
+                    div.html('<span class="lbl">' +
+                        '{0:</span> Host;</span> Hosts}'.newFormat(d.value) + ' with <span class="lbl">' +
+                        ('{0:</span> ' + sparklinesStorData.mons.title + ';</span> ' +
+                        sparklinesStorData.mons.title + 's }').newFormat(d.name))
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    $('body').find('.nvtooltip').remove();
+                });
+
+
         }
 
         infraDashboardView.addInfoBox({
