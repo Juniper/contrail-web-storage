@@ -266,16 +266,16 @@ function formatOsdSeriesLoadXMLData(resultJSON){
             results[i]['writes'] = Math.round(writes/count*100)/100;
 
             var reads_kbytes= resultJSON[i]['SUM(info_stats.read_kbytes)'];
-            results[i]['reads_kbytes'] = Math.round(reads_kbytes/count*100)/100;
+            results[i]['reads_kbytes'] = reads_kbytes/count;
 
             var writes_kbytes= resultJSON[i]['SUM(info_stats.write_kbytes)'];
-            results[i]['writes_kbytes'] = Math.round(writes_kbytes/count*100)/100;
+            results[i]['writes_kbytes'] = writes_kbytes/count;
 
             var op_r_latency = resultJSON[i]['SUM(info_stats.op_r_latency)'];
-            results[i]['op_r_latency'] = Math.round(op_r_latency/count*100)/100;
+            results[i]['op_r_latency'] = op_r_latency/count;
 
             var op_w_latency = resultJSON[i]['SUM(info_stats.op_w_latency)'];
-            results[i]['op_w_latency'] = Math.round(op_w_latency/count*100)/100;
+            results[i]['op_w_latency'] = op_w_latency/count;
         }
         return results;
     } catch (e) {
