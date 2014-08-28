@@ -304,6 +304,7 @@ function updateStorageChartsForSummary(dsData, nodeType) {
         }],
         xLbl: 'Available (%)',
         yLbl: 'Total Storage (GB)',
+        xLblFormat: d3.format('.02f'),
         chartOptions: {
             tooltipFn: storageChartUtils.storageNodeTooltipFn,
             clickFn: storageChartUtils.onStorageNodeDrillDown,

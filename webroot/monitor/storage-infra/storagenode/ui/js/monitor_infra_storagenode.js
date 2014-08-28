@@ -865,6 +865,7 @@ storageNodeView = function() {
                     return {
                         title: 'Disks',
                         xLbl: 'Available (%)',
+                        xLblFormat: d3.format('.02f'),
                         yLbl: 'Total Storage (GB)',
                         forceX: xscale,
                         forceY: yscale,

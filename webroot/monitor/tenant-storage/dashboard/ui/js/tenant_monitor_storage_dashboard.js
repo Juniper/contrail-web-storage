@@ -183,7 +183,8 @@ function tenantStorageDashboardClass() {
         $('#clusterActivityLatencyLabel').text('Latency');
         //End of Cluster Activity Charts
 
-        statusDataRefresh();
+        var init = true;
+        statusDataRefresh(init);
 
     }
     this.updateMonitorDashboard = function(ds) {
@@ -296,9 +297,19 @@ function parseClusterMonitorData(result) {
 }
 
 function parseClusterUsageData(data) {
-    var retObj = {};
+    var retObj = {},
+        proceedDefObj = $.Deferred();
+
     if (data != null) {
-        $.when(tenantStorageDashboardView.clusterReplicaDefrredObj).done(function() {
+        if(tenantStorageDashboardView.getClusterReplicaFactor() != null) {
+            proceedDefObj.resolve();
+        } else {
+            $.when(tenantStorageDashboardView.clusterReplicaDefrredObj).done(function() {
+                proceedDefObj.resolve();
+            });
+        }
+
+        $.when(proceedDefObj).done(function() {
             var replicaFactor = tenantStorageDashboardView.getClusterReplicaFactor();
 
             var osd_summary = data['usage_summary']['osd_summary'];
@@ -672,7 +683,7 @@ function getClusterUsage() {
     });
 }
 
-function getClusterPools() {
+function getClusterPools(defObj) {
     startWidgetLoading('dashPools')
     $.ajax({
         url: '/api/tenant/storage/cluster/pools/summary',
@@ -681,6 +692,8 @@ function getClusterPools() {
 
     }).done(function(response) {
         parseCephPoolsData(response['pools']);
+        if(defObj)
+            defObj.resolve();
 
     }).fail(function(result) {
         //flash error message;
@@ -1107,13 +1120,24 @@ function disksBarChart() {
     }
 }
 
-function statusDataRefresh() {
-
+function statusDataRefresh(init) {
+    /*
+     * first time request.
+     * before Cluster Usage request, replication factor needs to be calculated first.
+     * NOTE: same check is done in parse fn; but sometimes the event fails to catch leading to one more refresh cycle.
+     * Adding logic here makes sure the ajax call only goes after the other is resolved.
+     */
+    if(init) {
+        var defObj = $.Deferred();
+        getClusterPools(defObj);
+        $.when(defObj).done(function() {
+           getClusterUsage();
+        });
+    } else {
+        getClusterPools();
+        getClusterUsage();
+    }
     getClusterHealthStatus();
-    //getClusterMonitorStatus();
-    //getClusterDFStatus();
-    getClusterPools();
-    getClusterUsage();
     getOSDsStatus();
     getClusterDiskActivity();
 
