@@ -66,6 +66,7 @@ function addStorageTabs() {
                 var chartsData = {
                     title: 'Storage Nodes',
                     xLbl: 'Available (%)',
+                    xLblFormat: d3.format('.02f'),
                     yLbl: 'Total Storage (GB)',
                     chartOptions: {
                         xPositive: true,
