@@ -89,6 +89,7 @@ function parseStorageTopologyTree(osdJSON, callback){
             hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
             osdList.topology = parseRootFromHost(rootMap, hostMap);
             osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
+            osdList.cluster_status.monitor_count= monsJSON.length;
             callback(osdList);
         });
     }
