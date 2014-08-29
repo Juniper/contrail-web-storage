@@ -156,6 +156,11 @@ var infraMonitorStorageUtils = {
         clusterObj['nodeAlerts'] = infraMonitorStorageAlertUtils.processStorageHealthAlerts(result['cluster_status']);
         clusterObj['alerts'] = clusterObj['nodeAlerts'].sort(dashboardUtils.sortInfraAlerts);
         clusterObj['processAlerts'] = [];
+        /*
+        * total monitor count to display on the infobox.
+        * this includes monitor only and storage + monitor nodes.
+         */
+        clusterObj['monitor_count'] = result['cluster_status']['monitor_count'];
         //adding clusterObj to the top of the returned array
         retArr.unshift(clusterObj);
 
