@@ -81,18 +81,29 @@ function addStorageTabs() {
                 };
                 $('#storageNode-bubble').initScatterChart(chartsData);
             } else {}
-            self.updateStorageInfoBoxes(nodeData);
+            self.updateStorageInfoBoxes(data);
         }
 
         this.updateStorageInfoBoxes = function(data) {
+
+            var nodeData = [],
+                totMonCnt = 0;
+
+            $.map(data, function(val, idx) {
+                if (val['name'] != 'CLUSTER_HEALTH') {
+                    nodeData.push(val);
+                } else {
+                    totMonCnt = val['monitor_count'];
+                }
+            });
 
             var diskBuckets,
                 monBuckets,
                 diskCnt = 0,
                 monCnt = 0;
 
-            var storageCF = crossfilter(data);
-            $.each(data, function(idx, obj) {
+            var storageCF = crossfilter(nodeData);
+            $.each(nodeData, function(idx, obj) {
                 diskCnt += obj['osds'].length;
                 obj.diskCnt = obj['osds'].length;
                 if (obj.hasOwnProperty('monitor')) {
@@ -129,15 +140,17 @@ function addStorageTabs() {
 
             $('#sparkLineStorageStats').html('');
             var sparkLineTemplate = contrail.getTemplate4Id('sparkline-template');
-
             var diskElem = $('<div></div>').html(sparkLineTemplate({
                 title: 'Disks',
                 totalCnt: diskCnt,
                 id: 'infobox-disks'
             }));
-            var monElem = $('<div></div>').html(sparkLineTemplate({
+
+            var sparkLineMonTemplate = contrail.getTemplate4Id('sparkline-monitor-template');
+            var monElem = $('<div></div>').html(sparkLineMonTemplate({
                 title: monCnt > 1 ? 'Monitors':'Monitor',
                 totalCnt: monCnt,
+                monOnlyCnt: totMonCnt - monCnt,
                 id: 'infobox-mons'
             }));
 
@@ -187,6 +200,28 @@ function addStorageTabs() {
                     $('body').find('.nvtooltip').remove();
                 });
 
+            if($('#infoboxMonOnlyCnt').length) {
+                $('#infoboxMonCnt, #infoboxMonOnlyCnt').hover(
+                    function(event) {
+                        $('body').find('.nvtooltip').remove();
+                        var div = d3.select('body').append("div")
+                            .attr("class", "nvtooltip");
+                        div.transition().duration(10);
+
+                        var content = "Storage Node with Monitor";
+
+                        if (event.target.id == 'infoboxMonOnlyCnt')
+                            content = "Monitor only Node";
+
+                        div.html('<span class="lbl">' + content +'</span>')
+                            .style("left", (event.pageX) + "px")
+                            .style("top", (event.pageY - 50) + "px");
+
+                    }, function() {
+                        $('body').find('.nvtooltip').remove();
+                    }
+                );
+            }
 
         }
 
