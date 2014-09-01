@@ -260,10 +260,10 @@ function formatOsdSeriesLoadXMLData(resultJSON){
             results[i]['MessageTS'] = resultJSON[i]['T='];
             results[i]['sampleCnt'] = count;
             var reads = resultJSON[i]['SUM(info_stats.reads)'];
-            results[i]['reads'] =  Math.round(reads/count*100)/100;
+            results[i]['reads'] =  Math.ceil(reads/count);
 
             var writes= resultJSON[i]['SUM(info_stats.writes)'];
-            results[i]['writes'] = Math.round(writes/count*100)/100;
+            results[i]['writes'] = Math.ceil(writes/count);
 
             var reads_kbytes= resultJSON[i]['SUM(info_stats.read_kbytes)'];
             results[i]['reads_kbytes'] = reads_kbytes/count;
