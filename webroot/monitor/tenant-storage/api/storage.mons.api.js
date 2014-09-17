@@ -70,14 +70,15 @@ function parseMonitorDetails(name, resultJSON){
 
 function consolidateMonitors(resultJSON){
     var emptyObj = {};
-        var monJSON = {};
-        var monitor = jsonPath(resultJSON, "$..mons");
-        var monCnt= monitor.length;
+    var monJSON = {};
+    var monitor = jsonPath(resultJSON, "$..mons");
+    if(monitor != undefined && monitor.length > 0) {
+        var monCnt = monitor.length;
         var status = jsonPath(resultJSON, "$..health.overall_status")[0];
         monJSON['overall_status'] = status;
-        var details= jsonPath(resultJSON, "$..details");
+        var details = jsonPath(resultJSON, "$..details");
         monJSON['details'] = details;
-        if(monitor.length >2){
+        if (monitor.length > 2) {
             var monitors = monitor[0];
             monitors.merge(monitor[1]);
             monitors.merge(monitor[2]);
@@ -87,7 +88,7 @@ function consolidateMonitors(resultJSON){
             monitors.merge(monitor[1]);
             monitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
             monJSON['monitors'] = monitors;
-        }else if(monitor.length >1){
+        } else if (monitor.length > 1) {
             var monitors = monitor[0];
             monitors.merge(monitor[1]);
             var jsonstr = JSON.stringify(monitor[1]);
@@ -96,10 +97,11 @@ function consolidateMonitors(resultJSON){
             monitors.merge(monitor[1]);
             monitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
             monJSON['monitors'] = monitors;
-        }else{
+        } else {
             var monitors = monitor[0];
             monJSON['monitors'] = monitors;
         }
+    }
     return monJSON;
 }
 
@@ -150,7 +152,6 @@ function getStorageDiskFlowSeries (req, res, appData) {
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
     stMonUtils.executeQueryString(queryJSON,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
-
             resultJSON= formatFlowSeriesForDiskStats(resultJSON, timeObj, timeGran);
             commonUtils.handleJSONResponse(err, res, resultJSON);
         }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));

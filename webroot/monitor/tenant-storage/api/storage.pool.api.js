@@ -52,11 +52,13 @@ function getStoragePGPoolsSummary(req, res, appData){
 
 function parseStoragePGPoolsData(poolJSON){
     var resultJSON = {};
-    var pools= jsonPath(poolJSON[0],"$..pools")[0];
-    var odf= poolJSON[1];
-    var poolMapJSON = new Object();
-    poolMapJSON.pools= parsePoolsData(pools, odf);
-    resultJSON = poolMapJSON;
+        var pools = jsonPath(poolJSON[0], "$..pools");
+        if(pools != undefined && pools.length >0 ) {
+            var odf = poolJSON[1];
+            var poolMapJSON = new Object();
+            poolMapJSON.pools = parsePoolsData(pools[0], odf);
+            resultJSON = poolMapJSON;
+        }
     return resultJSON;
 }
 

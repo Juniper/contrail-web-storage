@@ -199,25 +199,27 @@ function getStorageClusterOSDActivity(req, res,appData){
     selectArr.push("T="+intervalSecs);
 
     processSources(res, appData, function(error,res,sourceJSON){
-        var count = sourceJSON.length;
-        for (i = 0; i < count; i += 1) {
-            var whereClauseArray=[];
-            whereClauseArray.push(createClause('Source', sourceJSON[i], 1));
-            whereClause.push(whereClauseArray);
-        }
+        if (sourceJSON != undefined && sourceJSON.length > 0) {
+            var count = sourceJSON.length;
+            for (i = 0; i < count; i += 1) {
+                var whereClauseArray = [];
+                whereClauseArray.push(createClause('Source', sourceJSON[i], 1));
+                whereClause.push(whereClauseArray);
+            }
 
-        var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
-        var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
-        var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
-        delete queryJSON['limit'];
-        delete queryJSON['dir'];
-        var selectEleCnt = queryJSON['select_fields'].length;
-        queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-        stMonUtils.executeQueryString(queryJSON,
-            commonUtils.doEnsureExecution(function(err, resultJSON)  {
-                resultJSON= parseStorageClusterOSDActivityData(resultJSON, timeObj, timeGran,sourceJSON, intervalSecs);
-                commonUtils.handleJSONResponse(err, res, resultJSON);
-            }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+            var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+            var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+            var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+            delete queryJSON['limit'];
+            delete queryJSON['dir'];
+            var selectEleCnt = queryJSON['select_fields'].length;
+            queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+            stMonUtils.executeQueryString(queryJSON,
+                commonUtils.doEnsureExecution(function (err, resultJSON) {
+                    resultJSON = parseStorageClusterOSDActivityData(resultJSON, timeObj, timeGran, sourceJSON, intervalSecs);
+                    commonUtils.handleJSONResponse(err, res, resultJSON);
+                }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+        }
     });
 }
 
