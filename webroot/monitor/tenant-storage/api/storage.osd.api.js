@@ -109,8 +109,8 @@ function parseStorageOSDSummary(osdJSON, callback){
     var osdDump= osdJSON[2];
     var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
-    
-    if (osds.length > 0) {
+
+    if (osds != undefined && osds.length > 0) {
         var osdMapJSON = new Object();
         parseOSDFromPG(osds,osdPG);
         parseOSDFromDump(osds,osdDump);
@@ -235,7 +235,7 @@ function parseStorageOSDTree(osdJSON, callback){
     var rootMap = jsonPath(osdTree, "$..nodes[?(@.type=='root')]");
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
     var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
-    if (osds.length > 0) {
+    if (osds != undefined && osds.length > 0) {
         var osdName='undefined';
         for(i=0; i < osds.length;i++){
             if(osds[i].status == "up"){
@@ -413,8 +413,7 @@ function getStorageOSDFlowSeries (req, res, appData) {
 }
 
 
-function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran,osdName)
-{
+function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran,osdName){
     var len = 0, secTime;
     var resultJSON = {};
     if(storageFlowSeriesData != undefined && storageFlowSeriesData['value']!= undefined && storageFlowSeriesData['value'].length > 0) {
@@ -443,19 +442,21 @@ function formatOsdSeriesLoadXMLData (resultJSON)
     var results = [];
     var counter = 0,secTime;
     try {
-        resultJSON = resultJSON['value'];
-        counter = resultJSON.length;
-       for (var i = 0; i < counter; i++) {
-            results[i] = {};
-            secTime = Math.floor(resultJSON[i]['T'] / 1000);
-            results[i]['date']= new Date(secTime);
-            results[i]['MessageTS'] = resultJSON[i]['T'];
-            results[i]['reads'] = resultJSON[i]['info_stats.reads'];
-            results[i]['writes'] = resultJSON[i]['info_stats.writes'];
-            results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
-            results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
-            results[i]['op_r_latency'] = resultJSON[i]['info_stats.op_r_latency'];
-            results[i]['op_w_latency'] = resultJSON[i]['info_stats.op_w_latency'];
+        if(resultJSON != undefined && resultJSON['value']!= undefined && resultJSON['value'].length > 0) {
+            resultJSON = resultJSON['value'];
+            counter = resultJSON.length;
+            for (var i = 0; i < counter; i++) {
+                results[i] = {};
+                secTime = Math.floor(resultJSON[i]['T'] / 1000);
+                results[i]['date'] = new Date(secTime);
+                results[i]['MessageTS'] = resultJSON[i]['T'];
+                results[i]['reads'] = resultJSON[i]['info_stats.reads'];
+                results[i]['writes'] = resultJSON[i]['info_stats.writes'];
+                results[i]['reads_kbytes'] = resultJSON[i]['info_stats.read_kbytes'];
+                results[i]['writes_kbytes'] = resultJSON[i]['info_stats.write_kbytes'];
+                results[i]['op_r_latency'] = resultJSON[i]['info_stats.op_r_latency'];
+                results[i]['op_w_latency'] = resultJSON[i]['info_stats.op_w_latency'];
+            }
         }
         return results;
     } catch (e) {
@@ -476,6 +477,7 @@ function getStorageOSDAvgBW(req, res,appData){
 function parseStorageOSDAvgBW(osdName, source, callback){
     var sampleCnt = 10, minsSince = 30, endTime ='now';
     var intervalSecs = 3600;
+    var emptyObj = {};
 
     var tableName, whereClause=[],
         selectArr = ["name", "uuid", "SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
@@ -500,8 +502,12 @@ function parseStorageOSDAvgBW(osdName, source, callback){
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
     stMonUtils.executeQueryString(queryJSON,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
-            resultJSON= formatOsdAvgBWLoadXMLData(resultJSON);
-            callback(resultJSON[0]);
+            if(resultJSON !== 'undefined') {
+                resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
+                callback(resultJSON[0]);
+            }else{
+                callback(emptyObj);
+            }
         }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
 }
 

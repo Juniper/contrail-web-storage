@@ -74,7 +74,7 @@ function parseStorageTopologyTree(osdJSON, callback){
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
     var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     var monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
-    if (osds.length > 0) {
+    if (osds != undefined && osds.length > 0) {
         var osdName='undefined';
         for(i=0; i < osds.length;i++){
             if(osds[i].status == "up"){
