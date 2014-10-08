@@ -194,6 +194,7 @@ cephOSDsView = function() {
                         onExpand: function(e, dc) {
 
                         },
+
                         onCollapse: function(e, dc) {
 
                         }
@@ -324,7 +325,7 @@ function updateDisksChart(data) {
             xPositive: true,
             tooltipFn: tenantStorageChartUtils.diskTooltipFn,
             clickFn: tenantStorageChartUtils.onDiskDrillDown,
-            addDomainBuffer: true,
+            addDomainBuffer: true
         },
         d: data
     };
