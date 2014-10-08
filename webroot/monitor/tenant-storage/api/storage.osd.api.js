@@ -107,13 +107,14 @@ function parseStorageOSDSummary(osdJSON, callback){
     var osdPG= osdJSON[0];
     var osdTree= osdJSON[1];
     var osdDump= osdJSON[2];
-    var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
+    var osds = jsonPath(osdDump, "$..osds");
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
 
     if (osds != undefined && osds.length > 0) {
         var osdMapJSON = new Object();
+        var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
+        osds=parseOSDFromTree(osdDump,tOSDs);
         parseOSDFromPG(osds,osdPG);
-        parseOSDFromDump(osds,osdDump);
         appendHostToOSD(osds,hostMap);
         getAvgBWHostToOSD(osds,hostMap, function(osds){
             osdMapJSON["osds"]= osds;
@@ -123,6 +124,64 @@ function parseStorageOSDSummary(osdJSON, callback){
 
     }
     return emptyObj;
+}
+
+function parseOSDFromTree(osdDump, osdTree){
+    var osds = jsonPath(osdDump, "$..osds")[0];
+    var nodeCnt= osds.length;
+    var osdList=[];
+    var osdDumpCnt = jsonPath(osdDump,"$.output.osds.length")[0];
+
+    for (i = 0; i < nodeCnt; i++) {
+        var treeId=osdTree[i].id;
+        for(j=0; j< osdDumpCnt; j++){
+            var dumpOSDId= jsonPath(osdDump,"$.output.osds["+j+"].osd")[0];
+            var temp = new Object();
+            if( treeId == dumpOSDId){
+                var status= osdTree[i].status;
+                temp['status'] = osdTree[i].status;
+                temp['name'] = osdTree[i].name;
+                temp['exists'] = osdTree[i].exists;
+                temp['type_id'] = osdTree[i].type_id;
+                temp['reweight'] = osdTree[i].reweight;
+                temp['crush_weight'] = osdTree[i].crush_weight;
+                temp['depth'] = osdTree[i].depth;
+                temp['type'] = osdTree[i].type;
+                temp['id'] = osdTree[i].id;
+
+                temp['heartbeat_back_addr']=jsonPath(osdDump,"$.output.osds["+j+"].heartbeat_back_addr")[0];
+                temp['heartbeat_front_addr']=jsonPath(osdDump, "$.output.osds["+j+"].heartbeat_front_addr")[0];
+                temp['public_addr']=jsonPath(osdDump, "$.output.osds["+j+"].public_addr")[0];
+                temp['cluster_addr']=jsonPath(osdDump, "$.output.osds["+j+"].cluster_addr")[0];
+                temp['uuid']=jsonPath(osdDump, "$.output.osds["+j+"].uuid")[0];
+                temp['down_at']=jsonPath(osdDump, "$.output.osds["+j+"].down_at")[0];
+                temp['up_from']=jsonPath(osdDump, "$.output.osds["+j+"].up_from")[0];
+                temp['lost_at']=jsonPath(osdDump, "$.output.osds["+j+"].lost_at")[0];
+                temp['up_thru']=jsonPath(osdDump, "$.output.osds["+j+"].up_thru")[0];
+                custer_status= jsonPath(osdDump, "$.output.osds["+i+"].in")[0]
+
+                if(custer_status==1){
+                    temp['cluster_status']='in';
+                }else{
+                    temp['cluster_status']='out';
+                }
+                temp['up']=jsonPath(osdDump, "$.output.osds["+i+"].up")[0];
+                temp['in']=custer_status;
+                temp['state']=jsonPath(osdDump, "$.output.osds["+i+"].state")[0];
+                temp['last_clean_begin']=jsonPath(osdDump, "$.output.osds["+i+"].last_clean_begin")[0];
+                temp['last_clean_end']=jsonPath(osdDump, "$.output.osds["+i+"].last_clean_end")[0];
+
+                var dumpOSDId= jsonPath(osdDump,"$.output.osd_xinfo["+j+"].osd")[0];
+                if( treeId == dumpOSDId){
+                    temp['osd_xinfo']=jsonPath(osdDump,"$.output.osd_xinfo["+j+"]")[0];
+
+                }
+                osdList.push(temp);
+            }
+        }
+
+    }
+    return osdList;
 }
 
 function appendHostToOSD(osds,hostJSON){
@@ -488,6 +547,7 @@ function parseStorageOSDAvgBW(osdName, source, callback){
 
 
     var name = source +":"+osdName;
+    console.log(name);
 
     whereClause = [
         {'Source':source},
@@ -502,7 +562,7 @@ function parseStorageOSDAvgBW(osdName, source, callback){
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
     stMonUtils.executeQueryString(queryJSON,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
-            if(resultJSON !== 'undefined') {
+            if(resultJSON !== 'undefined' && resultJSON.length > 0) {
                 resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
                 callback(resultJSON[0]);
             }else{
