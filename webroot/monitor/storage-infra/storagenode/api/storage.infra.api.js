@@ -72,17 +72,19 @@ function parseStorageTopologyTree(osdJSON, callback){
 
     var rootMap = jsonPath(osdTree, "$..nodes[?(@.type=='root')]");
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
-    var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
+    var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
+    var osds = jsonPath(osdDump, "$..osds");
     var monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
     if (osds != undefined && osds.length > 0) {
         var osdName='undefined';
-        for(i=0; i < osds.length;i++){
-            if(osds[i].status == "up"){
-                osdName= osds[i].name;
+        for(i=0; i < tOSDs.length;i++){
+            if(tOSDs[i].status == "up"){
+                osdName= tOSDs[i].name;
                 break;
             }
         }
         osdApi.parseOSDVersion(osdName, function(version) {
+            osds=osdApi.parseOSDFromTree(osdDump,tOSDs);
             osdApi.parseOSDFromPG(osds, osdPG);
             osdApi.parseOSDFromDump(osds, osdDump);
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
