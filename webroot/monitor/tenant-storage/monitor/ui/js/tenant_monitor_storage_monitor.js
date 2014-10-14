@@ -178,7 +178,7 @@ cephMonitorView = function () {
                                     ];
                                     var detailsTmpl = contrail.getTemplate4Id('monitor-grid-details-template');
                                     $(e.detailRow).html(detailsTmpl({d:detailsInfo}));
-                                    $("#gridMonitors").data('contrailGrid').adjustDetailRowHeight(dc.cgrid);
+                                    $("#gridMonitors").data('contrailGrid').adjustDetailRowHeight(dc.id);
                                 }, 1000);
                         },
                         onExpand: function(e,dc) {
