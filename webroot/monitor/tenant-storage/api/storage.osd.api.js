@@ -619,7 +619,7 @@ exports.getStorageOSDStatus=getStorageOSDStatus;
 exports.getStorageOSDTree=getStorageOSDTree;
 exports.getStorageOSDDetails=getStorageOSDDetails;
 exports.getOSDVersion = getOSDVersion;
-
+exports.parseOSDFromTree=parseOSDFromTree;
 exports.parseOSDVersion=parseOSDVersion;
 exports.parseOSDFromPG = parseOSDFromPG;
 exports.parseOSDFromDump= parseOSDFromDump;
