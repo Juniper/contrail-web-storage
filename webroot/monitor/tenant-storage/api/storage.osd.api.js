@@ -291,19 +291,22 @@ function parseStorageOSDTree(osdJSON, callback){
     var osdPG= osdJSON[0];
     var osdTree= osdJSON[1];
     var osdDump= osdJSON[2];
-    var rootMap = jsonPath(osdTree, "$..nodes[?(@.type=='root')]");
+    var rootMap = jsonPath(osdTree, "$..nodes[?(@.name=='default')]");
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
-    var osds = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
+    var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
+    var osds = jsonPath(osdDump, "$..osds");
+
     if (osds != undefined && osds.length > 0) {
         var osdName='undefined';
-        for(i=0; i < osds.length;i++){
-            if(osds[i].status == "up"){
-                osdName= osds[i].name;
+        for(i=0; i < tOSDs.length;i++){
+            if(tOSDs[i].status == "up"){
+                osdName= tOSDs[i].name;
                 break;
             }
         }
         parseOSDVersion(osdName, function(version){
             var osdMapJSON = new Object();
+            osds=parseOSDFromTree(osdDump,tOSDs);
             parseOSDFromPG(osds,osdPG);
             parseOSDFromDump(osds,osdDump);
             getAvgBWHostToOSD(osds,hostMap, function(osds){
@@ -396,11 +399,10 @@ function parseOSDFromDump(osdTree, osdDump){
                 osdTree[i]['lost_at']=jsonPath(osdDump, "$.output.osds["+j+"].lost_at")[0];
                 osdTree[i]['up_thru']=jsonPath(osdDump, "$.output.osds["+j+"].up_thru")[0];
                 custer_status= jsonPath(osdDump, "$.output.osds["+i+"].in")[0]
-           
-                if(custer_status==1){
-                     osdTree[i]['cluster_status']='in';
-                }else{
-                     osdTree[i]['cluster_status']='out';
+                if (custer_status == 1) {
+                    osdTree[i]['cluster_status'] = 'in';
+                } else {
+                    osdTree[i]['cluster_status'] = 'out';
                 }
                 osdTree[i]['up']=jsonPath(osdDump, "$.output.osds["+i+"].up")[0];
                 osdTree[i]['in']=custer_status;
