@@ -188,7 +188,7 @@ cephOSDsView = function() {
                                     d: detailsInfo,
                                     detailLink: moreLink
                                 }));
-                                $("#gridOSDs").data('contrailGrid').adjustDetailRowHeight(dc.cgrid);
+                                $("#gridOSDs").data('contrailGrid').adjustDetailRowHeight(dc.id);
                             }, 1000);
                         },
                         onExpand: function(e, dc) {
