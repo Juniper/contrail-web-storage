@@ -86,7 +86,6 @@ function parseStorageTopologyTree(osdJSON, callback){
         osdApi.parseOSDVersion(osdName, function(version) {
             osds=osdApi.parseOSDFromTree(osdDump,tOSDs);
             osdApi.parseOSDFromPG(osds, osdPG);
-            osdApi.parseOSDFromDump(osds, osdDump);
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
             hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
             osdList.topology = parseRootFromHost(rootMap, hostMap);
