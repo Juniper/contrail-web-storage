@@ -158,18 +158,17 @@ function parseOSDFromTree(osdDump, osdTree){
                 temp['up_from']=jsonPath(osdDump, "$.output.osds["+j+"].up_from")[0];
                 temp['lost_at']=jsonPath(osdDump, "$.output.osds["+j+"].lost_at")[0];
                 temp['up_thru']=jsonPath(osdDump, "$.output.osds["+j+"].up_thru")[0];
-                custer_status= jsonPath(osdDump, "$.output.osds["+i+"].in")[0]
-
-                if(custer_status==1){
+                var custer_status= jsonPath(osdDump, "$.output.osds["+j+"].in")[0];
+                if(custer_status=="1"){
                     temp['cluster_status']='in';
                 }else{
                     temp['cluster_status']='out';
                 }
-                temp['up']=jsonPath(osdDump, "$.output.osds["+i+"].up")[0];
-                temp['in']=custer_status;
-                temp['state']=jsonPath(osdDump, "$.output.osds["+i+"].state")[0];
-                temp['last_clean_begin']=jsonPath(osdDump, "$.output.osds["+i+"].last_clean_begin")[0];
-                temp['last_clean_end']=jsonPath(osdDump, "$.output.osds["+i+"].last_clean_end")[0];
+                temp['up']=jsonPath(osdDump, "$.output.osds["+j+"].up")[0];
+                temp['in']=jsonPath(osdDump, "$.output.osds["+j+"].in")[0];
+                temp['state']=jsonPath(osdDump, "$.output.osds["+j+"].state")[0];
+                temp['last_clean_begin']=jsonPath(osdDump, "$.output.osds["+j+"].last_clean_begin")[0];
+                temp['last_clean_end']=jsonPath(osdDump, "$.output.osds["+j+"].last_clean_end")[0];
 
                 var dumpOSDId= jsonPath(osdDump,"$.output.osd_xinfo["+j+"].osd")[0];
                 if( treeId == dumpOSDId){
@@ -308,7 +307,6 @@ function parseStorageOSDTree(osdJSON, callback){
             var osdMapJSON = new Object();
             osds=parseOSDFromTree(osdDump,tOSDs);
             parseOSDFromPG(osds,osdPG);
-            parseOSDFromDump(osds,osdDump);
             getAvgBWHostToOSD(osds,hostMap, function(osds){
                 hostMap = parseHostFromOSD(hostMap,osds, version, true);
                 osdMapJSON["osd_tree"]= parseRootFromHost(rootMap,hostMap,true);
@@ -377,45 +375,6 @@ function parseOSDFromPG(osdTree, osdPG ){
                 osdTree[i]['fs_perf_stat']=jsonPath(osdPG, "$.output["+j+"].fs_perf_stat")[0];
             }   
         }
-    }
-    return osdTree;
-}
-
-function parseOSDFromDump(osdTree, osdDump){
-    var nodeCnt= osdTree.length;
-    var osdDumpCnt = jsonPath(osdDump,"$.output.osds.length")[0];
-    for (i = 0; i < nodeCnt; i++) {
-        var treeId=osdTree[i].id;
-        for(j=0; j< osdDumpCnt; j++){
-            var dumpOSDId= jsonPath(osdDump,"$.output.osds["+j+"].osd")[0];
-            if( treeId == dumpOSDId){
-                osdTree[i]['heartbeat_back_addr']=jsonPath(osdDump,"$.output.osds["+j+"].heartbeat_back_addr")[0];
-                osdTree[i]['heartbeat_front_addr']=jsonPath(osdDump, "$.output.osds["+j+"].heartbeat_front_addr")[0];
-                osdTree[i]['public_addr']=jsonPath(osdDump, "$.output.osds["+j+"].public_addr")[0];
-                osdTree[i]['cluster_addr']=jsonPath(osdDump, "$.output.osds["+j+"].cluster_addr")[0];
-                osdTree[i]['uuid']=jsonPath(osdDump, "$.output.osds["+j+"].uuid")[0];
-                osdTree[i]['down_at']=jsonPath(osdDump, "$.output.osds["+j+"].down_at")[0];
-                osdTree[i]['up_from']=jsonPath(osdDump, "$.output.osds["+j+"].up_from")[0];
-                osdTree[i]['lost_at']=jsonPath(osdDump, "$.output.osds["+j+"].lost_at")[0];
-                osdTree[i]['up_thru']=jsonPath(osdDump, "$.output.osds["+j+"].up_thru")[0];
-                custer_status= jsonPath(osdDump, "$.output.osds["+i+"].in")[0]
-                if (custer_status == 1) {
-                    osdTree[i]['cluster_status'] = 'in';
-                } else {
-                    osdTree[i]['cluster_status'] = 'out';
-                }
-                osdTree[i]['up']=jsonPath(osdDump, "$.output.osds["+i+"].up")[0];
-                osdTree[i]['in']=custer_status;
-                osdTree[i]['state']=jsonPath(osdDump, "$.output.osds["+i+"].state")[0];
-                osdTree[i]['last_clean_begin']=jsonPath(osdDump, "$.output.osds["+i+"].last_clean_begin")[0];
-                osdTree[i]['last_clean_end']=jsonPath(osdDump, "$.output.osds["+i+"].last_clean_end")[0];
-            }   
-            var dumpOSDId= jsonPath(osdDump,"$.output.osd_xinfo["+j+"].osd")[0];
-            if( treeId == dumpOSDId){
-                osdTree[i]['osd_xinfo']=jsonPath(osdDump,"$.output.osd_xinfo["+j+"]")[0];
-            }
-        }
-
     }
     return osdTree;
 }
@@ -622,7 +581,6 @@ exports.getOSDVersion = getOSDVersion;
 exports.parseOSDFromTree=parseOSDFromTree;
 exports.parseOSDVersion=parseOSDVersion;
 exports.parseOSDFromPG = parseOSDFromPG;
-exports.parseOSDFromDump= parseOSDFromDump;
 exports.parseHostFromOSD=parseHostFromOSD;
 exports.parseRootFromHost=parseRootFromHost;
 exports.getStorageOSDFlowSeries= getStorageOSDFlowSeries;
