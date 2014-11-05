@@ -70,7 +70,7 @@ function parseStorageTopologyTree(osdJSON, callback){
     var osdDump= osdJSON[2];
     var status= osdJSON[3];
 
-    var rootMap = jsonPath(osdTree, "$..nodes[?(@.type=='root')]");
+    var rootMap = jsonPath(osdTree, "$..nodes[?(@.name=='default')]");
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
     var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     var osds = jsonPath(osdDump, "$..osds");
@@ -131,14 +131,47 @@ function getStorageTopologyDetails(req, res, appData){
 }
 
 function parseStorageTopologyDetails(name, resultJSON, callback){
-
-    parseStorageTopologyTree(resultJSON, function(resultJSON){
+    parseStorageTopologyTreeDetails(name,resultJSON, function(resultJSON){
         var hDetails = jsonPath(resultJSON, "$..hosts[?(@.name=='"+name+"')]")[0];
         var hJSON = {};
         hJSON['host_details'] = hDetails;
         callback(hJSON);
     });
 }
+
+function parseStorageTopologyTreeDetails(name,osdJSON, callback){
+    var osdList={};
+    var osdPG= osdJSON[0];
+    var osdTree= osdJSON[1];
+    var osdDump= osdJSON[2];
+    var status= osdJSON[3];
+
+    var rootMap = jsonPath(osdTree, "$..nodes[?(@.name=='default')]");
+    var hostMap = jsonPath(osdTree, "$..nodes[?(@.name=='"+name+"')]");
+    var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
+    var osds = jsonPath(osdDump, "$..osds");
+    var monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
+    if (osds != undefined && osds.length > 0) {
+        var osdName='undefined';
+        for(i=0; i < tOSDs.length;i++){
+            if(tOSDs[i].status == "up"){
+                osdName= tOSDs[i].name;
+                break;
+            }
+        }
+        osdApi.parseOSDVersion(osdName, function(version) {
+            osds=osdApi.parseOSDFromTree(osdDump,tOSDs);
+            osdApi.parseOSDFromPG(osds, osdPG);
+            hostMap = parseMonitorWithHost(monsJSON, hostMap);
+            hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
+            osdList.topology = parseRootFromHost(rootMap, hostMap);
+            osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
+            osdList.cluster_status.monitor_count= monsJSON.length;
+            callback(osdList);
+        });
+    }
+}
+
 
 function parseRootFromHost(rootJSON, hostJSON){
    var rootCnt = rootJSON.length;
