@@ -56,20 +56,6 @@
     </item>
 
     <item>
-        <url>/api/admin/monitor/infrastructure/storagenodes/summary</url>
-        <method>get</method>
-        <feature>storage</feature>
-        <callback>storageInfraApi.getStorageTopology</callback>
-    </item>
-    <!-- queryString ...details?hostname= -->
-     <item>
-        <url>/api/admin/monitor/infrastructure/storagenodes/details</url>
-        <method>get</method>
-        <feature>storage</feature>
-        <callback>storageInfraApi.getStorageTopologyDetails</callback>
-    </item>
-
-    <item>
         <url>/api/tenant/storage/cluster/hosts</url>
         <method>get</method>
         <feature>storage</feature>
