@@ -6,22 +6,21 @@
   <!-- Define module name here which is being referenced in the generated 
        file
    -->
-   <require>
+    <require>
        <define>parseJobsReq</define>
        <path>process.mainModule.exports["corePath"] + '/src/serverroot/common/parseJobsRequire'</path>
-  </require>
+    </require>
 
 
-  <require>
+    <require>
       <define>jobsProcess</define>
       <path>../../../common/api/storage.jobsProcess.api</path>
-  </require>
+    </require>
 
      <!-- Storage cluster status -->
-  <item>
-    <jobName>getStorageClusterStatus</jobName>
-    <callback>processStorageClusterStatusRequestByJob</callback>
-  </item>
-
-</jobLists>
+    <item>
+        <jobName>getStorageSummary</jobName>
+        <callback>processStorageSummaryRequestByJob</callback>
+    </item>
+ </jobLists>
 
