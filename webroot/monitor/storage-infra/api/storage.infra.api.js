@@ -1,18 +1,20 @@
 /*
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
-var storageApi= require('../../../../common/api/storage.api.constants');
-var 
+var storageApi= require('../../../common/api/storage.api.constants');
+var storageGlobal = require('../../../common/config/storage.global');
+var cacheApi = require(process.mainModule.exports["corePath"] +
+    '/src/serverroot/web/core/cache.api'),
     commonUtils = require(process.mainModule.exports["corePath"]  +
                     '/src/serverroot/utils/common.utils'),
-    storageRest= require('../../../../common/api/storage.rest.api'),
+    storageRest= require('../../../common/api/storage.rest.api'),
     global = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/global'),
     config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
-    osdApi= require('../../../tenant-storage/api/storage.osd.api'),
-    monsApi= require('../../../tenant-storage/api/storage.mons.api'),
-    dashApi= require('../../../tenant-storage/api/storage.dashboard.api'),
+    osdApi= require('../../tenant-storage/api/storage.osd.api'),
+    monsApi= require('../../tenant-storage/api/storage.mons.api'),
+    dashApi= require('../../tenant-storage/api/storage.dashboard.api'),
     storageInfraApi = module.exports;
 
 var  expireTime= storageApi.expireTimeSecs;
@@ -21,6 +23,27 @@ var redis = require("redis"),
     redisServerPort = (config.redis_server_port) ? config.redis_server_port : global.DFLT_REDIS_SERVER_PORT,
     redisServerIP = (config.redis_server_ip) ? config.redis_server_ip : global.DFLT_REDIS_SERVER_IP,
     redisClient = redis.createClient(redisServerPort, redisServerIP);
+
+
+function getStorageSummary (req, res, appData)
+{
+    var url = '/rawList';
+    var forceRefresh = req.param('forceRefresh');
+    var key = storageGlobal.STR_GET_STORAGE_SUMMARY;
+    var objData = {};
+
+    if (null == forceRefresh) {
+        forceRefresh = false;
+    } else {
+        forceRefresh = true;
+    }
+    cacheApi.queueDataFromCacheOrSendRequest(req, res,
+        storageGlobal.STR_JOB_TYPE_CACHE, key,
+        url, 0, 0, 0,
+        storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME,
+        forceRefresh, null);
+}
+
 
 function getTopologyURLs(appData){
     var dataObjArr = [];
@@ -230,6 +253,9 @@ function parseRootFromHost(rootJSON, hostJSON){
 /* List all public functions */
 exports.getStorageTopology = getStorageTopology;
 exports.getStorageTopologyDetails= getStorageTopologyDetails;
+exports.getStorageSummary= getStorageSummary;
+exports.processStorageTopologyRawList= processStorageTopologyRawList;
+exports.parseStorageTopologyTree=parseStorageTopologyTree;
 
 
 
