@@ -33,10 +33,21 @@ var redis = require("redis"),
 
 function getStorageJobClusterStatus(req, res ){
     url = storageApi.url.status;//"/status";
-    logutils.logger.debug("get data:"+url);
-    cacheApi.queueDataFromCacheOrSendRequest(req, res, storageGlobal.STR_JOB_TYPE_CACHE,
-        storageGlobal.STR_STORAGE_TYPE_CLUSTER, url,
-                                             0, 1, 0, -1, true, null);
+
+    var forceRefresh = req.param('forceRefresh');
+    var key = storageGlobal.STR_STORAGE_TYPE_CLUSTER;
+    var objData = {};
+
+    if (null == forceRefresh) {
+        forceRefresh = false;
+    } else {
+        forceRefresh = true;
+    }
+    cacheApi.queueDataFromCacheOrSendRequest(req, res,
+        storageGlobal.STR_JOB_TYPE_CACHE, key,
+        url, 0, 0, 0,
+        storageGlobal.STORAGE_STATUS_JOB_REFRESH_TIME,
+        forceRefresh, null);
 }
 
 function getStorageClusterHealthStatus(req, res, appData){

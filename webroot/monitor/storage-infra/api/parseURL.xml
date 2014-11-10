@@ -34,10 +34,17 @@
     </item>
 
     <item>
+        <url>/api/monitor/infrastructure/storagenodes/summary</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageInfraApi.getStorageSummary</callback>
+    </item>
+
+    <item>
         <url>/api/admin/monitor/infrastructure/storagenodes/summary</url>
         <method>get</method>
         <feature>storage</feature>
-        <callback>storageInfraApi.getStorageTopology</callback>
+        <callback>storageInfraApi.getStorageSummary</callback>
     </item>
     <!-- queryString ...details?hostname= -->
      <item>
