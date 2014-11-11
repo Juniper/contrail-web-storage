@@ -101,6 +101,15 @@ function getStorageOSDSummary(req, res, appData){
     });
 }
 
+function getStorageOSDTree(req, res, appData){
+    processStorageOSDList(res, appData, function(error,res,data){
+        parseStorageOSDTree(data, function(resultJSON){
+            commonUtils.handleJSONResponse(error, res, resultJSON);
+        });
+    });
+
+}
+
 function parseStorageOSDSummary(osdJSON, callback){
     var emptyObj = {};  
     var osdList={};
@@ -380,14 +389,7 @@ function parseHostFromOSD(hostJSON,osdsJSON, version, treeReplace) {
     return hostJSON;
 }
 
-function getStorageOSDTree(req, res, appData){
-    processStorageOSDList(res, appData, function(error,res,data){
-        parseStorageOSDTree(data, function(resultJSON){
-            commonUtils.handleJSONResponse(error, res, resultJSON);
-        });
-    });
 
-}
 
 function parseStorageOSDTree(osdJSON, callback){
     var emptyObj = {};
@@ -409,15 +411,13 @@ function parseStorageOSDTree(osdJSON, callback){
             }
         }
         parseOSDVersion(osdName, function(version){
-            var osdMapJSON = new Object();
-            osds=parseOSDFromTree(osdDump,tOSDs);
-            parseOSDFromPG(osds,osdPG);
-            getAvgBWHostToOSD(osds,hostMap, function(osds){
-                hostMap = parseHostFromOSD(hostMap,osds, version, true);
-                osdMapJSON["osd_tree"]= parseRootFromHost(rootMap,hostMap,true);
-                osdList= osdMapJSON;
-                callback(osdList);
-            });
+        var osdMapJSON = new Object();
+        osds=parseOSDFromTree(osdDump,tOSDs);
+        parseOSDFromPG(osds,osdPG);
+        hostMap = parseHostFromOSD(hostMap,osds, version, true);
+        osdMapJSON["osd_tree"]= parseRootFromHost(rootMap,hostMap,true);
+        osdList= osdMapJSON;
+        callback(osdList);
        });
     }
 }
