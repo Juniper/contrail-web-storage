@@ -412,12 +412,11 @@ function parseStorageOSDTree(osdJSON, callback){
             var osdMapJSON = new Object();
             osds=parseOSDFromTree(osdDump,tOSDs);
             parseOSDFromPG(osds,osdPG);
-            getAvgBWHostToOSD(osds,hostMap, function(osds){
-                hostMap = parseHostFromOSD(hostMap,osds, version, true);
-                osdMapJSON["osd_tree"]= parseRootFromHost(rootMap,hostMap,true);
-                osdList= osdMapJSON;
-                callback(osdList);
-            });
+            hostMap = parseHostFromOSD(hostMap,osds, version, true);
+            osdMapJSON["osd_tree"]= parseRootFromHost(rootMap,hostMap,true);
+            osdList= osdMapJSON;
+            callback(osdList);
+
        });
     }
 }
