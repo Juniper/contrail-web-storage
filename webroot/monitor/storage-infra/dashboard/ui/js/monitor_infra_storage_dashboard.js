@@ -107,9 +107,11 @@ function addStorageTabs() {
                 diskCnt += obj['osds'].length;
                 obj.diskCnt = obj['osds'].length;
                 if (obj.hasOwnProperty('monitor')) {
-                    if (!isEmptyObject(obj['monitor'])) {
+                    if (!isEmptyObject(obj['monitor']) && obj['monitor'] != "Not Available") {
                         monCnt += 1;
                         obj['monCnt'] = 1;
+                    } else {
+                        obj['monCnt'] = 0;
                     }
                 }
             });
