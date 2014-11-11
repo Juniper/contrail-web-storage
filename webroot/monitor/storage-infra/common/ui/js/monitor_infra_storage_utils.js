@@ -203,17 +203,28 @@ function calcPercent(val1, val2) {
 /**
  * populateFn for storageDS
  */
-function getAllStorageNodes(defferedObj, dataSource) {
-    var obj = {};
-    obj['transportCfg'] = {
-        url: monitorInfraStorageUrls['STORAGENODES_SUMMARY'],
-        type: 'GET'
+function getAllStorageNodes(defferedObj, dataSource, dsObj) {
+  var obj = {};
+    if(!dsObj['clean']){
+        obj['transportCfg'] = {
+            url: monitorInfraStorageUrls['STORAGENODES_SUMMARY'],
+            type: 'GET'
+        }
+    defferedObj.done(function(){
+            manageDataSource.refreshDataSource('storageNodeDS');
+        });
+    } else {
+        obj['transportCfg'] = {
+                url: monitorInfraStorageUrls['STORAGENODES_SUMMARY'] + '?forceRefresh',
+                type:'GET',
+                //set the default timeout as 5 mins
+                timeout:300000
+        }
     }
-    getOutputByPagination(dataSource, {
-        transportCfg: obj['transportCfg'],
-        parseFn: infraMonitorStorageUtils.parseStorageNodesDashboardData,
-        loadedDeferredObj: defferedObj
-    });
+    getOutputByPagination(dataSource,
+                        {transportCfg:obj['transportCfg'],
+                        parseFn:infraMonitorStorageUtils.parseStorageNodesDashboardData,
+                        loadedDeferredObj:defferedObj});
 }
 
 function getStorageNodeColor(d, obj) {
