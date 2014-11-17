@@ -638,7 +638,7 @@ function parseStorageOSDAvgBW(osdName, source, callback){
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
     stMonUtils.executeQueryString(queryJSON,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
-            if(resultJSON !== 'undefined' && resultJSON.length > 0) {
+            if(resultJSON !== 'undefined') {
                 resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
                 callback(resultJSON[0]);
             }else{
