@@ -620,9 +620,6 @@ function parseStorageOSDAvgBW(osdName, source, callback){
             "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)", "COUNT(info_stats)" ];
 
     tableName = 'StatTable.ComputeStorageOsd.info_stats';
-
-
-
     var name = source +":"+osdName;
 
     whereClause = [
@@ -642,7 +639,16 @@ function parseStorageOSDAvgBW(osdName, source, callback){
                 resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
                 callback(resultJSON[0]);
             }else{
-                callback(emptyObj);
+                results = {};
+                results['Date']= new Date();
+                results['name']= name;
+                results['reads']= "0";
+                results['writes']= "0";
+                results['reads_kbytes']= "0";
+                results['writes_kbytes']= "0";
+                results['op_r_latency']= "0";
+                results['op_w_latency']= "0";
+                callback(results);
             }
         }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
 }
@@ -702,6 +708,7 @@ exports.parseHostFromOSD=parseHostFromOSD;
 exports.parseRootFromHost=parseRootFromHost;
 exports.getStorageOSDFlowSeries= getStorageOSDFlowSeries;
 exports.getStorageOSDAvgBW= getStorageOSDAvgBW;
+exports.getAvgBWHostToOSD=getAvgBWHostToOSD;
 
 
 
