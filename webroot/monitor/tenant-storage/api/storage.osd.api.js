@@ -642,12 +642,12 @@ function parseStorageOSDAvgBW(osdName, source, callback){
                 results = {};
                 results['Date']= new Date();
                 results['name']= name;
-                results['reads']= "0";
-                results['writes']= "0";
-                results['reads_kbytes']= "0";
-                results['writes_kbytes']= "0";
-                results['op_r_latency']= "0";
-                results['op_w_latency']= "0";
+                results['reads']= "NA";
+                results['writes']= "NA";
+                results['reads_kbytes']= "NA";
+                results['writes_kbytes']= "NA";
+                results['op_r_latency']= "NA";
+                results['op_w_latency']= "NA";
                 callback(results);
             }
         }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
