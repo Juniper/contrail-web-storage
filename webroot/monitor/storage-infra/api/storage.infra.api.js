@@ -27,9 +27,12 @@ var redis = require("redis"),
 
 function getStorageSummary (req, res, appData)
 {
-    var url = '/rawList';
+    var url = '/storage-summary';
     var forceRefresh = req.param('forceRefresh');
     var key = storageGlobal.STR_GET_STORAGE_SUMMARY;
+    var jobRunCount=0;
+    var firstRunDelay= 0;
+    var nextRunDelay=storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
     var objData = {};
 
     if (null == forceRefresh) {
@@ -39,51 +42,37 @@ function getStorageSummary (req, res, appData)
     }
     cacheApi.queueDataFromCacheOrSendRequest(req, res,
         storageGlobal.STR_JOB_TYPE_CACHE, key,
-        url, 0, 0, 0,
-        storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME,
+        url, 0, jobRunCount, firstRunDelay, nextRunDelay,
         forceRefresh, null);
 }
 
+function getStorageTopologyDetails(req, res, appData){
 
-function getTopologyURLs(appData){
-    var dataObjArr = [];
-    urlOSDsFromPG = storageApi.url.pgDumpOSDs;
-    commonUtils.createReqObj(dataObjArr, urlOSDsFromPG, null, null, 
-                                         null, null, appData);
-    urlOSDTree = storageApi.url.osdTree;
-    commonUtils.createReqObj(dataObjArr, urlOSDTree, null, null, 
-                                         null, null, appData);
-    urlOSDDump = storageApi.url.osdDump;
-    commonUtils.createReqObj(dataObjArr, urlOSDDump, null, null, 
-                                         null, null, appData);
-    urlStatus = storageApi.url.status;
-    commonUtils.createReqObj(dataObjArr, urlStatus, null, null,
-        null, null, appData);
+    var reqUrl = "/storage-summary";
 
-    return dataObjArr;
+    var reqObj = {}
+    reqObj['req'] = req;
+    reqObj['res'] = res;
+    reqObj['jobType'] = storageGlobal.STR_JOB_TYPE_CACHE;;
+    reqObj['jobName'] = storageGlobal.STR_GET_STORAGE_SUMMARY;
+    reqObj['reqUrl'] = reqUrl;
+    reqObj['jobRunCount'] = 0;
+    reqObj['firstRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
+    reqObj['nextRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
+    reqObj['sendToJobServerAlways'] = true;
+    reqObj['appData'] = null;
+    reqObj['postCallback'] = parseStorageTopologyDetails;
+
+    cacheApi.queueDataFromCacheOrSendRequestByReqObj(reqObj)
 }
-function processStorageTopologyRawList(res, appData, callback){
-    var urlOSDList = "/cluster/topology/ceph/list";
-    dataObjArr = getTopologyURLs(appData);
-    redisClient.get(urlOSDList, function(error, cachedJSONStr) {
-        if (error || cachedJSONStr == null) {
-            async.map(dataObjArr,
-                commonUtils.getAPIServerResponse(storageRest.apiGet, true),
-                function(err, resultJSON) {
-                    redisClient.setex(urlOSDList, expireTime, JSON.stringify(resultJSON));
-                    callback(err,res,resultJSON);
-                });
-        } else {
-            callback(null, res, JSON.parse(cachedJSONStr));
-        }
-    });
-}
-function getStorageTopology(req, res, appData){
-    processStorageTopologyRawList(res, appData, function(error,res,data){
-        parseStorageTopologyTree(data, function(resultJSON){
-            commonUtils.handleJSONResponse(error, res, resultJSON);
-        });
-    });
+
+function parseStorageTopologyDetails(req, res, resultJSON){
+    var hostName = req.param('hostname');
+    var hDetails = jsonPath(resultJSON, "$..hosts[?(@.name=='"+hostName+"')]")[0];
+    var hJSON = {};
+    hJSON['host_details'] = hDetails;
+    commonUtils.handleJSONResponse(null, res, hJSON);
+
 }
 
 function parseStorageTopologyTree(osdJSON, callback){
@@ -146,58 +135,6 @@ function parseMonitorWithHost(monsJSON, hostJSON){
    return hostJSON;
 }
 
-function getStorageTopologyDetails(req, res, appData){
-    var hostName = req.param('hostname');
-    processStorageTopologyRawList(res, appData, function(error,res,data){
-        parseStorageTopologyDetails(hostName, data, function(resultJSON){
-            commonUtils.handleJSONResponse(error, res, resultJSON);
-        });
-    });
-}
-
-function parseStorageTopologyDetails(name, resultJSON, callback){
-    parseStorageTopologyTreeDetails(name,resultJSON, function(resultJSON){
-        var hDetails = jsonPath(resultJSON, "$..hosts[?(@.name=='"+name+"')]")[0];
-        var hJSON = {};
-        hJSON['host_details'] = hDetails;
-        callback(hJSON);
-    });
-}
-
-function parseStorageTopologyTreeDetails(name,osdJSON, callback){
-    var osdList={};
-    var osdPG= osdJSON[0];
-    var osdTree= osdJSON[1];
-    var osdDump= osdJSON[2];
-    var status= osdJSON[3];
-
-    var rootMap = jsonPath(osdTree, "$..nodes[?(@.name=='default')]");
-    var hostMap = jsonPath(osdTree, "$..nodes[?(@.name=='"+name+"')]");
-    var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
-    var osds = jsonPath(osdDump, "$..osds");
-    var monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
-    if (osds != undefined && osds.length > 0) {
-        var osdName='undefined';
-        for(i=0; i < tOSDs.length;i++){
-            if(tOSDs[i].status == "up"){
-                osdName= tOSDs[i].name;
-                break;
-            }
-        }
-        osdApi.parseOSDVersion(osdName, function(version) {
-            osds=osdApi.parseOSDFromTree(osdDump,tOSDs);
-            osdApi.parseOSDFromPG(osds, osdPG);
-            hostMap = parseMonitorWithHost(monsJSON, hostMap);
-            hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
-            osdList.topology = parseRootFromHost(rootMap, hostMap);
-            osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
-            osdList.cluster_status.monitor_count= monsJSON.length;
-            callback(osdList);
-        });
-    }
-}
-
-
 function parseRootFromHost(rootJSON, hostJSON){
    var rootCnt = rootJSON.length;
    for(q=0;q<rootCnt; q++) {
@@ -253,10 +190,8 @@ function parseRootFromHost(rootJSON, hostJSON){
 }
 
 /* List all public functions */
-exports.getStorageTopology = getStorageTopology;
 exports.getStorageTopologyDetails= getStorageTopologyDetails;
 exports.getStorageSummary= getStorageSummary;
-exports.processStorageTopologyRawList= processStorageTopologyRawList;
 exports.parseStorageTopologyTree=parseStorageTopologyTree;
 
 

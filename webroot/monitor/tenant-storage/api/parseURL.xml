@@ -135,7 +135,7 @@
         <url>/api/tenant/storage/cluster/osds/summary</url>
         <method>get</method>
         <feature>storage</feature>
-        <callback>storageOsdsApi.getStorageOSDSummary</callback>
+        <callback>storageOsdsApi.getStorageOSDsSummary</callback>
     </item>
    <!-- queryString ...details?name= -->
     <item>
