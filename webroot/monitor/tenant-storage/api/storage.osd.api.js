@@ -637,17 +637,30 @@ function parseStorageOSDAvgBW(osdName, source, callback){
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
             if(resultJSON !== 'undefined' && typeof resultJSON['value'] !== "undefined") {
                 resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
-                callback(resultJSON[0]);
+                if(resultJSON.length > 0){
+                    callback(resultJSON[0]);
+                }else{
+                   results = new Object();
+                   results['Date']= new Date();
+                   results['name']= name;
+                   results['reads']= "Not Available";
+                   results['writes']= "Not Available";
+                   results['reads_kbytes']= "Not Available";
+                   results['writes_kbytes']= "Not Available";
+                   results['op_r_latency']= "Not Available";
+                   results['op_w_latency']= "Not Available";
+                   callback(results);
+               }
             }else{
                 results = {};
                 results['Date']= new Date();
                 results['name']= name;
-                results['reads']= "NA";
-                results['writes']= "NA";
-                results['reads_kbytes']= "NA";
-                results['writes_kbytes']= "NA";
-                results['op_r_latency']= "NA";
-                results['op_w_latency']= "NA";
+                results['reads']= "Not Available";
+                results['writes']= "Not Available";
+                results['reads_kbytes']= "Not Available";
+                results['writes_kbytes']= "Not Available";
+                results['op_r_latency']= "Not Available";
+                results['op_w_latency']= "Not Available";
                 callback(results);
             }
         }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
