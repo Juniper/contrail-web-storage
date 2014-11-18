@@ -552,7 +552,7 @@ function getStorageOSDFlowSeries (req, res, appData) {
 function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran,osdName){
     var len = 0, secTime;
     var resultJSON = {};
-    if(storageFlowSeriesData != undefined && storageFlowSeriesData['value']!= undefined && storageFlowSeriesData['value'].length > 0) {
+    if(storageFlowSeriesData !== undefined && storageFlowSeriesData['value']!== undefined && storageFlowSeriesData['value'].length > 0) {
         try {
             resultJSON['summary'] = {};
             secTime = Math.floor(timeObj['start_time'] / 1000);
@@ -578,7 +578,7 @@ function formatOsdSeriesLoadXMLData (resultJSON)
     var results = [];
     var counter = 0,secTime;
     try {
-        if(resultJSON != undefined && resultJSON['value']!= undefined && resultJSON['value'].length > 0) {
+        if(resultJSON !== undefined && resultJSON['value']!== undefined && resultJSON['value'].length > 0) {
             resultJSON = resultJSON['value'];
             counter = resultJSON.length;
             for (var i = 0; i < counter; i++) {
@@ -635,7 +635,7 @@ function parseStorageOSDAvgBW(osdName, source, callback){
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
     stMonUtils.executeQueryString(queryJSON,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
-            if(resultJSON != 'undefined' && resultJSON.length > 0) {
+            if(resultJSON !== 'undefined' && typeof resultJSON['value'] !== "undefined") {
                 resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
                 callback(resultJSON[0]);
             }else{
