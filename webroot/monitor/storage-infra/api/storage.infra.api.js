@@ -188,11 +188,13 @@ function parseStorageTopologyTreeDetails(name,osdJSON, callback){
             osds=osdApi.parseOSDFromTree(osdDump,tOSDs);
             osdApi.parseOSDFromPG(osds, osdPG);
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
-            hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
-            osdList.topology = parseRootFromHost(rootMap, hostMap);
-            osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
-            osdList.cluster_status.monitor_count= monsJSON.length;
-            callback(osdList);
+            osdApi.getAvgBWHostToOSD(osds,hostMap, function(osds){
+              hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
+              osdList.topology = parseRootFromHost(rootMap, hostMap);
+              osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
+              osdList.cluster_status.monitor_count= monsJSON.length;
+              callback(osdList);
+            });
         });
     }
 }
