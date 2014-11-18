@@ -27,9 +27,12 @@ var redis = require("redis"),
 
 function getStorageSummary (req, res, appData)
 {
-    var url = '/rawList';
+    var url = '/storage-summary';
     var forceRefresh = req.param('forceRefresh');
     var key = storageGlobal.STR_GET_STORAGE_SUMMARY;
+    var jobRunCount=0;
+    var firstRunDelay= 0;
+    var nextRunDelay=storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
     var objData = {};
 
     if (null == forceRefresh) {
@@ -39,8 +42,7 @@ function getStorageSummary (req, res, appData)
     }
     cacheApi.queueDataFromCacheOrSendRequest(req, res,
         storageGlobal.STR_JOB_TYPE_CACHE, key,
-        url, 0, 0, 0,
-        storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME,
+        url, 0, jobRunCount, firstRunDelay, nextRunDelay,
         forceRefresh, null);
 }
 
@@ -188,11 +190,13 @@ function parseStorageTopologyTreeDetails(name,osdJSON, callback){
             osds=osdApi.parseOSDFromTree(osdDump,tOSDs);
             osdApi.parseOSDFromPG(osds, osdPG);
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
-            hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
-            osdList.topology = parseRootFromHost(rootMap, hostMap);
-            osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
-            osdList.cluster_status.monitor_count= monsJSON.length;
-            callback(osdList);
+            osdApi.getAvgBWHostToOSD(osds,hostMap, function(osds){
+              hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
+              osdList.topology = parseRootFromHost(rootMap, hostMap);
+              osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
+              osdList.cluster_status.monitor_count= monsJSON.length;
+              callback(osdList);
+            });
         });
     }
 }

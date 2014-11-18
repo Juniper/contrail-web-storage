@@ -637,18 +637,32 @@ function parseStorageOSDAvgBW(osdName, source, callback){
     stMonUtils.executeQueryString(queryJSON,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
             if(resultJSON !== 'undefined' && typeof resultJSON['value'] !== "undefined") {
+                console.log("name:"+name);
                 resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
-                callback(resultJSON[0]);
+                if(resultJSON.length > 0){
+                    callback(resultJSON[0]);
+                }else{
+                   results = new Object();
+                   results['Date']= new Date();
+                   results['name']= name;
+                   results['reads']= "Not Available";
+                   results['writes']= "Not Available";
+                   results['reads_kbytes']= "Not Available";
+                   results['writes_kbytes']= "Not Available";
+                   results['op_r_latency']= "Not Available";
+                   results['op_w_latency']= "Not Available";
+                   callback(results);
+                }
             }else{
                results = new Object();
                results['Date']= new Date();
                results['name']= name;
-               results['reads']= "0";
-               results['writes']= "0";
-               results['reads_kbytes']= "0";
-               results['writes_kbytes']= "0";
-               results['op_r_latency']= "0";
-               results['op_w_latency']= "0";
+               results['reads']= "Not Available";
+               results['writes']= "Not Available";
+               results['reads_kbytes']= "Not Available";
+               results['writes_kbytes']= "Not Available";
+               results['op_r_latency']= "Not Available";
+               results['op_w_latency']= "Not Available";
                callback(results);
 
             }
@@ -661,6 +675,7 @@ function formatOsdAvgBWLoadXMLData(resultJSON){
     try {
         resultJSON = resultJSON['value'];
         counter = resultJSON.length;
+
         for (var i = 0; i < counter; i++) {
             results[i] = {};
             results[i]['Date']= new Date();
