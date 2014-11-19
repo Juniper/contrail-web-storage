@@ -1005,8 +1005,7 @@ function poolsBarChart() {
 
         this.d3ChartElem = d3.select(chartId).append('svg');
 
-        var barColor = d3.scale.ordinal()
-            .range(['#9e9ac8', '#6baed6', '#8ca252', '#7f7f7f', '#bd9e39']);
+        var barColor = d3.scale.category10();
 
         var chart = nv.models.multiBarHorizontalChart()
             .x(function(d) {
@@ -1021,7 +1020,7 @@ function poolsBarChart() {
                 bottom: 10,
                 left: 12
             })
-            .showLegend(true)
+            .showLegend(false)
             .showValues(false)
             .stacked(true)
             .showControls(false)
