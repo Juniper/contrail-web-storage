@@ -65,9 +65,9 @@ function addStorageTabs() {
                 });
                 var chartsData = {
                     title: 'Storage Nodes',
-                    xLbl: 'Available (%)',
+                    xLbl: 'Used (%)',
                     xLblFormat: d3.format('.02f'),
-                    yLbl: 'Total Storage (GB)',
+                    yLbl: 'Avg BW (Read + Write)',
                     chartOptions: {
                         xPositive: true,
                         tooltipFn: storageChartUtils.storageNodeTooltipFn,
