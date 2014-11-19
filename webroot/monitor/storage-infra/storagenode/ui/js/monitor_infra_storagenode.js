@@ -809,8 +809,22 @@ storageNodeView = function() {
                 outCnt = 0;
 
             $.each(osds, function(idx, osd) {
-                osd['x'] = parseFloat(((osd.kb_avail / osd.kb) * 100).toFixed(2));
+                osd['x'] = parseFloat((100 -((osd.kb_avail / osd.kb) * 100)).toFixed(2));
                 osd['y'] = parseFloat((osd.kb / 1048576).toFixed(2));
+                if (!isEmptyObject(osd['avg_bw'])){
+                    if($.isNumeric(osd['avg_bw']['reads_kbytes']) && $.isNumeric(osd['avg_bw']['writes_kbytes'])){
+                        osd['y'] = osd['avg_bw']['reads_kbytes'] + osd['avg_bw']['writes_kbytes'];
+                        osd['tot_avg_bw'] = formatBytes(osd['y'] * 1024);
+                        osd['avg_bw']['read'] = formatBytes(osd['avg_bw']['reads_kbytes'] * 1024);
+                        osd['avg_bw']['write'] = formatBytes(osd['avg_bw']['writes_kbytes'] * 1024);
+                    } else {
+                        osd['tot_avg_bw'] = 'N/A';
+                        osd['y'] = 'N/A';
+                        osd['avg_bw']['read'] = 'N/A';
+                        osd['avg_bw']['write'] = 'N/A';
+                    }
+                }
+
                 osd['available_perc'] = $.isNumeric(osd['x']) ? osd['x'] : 'N/A';
                 osd['total'] = osd.hasOwnProperty('kb') ? formatBytes(osd.kb * 1024) : 'N/A';
                 osd['size'] = 1;
@@ -845,11 +859,8 @@ storageNodeView = function() {
              the min values of series and tooltip info is returned to --
              */
             var xscale = d3.extent(xvals);
-            xscale[0] = (xscale[0] <= 5) ? 0.0 : xscale[0] - 0.2;
             xscale[1] = (xscale[1] >= 95.5) ? 100.00 : xscale[1] + 0.5;
             var yscale = d3.extent(yvals);
-            yscale[0] = (yscale[0] <= 150) ? 0 : yscale[0] - 150;
-            yscale[1] = yscale[1] + 150;
 
             $.each(retArr, function(idx, osd) {
                 if (isNaN(osd.x))
@@ -864,11 +875,10 @@ storageNodeView = function() {
                 parseFn: function(response) {
                     return {
                         title: 'Disks',
-                        xLbl: 'Available (%)',
+                        xLbl: 'Used (%)',
                         xLblFormat: d3.format('.02f'),
-                        yLbl: 'Total Storage (GB)',
+                        yLbl: 'Avg BW (Read + Write)',
                         forceX: xscale,
-                        forceY: yscale,
                         chartOptions: {
                             xPositive: true,
                             tooltipFn: storageChartUtils.diskTooltipFn,

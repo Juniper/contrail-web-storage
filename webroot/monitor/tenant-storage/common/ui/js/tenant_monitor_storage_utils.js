@@ -116,7 +116,7 @@ var tenantStorageChartUtils = {
     },
     diskTooltipFn: function(currObj) {
         var tooltipContents = [{
-            lbl: 'Host Name',
+            lbl: 'Storage Disk',
             value: currObj['name']
         }, {
             lbl: 'Total Space',
@@ -126,6 +126,10 @@ var tenantStorageChartUtils = {
             value: formatBytes((currObj['kb'] - currObj['kb_used']) * 1024) +
                 ' [ ' + currObj['available_perc'] + '%' + ' ]'
         }, {
+            lbl: 'Avg BW',
+            value: currObj['tot_avg_bw'] + ' [ Read ' +
+                currObj['avg_bw']['read'] + ', Write ' + currObj['avg_bw']['write'] + ' ]'
+        },{
             lbl: 'Status',
             value: currObj['status'] + '&' + currObj['cluster_status']
         }];
@@ -136,7 +140,7 @@ var tenantStorageChartUtils = {
         var series = e['series'];
         var processDetails = e['point']['processDetails'];
         var tooltipContents = [{
-            lbl: 'Host Name',
+            lbl: 'Storage Node',
             value: e['point']['name']
         }, {
             lbl: 'Total Space',
@@ -380,8 +384,24 @@ function getHostStatusTmpl(obj) {
         return "<span> N/A</span>";
 }
 
+function formatLblValueTooltip(infoObj) {
+    var tooltipTemplateSel = 'title-lblval-tooltip-template';
+    if (infoObj[0]['lbl'] == "Storage Node")
+        return formatHostLblValueTooltip(infoObj);
+    if (infoObj[0]['lbl'] == "Storage Disk")
+        return formatDiskLblValueTooltip(infoObj);
+    var tooltipTemplate = contrail.getTemplate4Id(tooltipTemplateSel);
+    return tooltipTemplate(infoObj);
+}
+
 function formatSmallLblValueTooltip(infoObj) {
     var tooltipTemplateSel = 'small-lblval-tooltip-template';
+    var tooltipTemplate = contrail.getTemplate4Id(tooltipTemplateSel);
+    return tooltipTemplate(infoObj);
+}
+
+function formatDiskLblValueTooltip(infoObj) {
+    var tooltipTemplateSel = 'disk-lblval-tooltip-template';
     var tooltipTemplate = contrail.getTemplate4Id(tooltipTemplateSel);
     return tooltipTemplate(infoObj);
 }
