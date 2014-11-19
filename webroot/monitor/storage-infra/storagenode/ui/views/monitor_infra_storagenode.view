@@ -51,7 +51,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div id='disks-bubble' class='infra-node-chart row-fluid' style="height:200px;"></div>
+                                    <div id='disks-bubble' class='infra-node-chart row-fluid' style="height:350px;"></div>
                                 </div><!-- /widget-main -->
                             </div><!--/widget-body -->
                         </div><!--/widget-box-->

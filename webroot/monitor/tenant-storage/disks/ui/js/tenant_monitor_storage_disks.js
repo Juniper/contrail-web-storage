@@ -319,8 +319,9 @@ tenantStorageDisksView = new cephOSDsView();
 function updateDisksChart(data) {
     var chartsData = {
         title: 'Disks',
-        xLbl: 'Available (%)',
-        yLbl: 'Total Storage (GB)',
+        xLbl: 'Used (%)',
+        xLblFormat: d3.format('.02f'),
+        yLbl: 'Avg BW (Read + Write)',
         chartOptions: {
             xPositive: true,
             tooltipFn: tenantStorageChartUtils.diskTooltipFn,
@@ -329,6 +330,7 @@ function updateDisksChart(data) {
         },
         d: data
     };
+    /*
     var yvals = [];
     $.each(data, function(idx, grp) {
         $.each(grp.values, function(i, osd) {
@@ -339,7 +341,7 @@ function updateDisksChart(data) {
 
     yscale[0] = yscale[0] - 150;
     yscale[1] = yscale[1] + 150;
-
+    */
     var xvals = [];
     $.each(data, function(idx, grp) {
         $.each(grp.values, function(i, osd) {
@@ -354,7 +356,7 @@ function updateDisksChart(data) {
         xscale[0] = parseFloat((xscale[0] - 5).toFixed(2));
     }
     chartsData['forceX'] = xscale;
-    chartsData['forceY'] = yscale;
+    //chartsData['forceY'] = yscale;
 
     if (!isScatterChartInitialized('#osds-bubble')) {
         $('#osds-bubble').initScatterChart(chartsData);
@@ -452,9 +454,9 @@ function parseOSDsData(data) {
 
             if (osd.kb) {
                 osd.available_perc = calcPercent(osd.kb_avail, osd.kb);
-                osd.x = parseFloat(osd.available_perc);
+                osd.x = parseFloat(100 - osd.available_perc);
                 osd.gb = kiloByteToGB(osd.kb);
-                osd.y = parseFloat(osd.gb);
+                //osd.y = parseFloat(osd.gb);
                 osd.total = formatBytes(osd.kb * 1024);
                 osd.used = formatBytes(osd.kb_used * 1024);
                 osd.gb_avail = kiloByteToGB(osd.kb_avail);
@@ -470,6 +472,20 @@ function parseOSDsData(data) {
                 osd.gb_used = 'N/A';
                 osd.gb_avail = 'N/A';
                 osd.available_perc = 'N/A';
+                osd.x = 'N/A';
+            }
+            if (!isEmptyObject(osd.avg_bw)){
+                if($.isNumeric(osd.avg_bw.reads_kbytes) && $.isNumeric(osd.avg_bw.writes_kbytes)){
+                    osd.y = osd.avg_bw.reads_kbytes + osd.avg_bw.writes_kbytes;
+                    osd.tot_avg_bw = formatBytes(osd.y * 1024);
+                    osd.avg_bw.read = formatBytes(osd.avg_bw.reads_kbytes * 1024);
+                    osd.avg_bw.write = formatBytes(osd.avg_bw.writes_kbytes * 1024);
+                } else {
+                    osd.tot_avg_bw = 'N/A';
+                    osd.y = 'N/A';
+                    osd.avg_bw.read = 'N/A';
+                    osd.avg_bw.write = 'N/A';
+                }
             }
             /**
              * osd status template UP?DOWN

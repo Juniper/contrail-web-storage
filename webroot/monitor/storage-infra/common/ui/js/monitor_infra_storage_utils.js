@@ -115,15 +115,29 @@ var infraMonitorStorageUtils = {
             obj['osds'] = host['osds'];
             obj['osds_total'] = 0;
             obj['osds_used'] = 0;
+            obj['tot_avg_bw'] = 0;
+            obj['tot_avg_read_kb'] = 0;
+            obj['tot_avg_write_kb'] = 0;
             $.each(host.osds, function(idx, osd) {
                 if (osd.hasOwnProperty('kb') && osd.hasOwnProperty('kb_used')) {
                     obj['osds_total'] += osd['kb'] * 1024;
                     obj['osds_used'] += osd['kb_used'] * 1024;
                 }
+                if (!isEmptyObject(osd['avg_bw'])){
+                    if($.isNumeric(osd['avg_bw']['reads_kbytes']) && $.isNumeric(osd['avg_bw']['writes_kbytes'])){
+                        obj['tot_avg_bw'] += osd['avg_bw']['reads_kbytes'] + osd['avg_bw']['writes_kbytes'];
+                        obj['tot_avg_read_kb'] += osd['avg_bw']['reads_kbytes'];
+                        obj['tot_avg_write_kb'] += osd['avg_bw']['writes_kbytes'];
+                    } else {
+                        osd['avg_bw']['read'] = 'N/A';
+                        osd['avg_bw']['write'] = 'N/A';
+                    }
+                }
             });
             obj['osds_available_perc'] = calcPercent((obj['osds_total'] - obj['osds_used']), obj['osds_total']);
-            obj['x'] = parseFloat(obj['osds_available_perc']);
-            obj['y'] = parseFloat(byteToGB(obj['osds_total']));
+            obj['x'] = parseFloat((100 - obj['osds_available_perc']).toFixed(2));
+            //obj['y'] = parseFloat(byteToGB(obj['osds_total']));
+            obj['y'] = parseFloat(obj['tot_avg_bw'].toFixed(2))
             obj['osds_available'] = formatBytes(obj['osds_total'] - obj['osds_used']);
             obj['osds_total'] = formatBytes(obj['osds_total']);
             obj['osds_used'] = formatBytes(obj['osds_used']);
@@ -318,8 +332,8 @@ function updateStorageChartsForSummary(dsData, nodeType) {
             key: key,
             values: data
         }],
-        xLbl: 'Available (%)',
-        yLbl: 'Total Storage (GB)',
+        xLbl: 'Used (%)',
+        yLbl: 'Avg BW (Read + Write)',
         xLblFormat: d3.format('.02f'),
         chartOptions: {
             tooltipFn: storageChartUtils.storageNodeTooltipFn,
@@ -353,9 +367,33 @@ function updateStorageChartsForSummary(dsData, nodeType) {
     }
 }
 
+function formatLblValueTooltip(infoObj) {
+    var tooltipTemplateSel = 'title-lblval-tooltip-template';
+    if (infoObj[0]['lbl'] == "Storage Node")
+        return formatHostLblValueTooltip(infoObj);
+    if (infoObj[0]['lbl'] == "Storage Disk")
+        return formatDiskLblValueTooltip(infoObj);
+    var tooltipTemplate = contrail.getTemplate4Id(tooltipTemplateSel);
+    return tooltipTemplate(infoObj);
+}
+
+function formatHostLblValueTooltip(infoObj) {
+    var tooltipTemplateSel = 'host-lblval-tooltip-template';
+    var tooltipTemplate = contrail.getTemplate4Id(tooltipTemplateSel);
+    return tooltipTemplate(infoObj);
+}
+
+function formatDiskLblValueTooltip(infoObj) {
+    var tooltipTemplateSel = 'disk-lblval-tooltip-template';
+    var tooltipTemplate = contrail.getTemplate4Id(tooltipTemplateSel);
+    return tooltipTemplate(infoObj);
+}
+
+
+
 function getStorageNodeTooltipContents(currObj) {
     var tooltipContents = [{
-        lbl: 'Host Name',
+        lbl: 'Storage Node',
         value: currObj['name']
     }, {
         lbl: 'Total Space',
@@ -388,12 +426,17 @@ var storageChartUtils = {
         var tooltipContents = [{
             lbl: 'Disks',
             value: currObj['osds'].length
+        }, {
+            lbl: 'Avg BW',
+            value: formatBytes(currObj['tot_avg_bw'] * 1024) +
+                ' [ Read ' + formatBytes(currObj['tot_avg_read_kb'] * 1024) + ', Write ' +
+                formatBytes(currObj['tot_avg_write_kb'] * 1024) + ']'
         }];
         return getStorageNodeTooltipContents(currObj).concat(tooltipContents);
     },
     diskTooltipFn: function(currObj) {
         var tooltipContents = [{
-            lbl: 'Host Name',
+            lbl: 'Storage Disk',
             value: currObj['name']
         }, {
             lbl: 'Total Space',
@@ -402,6 +445,10 @@ var storageChartUtils = {
             lbl: 'Available',
             value: formatBytes((currObj['kb'] - currObj['kb_used']) * 1024) +
                 ' [ ' + currObj['available_perc'] + '%' + ' ]'
+        }, {
+            lbl: 'Avg BW',
+            value: currObj['tot_avg_bw'] + ' [ Read ' +
+            currObj['avg_bw']['read'] + ', Write ' + currObj['avg_bw']['write'] + ' ]'
         }, {
             lbl: 'Status',
             value: currObj['status'] + '&' + currObj['cluster_status']
