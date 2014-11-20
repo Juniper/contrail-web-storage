@@ -340,7 +340,6 @@ storageNodeView = function() {
 
                 osdArr.push(osd);
             });
-            osdsDV.setData(osdArr);
 
             $("#gridDisksDash").contrailGrid({
 
@@ -399,6 +398,7 @@ storageNodeView = function() {
                 body: {
                     options: {
                         autoHeight: true,
+                        lazyLoading: true,
                         checkboxSelectable: false,
                         enableAsyncPostRender: true,
                         forceFitColumns: true,
@@ -449,7 +449,7 @@ storageNodeView = function() {
                                         d: detailsInfo,
                                         detailLink: moreLink
                                     }));
-                                    $("#gridDisksDash").data('contrailGrid').adjustDetailRowHeight(dc.id);
+                                    $("#gridDisksDash").data('contrailGrid').adjustDetailRowHeight(dc.cgrid);
                                 }, 1000);
                             },
                             onExpand: function(e, dc) {
@@ -461,7 +461,13 @@ storageNodeView = function() {
                         }
                     },
                     dataSource: {
-                        dataView: osdsDV
+                        dataView: osdsDV,
+                        events: {
+                            onUpdateDataCB: function() {
+                                var dvGrid = $("#gridDisksDash").data('contrailGrid');
+                                dvGrid.removeGridLoading();
+                            }
+                        }
                     },
                     statusMessages: {
                         loading: {
@@ -486,8 +492,12 @@ storageNodeView = function() {
                     }
                 }
             });
-            var dvGrid = $("#gridDisksDash").data('contrailGrid');
-            dvGrid.removeGridLoading();
+
+            if(osdArr.length != 0) {
+                osdsDV.setData(osdArr);
+            }
+
+
         }).fail(function(result) {
 
         });
