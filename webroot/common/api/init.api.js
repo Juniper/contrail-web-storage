@@ -9,13 +9,13 @@ var jobsApi = require(process.mainModule.exports["corePath"]  +'/src/serverroot/
 
 function createStorageSummaryJob (){
     var appData = {};
-    appData['addGen'] = true;
     var jobObj = {};
     var url = '/storage-summary';
     jobObj['jobName'] = storageGlobal.STR_GET_STORAGE_SUMMARY;
     jobObj['url'] = url;
-    jobObj['firstRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
+    jobObj['firstRunDelay'] = 2 * 60 * 1000;
     jobObj['runCount'] = 0;
+    jobObj['orchModel'] = 'openstack';
     jobObj['nextRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
     jobObj['appData'] = appData;
     jobsApi.createJobAtInit(jobObj);
@@ -23,18 +23,24 @@ function createStorageSummaryJob (){
 
 function createStorageOSDsJob (){
     var appData = {};
-    appData['addGen'] = true;
     var jobObj = {};
     var url = '/storage-osds-summary';
     jobObj['jobName'] = storageGlobal.STR_GET_STORAGE_OSD_SUMMARY;
     jobObj['url'] = url;
-    jobObj['firstRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
+    jobObj['firstRunDelay'] = 2 * 60 * 1000;
     jobObj['runCount'] = 0;
+    jobObj['orchModel'] = 'openstack';
     jobObj['nextRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
     jobObj['appData'] = appData;
     jobsApi.createJobAtInit(jobObj);
 }
 
 
+function featureInit(){
+    createStorageSummaryJob();
+    createStorageOSDsJob();
+}
+
 exports.createStorageSummaryJob = createStorageSummaryJob;
 exports.createStorageOSDsJob = createStorageOSDsJob;
+exports.featureInit = featureInit;

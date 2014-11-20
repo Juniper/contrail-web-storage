@@ -24,7 +24,7 @@ function processStorageSummaryRequestByJob(pubChannel, saveChannelKey, jobData, 
                     global.HTTP_STATUS_INTERNAL_ERROR,
                     global.STR_CACHE_RETRIEVE_ERROR,
                     global.STR_CACHE_RETRIEVE_ERROR,
-                    0, 0, done);
+                    0, 0, done,jobData);
                 return;
             }else{
                 redisPub.publishDataToRedis(pubChannel, saveChannelKey,

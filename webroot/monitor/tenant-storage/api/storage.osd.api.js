@@ -67,7 +67,7 @@ function getStorageOSDsSummary (req, res, appData) {
     var url = '/storage-osds-summary';
     var forceRefresh = req.param('forceRefresh');
     var key = storageGlobal.STR_GET_STORAGE_OSD_SUMMARY;
-    var jobRunCount=0;
+    var jobRunCount=1;
     var firstRunDelay= 0;
     var nextRunDelay=storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
     var objData = {};
@@ -120,10 +120,10 @@ function getStorageOSDDetails(req, res, appData){
     reqObj['jobType'] = storageGlobal.STR_JOB_TYPE_CACHE;;
     reqObj['jobName'] = storageGlobal.STR_GET_STORAGE_OSD_SUMMARY;
     reqObj['reqUrl'] = reqUrl;
-    reqObj['jobRunCount'] = 0;
-    reqObj['firstRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
+    reqObj['jobRunCount'] = 1;
+    reqObj['firstRunDelay'] = 0;
     reqObj['nextRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
-    reqObj['sendToJobServerAlways'] = true;
+    reqObj['sendToJobServerAlways'] = false;
     reqObj['appData'] = null;
     reqObj['postCallback'] = parseStorageOSDDetails;
 
@@ -132,6 +132,7 @@ function getStorageOSDDetails(req, res, appData){
 
 function parseStorageOSDDetails(req, res, resultJSON){
     var osd_name = req.param('name');
+    //resultJSON = JSON.parse(resultJSON);
     var osdDetails = jsonPath(resultJSON, "$..osds[?(@.name=='"+osd_name+"')]")[0];
     var osdJSON = {};
     osdJSON['osd_details'] = osdDetails;
