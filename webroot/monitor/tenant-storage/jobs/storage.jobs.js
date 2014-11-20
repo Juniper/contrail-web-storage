@@ -24,13 +24,13 @@ function processStorageClusterStatus(pubChannel, saveChannelKey, jobData, done){
                         global.HTTP_STATUS_RESP_OK,
                         JSON.stringify(resultJSON),
                         JSON.stringify(resultJSON),
-                        0, 0, done);
+                        0, 0, done, jobData);
             } else {
                   redisPub.publishDataToRedis(pubChannel, saveChannelKey,
                                               global.HTTP_STATUS_INTERNAL_ERROR,
                                         global.STR_CACHE_RETRIEVE_ERROR,
                                         global.STR_CACHE_RETRIEVE_ERROR, 0,
-                                        0, done);
+                                        0, done, jobData);
             }
         });   
 }
