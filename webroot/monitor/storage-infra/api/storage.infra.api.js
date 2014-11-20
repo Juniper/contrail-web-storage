@@ -30,10 +30,9 @@ function getStorageSummary (req, res, appData)
     var url = '/storage-summary';
     var forceRefresh = req.param('forceRefresh');
     var key = storageGlobal.STR_GET_STORAGE_SUMMARY;
-    var jobRunCount=0;
+    var jobRunCount=1;
     var firstRunDelay= 0;
     var nextRunDelay=storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
-    var objData = {};
 
     if (null == forceRefresh) {
         forceRefresh = false;
@@ -56,10 +55,10 @@ function getStorageTopologyDetails(req, res, appData){
     reqObj['jobType'] = storageGlobal.STR_JOB_TYPE_CACHE;;
     reqObj['jobName'] = storageGlobal.STR_GET_STORAGE_SUMMARY;
     reqObj['reqUrl'] = reqUrl;
-    reqObj['jobRunCount'] = 0;
-    reqObj['firstRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
+    reqObj['jobRunCount'] = 1;
+    reqObj['firstRunDelay'] = 0;
     reqObj['nextRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
-    reqObj['sendToJobServerAlways'] = true;
+    reqObj['sendToJobServerAlways'] = false;
     reqObj['appData'] = null;
     reqObj['postCallback'] = parseStorageTopologyDetails;
 
@@ -72,7 +71,6 @@ function parseStorageTopologyDetails(req, res, resultJSON){
     var hJSON = {};
     hJSON['host_details'] = hDetails;
     commonUtils.handleJSONResponse(null, res, hJSON);
-
 }
 
 function parseStorageTopologyTree(osdJSON, callback){
