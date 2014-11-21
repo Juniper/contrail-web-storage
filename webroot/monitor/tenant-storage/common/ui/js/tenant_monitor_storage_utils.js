@@ -111,8 +111,10 @@ var tenantStorageChartUtils = {
             node: currObj['host'],
             tab: 'details:' + currObj['name']
         }, {
-            p: 'mon_storage_disks'
+            p: 'mon_storage_disks',
+            triggerHashChange: false
         });
+        tenantStorageDisksView.updateViewByHash(layoutHandler.getURLHashParams());
     },
     diskTooltipFn: function(currObj) {
         var tooltipContents = [{
@@ -644,6 +646,344 @@ function getFormattedDate(timeStamp){
         fmtDate=date.getFullYear()+"-"+mnth+"-"+dte+"  "+hrs+":"+mns+":"+secs;
         return fmtDate;}
 }
+
+function getHostColor(osdColorArr) {
+    var host_color = color_info;
+    var colorCount = {};
+    var osdColorCount = osdColorArr.length;
+    $.each(osdColorArr, function(idx, color) {
+        /*
+         * Old way of calculating host color.
+         * if atleast one disk is down, the host is down
+
+         if (color == color_imp) {
+         host_color = color_imp;
+         return;
+         } else if (color == color_warn && host_color != color_warn && host_color != color_imp) {
+         host_color = color_warn;
+         } else if (color == color_success && host_color != color_warn && host_color != color_imp) {
+         host_color = color_success;
+         } else {}
+         */
+        colorCount[color] = (colorCount[color] || 0) + 1;
+    });
+    colorKeyCount = Object.keys(colorCount).length;
+    if (colorKeyCount == 1) {
+        host_color = osdColorArr[0]; //all colors are same
+    } else if (colorKeyCount == 3 || colorKeyCount == 2) {
+        host_color = color_warn; //all possible colors or two colors; return warn color
+    } else {
+
+    }
+    return host_color;
+}
+
+function getHostStatus(statusArr) {
+    var host_status = 'up';
+    var downCnt = 0
+    $.each(statusArr, function(idx, status) {
+        // Following checks for OSD status [in, out, down]
+        if (status == 'down') {
+            //host_status = 'critical';
+            downCnt++;
+        } else if (status == 'out' && host_status != 'critical') {
+            host_status = 'warn';
+        } else if (status == 'in' && host_status != 'warn' && host_status != 'critical') {
+            host_status = 'active';
+        }
+        // Following checks for Host status itself [critical, warn, active]
+        else if (status == 'critical') {
+            host_status = 'critical';
+        } else if (status == 'warn' && host_status != 'critical') {
+            host_status = 'warn';
+        } else if (status == 'active' && host_status != 'warn' && host_status != 'critical') {
+            host_status = 'active';
+        } else {}
+    });
+    if (downCnt == statusArr.length / 2)
+        host_status = 'critical';
+
+    return host_status;
+}
+
+var tenantStorageUtils = {
+    parseDisksSingleSeriesData: function(data) {
+        var retArr = [],
+            osdChartArr = [],
+            osdErrArr = [],
+            osdArr = [];
+        var skip_osd_bubble = new Boolean();
+        var statusTemplate = contrail.getTemplate4Id("disk-status-template");
+
+        if (data != null) {
+            var osds = data.osds;
+            $.each(osds, function(idx, osd) {
+                skip_osd_bubble = false;
+
+                if (osd.kb) {
+                    osd.available_perc = calcPercent(osd.kb_avail, osd.kb);
+                    osd.x = parseFloat(osd.available_perc);
+                    osd.gb = kiloByteToGB(osd.kb);
+                    osd.total = formatBytes(osd.kb * 1024);
+                    osd.y = parseFloat(osd.gb);
+                    osd.gb_avail = kiloByteToGB(osd.kb_avail);
+                    osd.gb_used = kiloByteToGB(osd.kb_used);
+                    osd.color = getOSDColor(osd);
+                    osd.shape = 'circle';
+                    osd.size = 1;
+                } else {
+                    skip_osd_bubble = true;
+                    osd.gb = 'Not Available';
+                    osd.gb_used = 'Not Available';
+                    osd.gb_avail = 'Not Available';
+                    osd.available_perc = 'Not Available';
+                }
+
+                /**
+                 * osd status template UP?DOWN
+                 */
+                osd.status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['NOTICE'],
+                    sevLevels: sevLevels
+                }) + " up</span>";
+                if (osd.status == 'down')
+                    osd.status_tmpl = "<span> " + statusTemplate({
+                        sevLevel: sevLevels['ERROR'],
+                        sevLevels: sevLevels
+                    }) + " down</span>";
+                /**
+                 * osd cluster membership template IN?OUT
+                 */
+                osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['INFO'],
+                    sevLevels: sevLevels
+                }) + " in</span>";
+                if (osd.cluster_status == 'out')
+                    osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                        sevLevel: sevLevels['WARNING'],
+                        sevLevels: sevLevels
+                    }) + " out</span>";
+
+                // Add to OSD scatter chart data of flag is not set
+                if (!skip_osd_bubble) {
+                    osdChartArr.push(osd)
+                } else {
+                    osdErrArr.push(osd.name);
+                }
+
+                // All OSDs data should be pushed here for List grid
+                osdArr.push(osd);
+            });
+        }
+        retArr.push({
+            disksGrid: osdArr,
+            disksChart: osdChartArr,
+            disksError: osdErrArr
+        });
+        return retArr;
+    },
+    parseDisksData: function(data) {
+        var retArr = [],
+            osdErrArr = [],
+            osdChartArr = [],
+            osdArr = [],
+            osdUpInArr = [],
+            osdDownArr = [],
+            osdUpOutArr = [],
+            skip_osd_bubble = new Boolean(),
+            statusTemplate = contrail.getTemplate4Id("disk-status-template");
+
+        if (data != null) {
+            var osds = data.osds;
+            $.each(osds, function(idx, osd) {
+                skip_osd_bubble = false;
+
+                if (osd.kb) {
+                    osd.available_perc = calcPercent(osd.kb_avail, osd.kb);
+                    osd.x = parseFloat(100 - osd.available_perc);
+                    osd.gb = kiloByteToGB(osd.kb);
+                    //osd.y = parseFloat(osd.gb);
+                    osd.total = formatBytes(osd.kb * 1024);
+                    osd.used = formatBytes(osd.kb_used * 1024);
+                    osd.gb_avail = kiloByteToGB(osd.kb_avail);
+                    osd.gb_used = kiloByteToGB(osd.kb_used);
+                    osd.color = getOSDColor(osd);
+                    osd.shape = 'circle';
+                    osd.size = 1;
+                } else {
+                    skip_osd_bubble = true;
+                    osd.gb = 'N/A';
+                    osd.total = 'N/A';
+                    osd.used = 'N/A';
+                    osd.gb_used = 'N/A';
+                    osd.gb_avail = 'N/A';
+                    osd.available_perc = 'N/A';
+                    osd.x = 'N/A';
+                }
+                if (!isEmptyObject(osd.avg_bw)) {
+                    if ($.isNumeric(osd.avg_bw.reads_kbytes) && $.isNumeric(osd.avg_bw.writes_kbytes)) {
+                        osd.y = osd.avg_bw.reads_kbytes + osd.avg_bw.writes_kbytes;
+                        osd.tot_avg_bw = formatBytes(osd.y * 1024);
+                        osd.avg_bw.read = formatBytes(osd.avg_bw.reads_kbytes * 1024);
+                        osd.avg_bw.write = formatBytes(osd.avg_bw.writes_kbytes * 1024);
+                    } else {
+                        osd.tot_avg_bw = 'N/A';
+                        osd.y = 'N/A';
+                        osd.avg_bw.read = 'N/A';
+                        osd.avg_bw.write = 'N/A';
+                    }
+                }
+                /**
+                 * osd status template UP?DOWN
+                 */
+                osd.status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['NOTICE'],
+                    sevLevels: sevLevels
+                }) + " up</span>";
+                if (osd.status == 'down')
+                    osd.status_tmpl = "<span> " + statusTemplate({
+                        sevLevel: sevLevels['ERROR'],
+                        sevLevels: sevLevels
+                    }) + " down</span>";
+                /**
+                 * osd cluster membership template IN?OUT
+                 */
+                osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                    sevLevel: sevLevels['INFO'],
+                    sevLevels: sevLevels
+                }) + " in</span>";
+                if (osd.cluster_status == 'out')
+                    osd.cluster_status_tmpl = "<span> " + statusTemplate({
+                        sevLevel: sevLevels['WARNING'],
+                        sevLevels: sevLevels
+                    }) + " out</span>";
+
+                // Add to OSD scatter chart data of flag is not set
+                if (!skip_osd_bubble) {
+                    if (osd.status == "up") {
+                        if (osd.cluster_status == "in") {
+                            osdUpInArr.push(osd);
+                        } else if (osd.cluster_status == "out") {
+                            osdUpOutArr.push(osd);
+                        } else {
+                        }
+                    } else if (osd.status == "down") {
+                        osdDownArr.push(osd);
+                    } else {
+                    }
+                } else {
+                    osdErrArr.push(osd.name);
+                }
+                // All OSDs data should be pushed here for List grid
+                osdArr.push(osd);
+            });
+
+            upInGroup = {}, upOutGroup = {}, downGroup = {};
+            //UP & IN OSDs
+            upInGroup.key = "UP & IN ";
+            upInGroup.values = osdUpInArr;
+            upInGroup.color = color_success;
+            osdChartArr.push(upInGroup);
+            //UP & OUT OSDs
+            upOutGroup.key = "UP & OUT";
+            upOutGroup.values = osdUpOutArr;
+            upOutGroup.color = color_warn;
+            osdChartArr.push(upOutGroup);
+            //Down OSDs
+            downGroup.key = "Down";
+            downGroup.values = osdDownArr;
+            downGroup.color = color_imp;
+            osdChartArr.push(downGroup);
+        }
+
+        retArr.push({
+            disksGrid: osdArr,
+            disksChart: osdChartArr,
+            disksError: osdErrArr
+        })
+        return retArr;
+    },
+    getAllDisks: function(defferedObj, dataSource, dsObj) {
+        var obj = {};
+        if(!dsObj['clean']){
+            obj['transportCfg'] = {
+                url: tenantMonitorStorageUrls['DISKS_SUMMARY'],
+                type: 'GET'
+            }
+            defferedObj.done(function(){
+                manageDataSource.refreshDataSource('storageDisksDS');
+            });
+        } else {
+            obj['transportCfg'] = {
+                url: tenantMonitorStorageUrls['DISKS_SUMMARY'] + '?forceRefresh',
+                type:'GET',
+                //set the default timeout as 5 mins
+                timeout:300000
+            }
+        }
+        getOutputByPagination(dataSource, {
+            transportCfg: obj['transportCfg'],
+            parseFn: tenantStorageUtils.parseDisksData,
+            loadedDeferredObj: defferedObj
+        });
+    },
+    parseDisksTreeData: function(data) {
+        var osdColorArr, osdStatusArr,
+            hostColorArr = [],
+            hostStatusArr = [],
+            retArr = [];
+
+        var root = data.osd_tree[0];
+        root.children = root.hosts;
+
+        $.each(root.children, function(idx, host) {
+            osdColorArr = [];
+            osdStatusArr = [];
+            host.children = host.osds;
+            $.each(host.children, function(idx, osd) {
+                osd.color = getOSDColor(osd);
+                osdColorArr.push(osd.color);
+                osdStatusArr.push(osd.status);
+                osdStatusArr.push(osd.cluster_status);
+            });
+            host.color = getHostColor(osdColorArr);
+            hostColorArr.push(host.color);
+            host.status = getHostStatus(osdStatusArr);
+            hostStatusArr.push(host.status);
+        });
+
+        root.color = getHostColor(hostColorArr);
+        root.status = getHostStatus(hostStatusArr);
+        retArr.push(root);
+
+        return retArr;
+
+    },
+    getDisksTree: function(defferedObj, dataSource, dsObj) {
+        var obj = {};
+        if(!dsObj['clean']){
+            obj['transportCfg'] = {
+                url: tenantMonitorStorageUrls['DISKS_TREE'],
+                type: 'GET'
+            }
+            defferedObj.done(function(){
+                manageDataSource.refreshDataSource('storageDisksTreeDS');
+            });
+        } else {
+            obj['transportCfg'] = {
+                url: tenantMonitorStorageUrls['DISKS_TREE'] + '?forceRefresh',
+                type:'GET',
+                //set the default timeout as 5 mins
+                timeout:300000
+            }
+        }
+        getOutputByPagination(dataSource, {
+            transportCfg: obj['transportCfg'],
+            parseFn: tenantStorageUtils.parseDisksTreeData,
+            loadedDeferredObj: defferedObj
+        });
+    }
+};
 
 (function($) {
     $.extend($.fn, {
