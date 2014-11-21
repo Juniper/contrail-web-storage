@@ -9,6 +9,7 @@ var color_info = '#1F77B4',
 
 //Global refresh timeout in ms
 var refreshTimeout = 30000;
+var ACTIVITY_QUERY_TIMEOUT = 60000;
 
 var tenantStorageChartsInitializationStatus = {
     disks: false,
@@ -21,6 +22,22 @@ var tenantStorageChartsInitializationStatus = {
 var disksTabs = ['Scatter Plot', 'Host Tree', 'Details'];
 var disksTabStrip = 'osdsTabStrip';
 var storageTreeChartExpandedNodes = [];
+
+$.extend(globalObj['dataSources'], {
+    'storageDisksDS': {
+        ongoing:false,
+        lastUpdated:null,
+        populateFn:['tenantStorageUtils.getAllDisks'],
+        deferredObj:null,
+        dataSource:null
+    },
+    'storageDisksTreeDS': {
+        ongoing:false,
+        lastUpdated:null,
+        populateFn:['tenantStorageUtils.getDisksTree'],
+        deferredObj:null,
+        dataSource:null
+    }});
 
 var tenantMonitorStorageUrls = {
     CLUSTER_STATUS: '/api/tenant/storage/cluster/status',
