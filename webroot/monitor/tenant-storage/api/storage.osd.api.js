@@ -63,6 +63,25 @@ function parseStorageOSDStatus(osdJSON){
     return osdMapJSON;
 }
 
+function getStorageOSDTree(req, res, appData){
+    var url = '/storage-topology-summary';
+    var forceRefresh = req.param('forceRefresh');
+    var key = storageGlobal.STR_GET_STORAGE_SUMMARY;
+    var jobRunCount=1;
+    var firstRunDelay= 0;
+    var nextRunDelay=storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
+
+    if (null == forceRefresh) {
+        forceRefresh = false;
+    } else {
+        forceRefresh = true;
+    }
+    cacheApi.queueDataFromCacheOrSendRequest(req, res,
+        storageGlobal.STR_JOB_TYPE_CACHE, key,
+        url, 0, jobRunCount, firstRunDelay, nextRunDelay,
+        forceRefresh, null);
+}
+
 function getStorageOSDsSummary (req, res, appData) {
     var url = '/storage-osds-summary';
     var forceRefresh = req.param('forceRefresh');
@@ -140,25 +159,7 @@ function parseStorageOSDDetails(req, res, resultJSON){
 
 }
 
-function getStorageOSDTree(req, res, appData){
-    var url = '/storage-osds-tree';
-    var forceRefresh = req.param('forceRefresh');
-    var key = storageGlobal.STR_GET_STORAGE_OSD_TREE;
-    var jobRunCount=0;
-    var firstRunDelay= 0;
-    var nextRunDelay=storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
 
-    if (null == forceRefresh) {
-        forceRefresh = false;
-    } else {
-        forceRefresh = true;
-    }
-    cacheApi.queueDataFromCacheOrSendRequest(req, res,
-        storageGlobal.STR_JOB_TYPE_CACHE, key,
-        url, 0, jobRunCount, firstRunDelay, nextRunDelay,
-        forceRefresh, null);
-
-}
 
 function parseOSDFromTree(osdDump, osdTree){
     var osds = jsonPath(osdDump, "$..osds")[0];
@@ -285,38 +286,6 @@ function parseHostFromOSD(hostJSON,osdsJSON, version, treeReplace) {
 }
 
 
-
-function parseStorageOSDTree(osdJSON, callback){
-    var emptyObj = {};
-    var osdList={};
-    var osdPG= osdJSON[0];
-    var osdTree= osdJSON[1];
-    var osdDump= osdJSON[2];
-    var rootMap = jsonPath(osdTree, "$..nodes[?(@.name=='default')]");
-    var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
-    var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
-    var osds = jsonPath(osdDump, "$..osds");
-
-    if (osds != undefined && osds.length > 0) {
-        var osdName='undefined';
-        for(i=0; i < tOSDs.length;i++){
-            if(tOSDs[i].status == "up"){
-                osdName= tOSDs[i].name;
-                break;
-            }
-        }
-        parseOSDVersion(osdName, function(version){
-            var osdMapJSON = new Object();
-            osds=parseOSDFromTree(osdDump,tOSDs);
-            parseOSDFromPG(osds,osdPG);
-            hostMap = parseHostFromOSD(hostMap,osds, version, true);
-            osdMapJSON["osd_tree"]= parseRootFromHost(rootMap,hostMap,true);
-            osdList= osdMapJSON;
-            callback(osdList);
-
-       });
-    }
-}
 
 function getAvgBWHostToOSD(osds,hostJSON, callback){
     var hstCnt= hostJSON.length;
@@ -615,7 +584,6 @@ exports.parseStorageOSDSummary=parseStorageOSDSummary;
 exports.getStorageOSDStatus=getStorageOSDStatus;
 
 exports.getStorageOSDTree=getStorageOSDTree;
-exports.parseStorageOSDTree=parseStorageOSDTree;
 
 exports.getStorageOSDDetails=getStorageOSDDetails;
 
