@@ -33,26 +33,29 @@ function processStorageOSDsSummaryRequestByJob(pubChannel, saveChannelKey, jobDa
     });
 }
 
-function processStorageOSDsTreeRequestByJob(pubChannel, saveChannelKey, jobData, done){
-    storageCommon.processStorageTopologyRawList(null, jobData, function(error,res,data){
-        osdApi.parseStorageOSDTree(data, function(resultJSON){
-            if (null != error) {
-                redisPub.publishDataToRedis(pubChannel, saveChannelKey,
-                    global.HTTP_STATUS_INTERNAL_ERROR,
-                    global.STR_CACHE_RETRIEVE_ERROR,
-                    global.STR_CACHE_RETRIEVE_ERROR,
-                    0, 0, done, jobData);
-                return;
-            }else{
-                redisPub.publishDataToRedis(pubChannel, saveChannelKey,
-                    global.HTTP_STATUS_RESP_OK,
-                    JSON.stringify(resultJSON),
-                    JSON.stringify(resultJSON),
-                    1, 0, done, jobData);
+function processStorageClusterStatus(pubChannel, saveChannelKey, jobData, done){
+    
+    url = "/status";
+    console.log("URL"+url);
+    storageRest.apiGet(url, jobData, function (error, resultJSON) {
+
+            if(!error && (resultJSON)) {
+                console.log("resultJSON"+resultJSON);
+                console.log("error"+error);
+                     redisPub.publishDataToRedis(pubChannel, saveChannelKey,
+                        global.HTTP_STATUS_RESP_OK,
+                        JSON.stringify(resultJSON),
+                        JSON.stringify(resultJSON),
+                        0, 0, done, jobData);
+            } else {
+                  redisPub.publishDataToRedis(pubChannel, saveChannelKey,
+                                              global.HTTP_STATUS_INTERNAL_ERROR,
+                                        global.STR_CACHE_RETRIEVE_ERROR,
+                                        global.STR_CACHE_RETRIEVE_ERROR, 0,
+                                        0, done, jobData);
             }
-        });
-    });
+        });   
 }
 
+exports.processStorageClusterStatus = processStorageClusterStatus;
 exports.processStorageOSDsSummaryRequestByJob = processStorageOSDsSummaryRequestByJob;
-exports.processStorageOSDsTreeRequestByJob=processStorageOSDsTreeRequestByJob;

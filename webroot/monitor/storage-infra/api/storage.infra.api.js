@@ -27,7 +27,7 @@ var redis = require("redis"),
 
 function getStorageSummary (req, res, appData)
 {
-    var url = '/storage-summary';
+    var url = '/storage-topology-summary';
     var forceRefresh = req.param('forceRefresh');
     var key = storageGlobal.STR_GET_STORAGE_SUMMARY;
     var jobRunCount=1;
@@ -47,7 +47,7 @@ function getStorageSummary (req, res, appData)
 
 function getStorageTopologyDetails(req, res, appData){
 
-    var reqUrl = "/storage-summary";
+    var reqUrl = "/storage-topology-summary";
 
     var reqObj = {}
     reqObj['req'] = req;
