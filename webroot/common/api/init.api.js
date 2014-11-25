@@ -10,7 +10,7 @@ var jobsApi = require(process.mainModule.exports["corePath"]  +'/src/serverroot/
 function createStorageSummaryJob (){
     var appData = {};
     var jobObj = {};
-    var url = '/storage-summary';
+    var url = '/storage-topology-summary';
     jobObj['jobName'] = storageGlobal.STR_GET_STORAGE_SUMMARY;
     jobObj['url'] = url;
     jobObj['firstRunDelay'] = 2 * 60 * 1000;

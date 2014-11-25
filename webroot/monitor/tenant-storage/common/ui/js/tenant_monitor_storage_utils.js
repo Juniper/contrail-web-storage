@@ -933,7 +933,7 @@ var tenantStorageUtils = {
             hostStatusArr = [],
             retArr = [];
 
-        var root = data.osd_tree[0];
+        var root = data.topology[0];
         root.children = root.hosts;
 
         $.each(root.children, function(idx, host) {

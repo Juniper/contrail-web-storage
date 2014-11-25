@@ -27,11 +27,6 @@
         <jobName>getStorageOSDsSummary</jobName>
         <callback>processStorageOSDsSummaryRequestByJob</callback>
     </item>
-    <item>
-        <jobName>getStorageOSDsTree</jobName>
-        <callback>processStorageOSDsTreeRequestByJob</callback>
-    </item>
-
-
+   
 </jobLists>
 
