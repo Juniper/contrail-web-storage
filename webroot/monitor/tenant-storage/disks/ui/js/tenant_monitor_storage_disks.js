@@ -29,6 +29,7 @@ cephOSDsView = function() {
 
         // cleanup diskActivity, stop fetching individual disk stats
         diskActivity.destroy();
+        tenantStorageChartsInitializationStatus['disks'] = false;
     }
 
     this.setOSDsBubbleData = function(data) {
@@ -259,7 +260,6 @@ cephOSDsView = function() {
         } else {
             osdsDV.updateData(self.getOSDsData());
         }*/
-        tenantStorageChartsInitializationStatus['disks'] = true;
     }
 
     function populateDisksTree() {
@@ -345,6 +345,7 @@ function updateDisksChart(data) {
         xLbl: 'Used (%)',
         xLblFormat: d3.format('.02f'),
         yLbl: 'Avg BW (Read + Write)',
+        yDataType: 'bytes',
         chartOptions: {
             xPositive: true,
             tooltipFn: tenantStorageChartUtils.diskTooltipFn,
@@ -381,7 +382,7 @@ function updateDisksChart(data) {
     chartsData['forceX'] = xscale;
     //chartsData['forceY'] = yscale;
 
-    if (!isScatterChartInitialized('#osds-bubble')) {
+    if (!tenantStorageChartsInitializationStatus['disks']){//!isScatterChartInitialized('#osds-bubble')) {
         $('#osds-bubble').initScatterChart(chartsData);
         tenantStorageChartsInitializationStatus['disks'] = true;
     } else {
@@ -390,7 +391,7 @@ function updateDisksChart(data) {
 }
 
 function updateDisksView(data) {
-    data = data[0];
+    var data = data[0];
     tenantStorageDisksView.setOSDsData(data.disksGrid);
     tenantStorageDisksView.setOSDsBubbleData(data.disksChart);
     if (data.disksError.length != 0) {
