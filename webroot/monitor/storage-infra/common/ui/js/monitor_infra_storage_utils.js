@@ -137,7 +137,7 @@ var infraMonitorStorageUtils = {
             obj['osds_available_perc'] = calcPercent((obj['osds_total'] - obj['osds_used']), obj['osds_total']);
             obj['x'] = parseFloat((100 - obj['osds_available_perc']).toFixed(2));
             //obj['y'] = parseFloat(byteToGB(obj['osds_total']));
-            obj['y'] = parseFloat(obj['tot_avg_bw'].toFixed(2))
+            obj['y'] = parseFloat(obj['tot_avg_bw'].toFixed(2)) * 1024;
             obj['osds_available'] = formatBytes(obj['osds_total'] - obj['osds_used']);
             obj['osds_total'] = formatBytes(obj['osds_total']);
             obj['osds_used'] = formatBytes(obj['osds_used']);
@@ -313,8 +313,7 @@ function getNodeStatusForSummaryPages(data, page) {
 }
 
 function updateStorageChartsForSummary(dsData, nodeType) {
-    var title, key, chartId, isChartInitialized = false,
-        tooltipFn;
+    var title, key, chartId, tooltipFn, clickFn;
     var nodeData = dsData;
     var data = [];
     if (nodeData != null) {
@@ -322,48 +321,41 @@ function updateStorageChartsForSummary(dsData, nodeType) {
     }
     if (nodeType == 'storageNodes') {
         title = 'Storage Nodes';
-        key = 'Storage Nodes';
+        key = 'storageNodes';
         chartId = 'storageNodes-bubble';
-        tooltipFn = dashboardUtils.storageNodeTooltipFn;
+        tooltipFn = storageChartUtils.storageNodeTooltipFn;
+        clickFn = storageChartUtils.onStorageNodeDrillDown;
     }
-    var chartsData = [{
+    var chartsData = {
         title: title,
+        xLbl: 'Used (%)',
+        xLblFormat: d3.format('.02f'),
+        yLbl: 'Avg BW (Read + Write)',
+        yDataType: 'bytes',
+        chartOptions: {
+            xPositive: true,
+            tooltipFn: tooltipFn,
+            clickFn: clickFn,
+            addDomainBuffer: true
+        },
         d: [{
             key: key,
             values: data
-        }],
-        xLbl: 'Used (%)',
-        yLbl: 'Avg BW (Read + Write)',
-        xLblFormat: d3.format('.02f'),
-        chartOptions: {
-            tooltipFn: storageChartUtils.storageNodeTooltipFn,
-            clickFn: storageChartUtils.onStorageNodeDrillDown,
-            xPositive: true,
-            addDomainBuffer: true
-        },
-        link: {
-            hashParams: {
-                p: 'mon_bgp',
-                q: {
-                    node: 'storageNode'
-                }
-            }
-        },
-        widgetBoxId: 'recent'
-    }];
-    var chartObj = {},
-        nwObj = {};
-    if (!storageSummaryChartsInitializationStatus[key]) {
-        $('#' + chartId).initScatterChart(chartsData[0]);
-        storageSummaryChartsInitializationStatus[key] = true;
+        }]
+    };
+    var chartObj = {};
+    if (!storageChartsInitializationStatus[key]) {
+        $('#' + chartId).initScatterChart(chartsData);
+        storageChartsInitializationStatus[key] = true;
     } else {
-        chartObj['selector'] = $('#content-container').find('#' + chartId + ' > svg').first()[0];
-        chartObj['data'] = [{
-            key: key,
-            values: data
-        }];
-        chartObj['type'] = 'infrabubblechart';
-        updateCharts.updateView(chartObj);
+        chartsData['selector'] = $('#content-container').find('#' + chartId + ' > svg').first()[0];
+        var chart = $(chartsData['selector']).parent('div').data('chart');
+        var result = formatByteAxis(chartsData['d']);
+        chartsData['d'] = result['data'];
+        chart.yAxis.axisLabel(chartsData['yLbl']+" "+result['yLbl']);
+        d3.select(chartObj['selector']).datum(chartsData['data']);
+        if(chart != null)
+            chart.update();
     }
 }
 

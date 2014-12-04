@@ -50,8 +50,26 @@ function addStorageTabs() {
                if (val['name'] != 'CLUSTER_HEALTH')
                     return val;
             });
+            var chartObj = {};
+            var chartsData = {
+                title: 'Storage Nodes',
+                xLbl: 'Used (%)',
+                xLblFormat: d3.format('.02f'),
+                yLbl: 'Avg BW (Read + Write)',
+                yDataType: 'bytes',
+                chartOptions: {
+                    xPositive: true,
+                    tooltipFn: storageChartUtils.storageNodeTooltipFn,
+                    clickFn: storageChartUtils.onStorageNodeDrillDown,
+                    addDomainBuffer: true
+                },
+                d: [{
+                    key: 'Storage Nodes',
+                    values: nodeData
+                }]
+            };
 
-            if (!isScatterChartInitialized('#storageNode-bubble')) {
+            if (!storageChartsInitializationStatus['storageDashboard']) {
                 $('#storageNodeStats-header').initWidgetHeader({
                     title: 'Storage Nodes',
                     link: {
@@ -63,24 +81,15 @@ function addStorageTabs() {
                         }
                     }
                 });
-                var chartsData = {
-                    title: 'Storage Nodes',
-                    xLbl: 'Used (%)',
-                    xLblFormat: d3.format('.02f'),
-                    yLbl: 'Avg BW (Read + Write)',
-                    chartOptions: {
-                        xPositive: true,
-                        tooltipFn: storageChartUtils.storageNodeTooltipFn,
-                        clickFn: storageChartUtils.onStorageNodeDrillDown,
-                        addDomainBuffer: true
-                    },
-                    d: [{
-                        key: 'Storage Nodes',
-                        values: nodeData
-                    }]
-                };
                 $('#storageNode-bubble').initScatterChart(chartsData);
-            } else {}
+                storageChartsInitializationStatus['storageDashboard'] = true;
+            } else {
+                nodeData = updateCharts.setUpdateParams(nodeData);
+                chartObj['selector'] = $('#content-contailner').find('#storageNode-bubble > svg').first()[0];
+                chartObj['data'] = [{key: 'storageNode', values: nodeData}];
+                chartObj['type'] = 'infrabubblechart';
+                updateCharts.updateView(chartObj);
+            }
             self.updateStorageInfoBoxes(data);
         }
 

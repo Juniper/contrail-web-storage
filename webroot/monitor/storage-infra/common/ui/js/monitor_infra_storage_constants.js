@@ -11,8 +11,7 @@ globalObj['dataSources']['storageNodeDS'] = {
 };
 
 var storageNodeTabs = ['details', 'disks', 'monitor'];
-var storageNodesDashboardChartInitialized = false;
-var storageSummaryChartsInitializationStatus = {storageNode:false};
+var storageChartsInitializationStatus = {storageDashboard: false, storageNodes:false};
 
 
 var monitorInfraStorageUrls = {

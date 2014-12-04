@@ -822,13 +822,13 @@ var tenantStorageUtils = {
                 }
                 if (!isEmptyObject(osd.avg_bw)) {
                     if ($.isNumeric(osd.avg_bw.reads_kbytes) && $.isNumeric(osd.avg_bw.writes_kbytes)) {
-                        osd.y = osd.avg_bw.reads_kbytes + osd.avg_bw.writes_kbytes;
-                        osd.tot_avg_bw = formatBytes(osd.y * 1024);
+                        osd.y = (osd.avg_bw.reads_kbytes + osd.avg_bw.writes_kbytes) * 1024;
+                        osd.tot_avg_bw = formatBytes(osd.y);
                         osd.avg_bw.read = formatBytes(osd.avg_bw.reads_kbytes * 1024);
                         osd.avg_bw.write = formatBytes(osd.avg_bw.writes_kbytes * 1024);
                     } else {
                         osd.tot_avg_bw = 'N/A';
-                        osd.y = 'N/A';
+                        osd.y = 0;
                         osd.avg_bw.read = 'N/A';
                         osd.avg_bw.write = 'N/A';
                     }

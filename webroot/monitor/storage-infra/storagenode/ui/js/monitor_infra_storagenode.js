@@ -3,6 +3,7 @@
  */
 
 storageNodesView = function() {
+    var self = this;
     this.load = function(obj) {
         var hashParams = ifNullOrEmptyObject(obj['hashParams'], {
             node: ''
@@ -29,10 +30,16 @@ storageNodesView = function() {
         });
     }
 
+    this.destroy = function() {
+        storageChartsInitializationStatus['storageNodes'] = false;
+        var cGrid = $('.contrail-grid').data('contrailGrid');
+        if(cGrid != null)
+            cGrid.destroy();
+    }
+
     function populateStorageNodes() {
 
         infraMonitorStorageUtils.clearTimers();
-        storageSummaryChartsInitializationStatus['storageNode'] = false;
         var storNodesTemplate = contrail.getTemplate4Id("storagenodes-template");
         $(pageContainer).html(storNodesTemplate({}));
 
@@ -820,11 +827,10 @@ storageNodeView = function() {
 
             $.each(osds, function(idx, osd) {
                 osd['x'] = parseFloat((100 -((osd.kb_avail / osd.kb) * 100)).toFixed(2));
-                osd['y'] = parseFloat((osd.kb / 1048576).toFixed(2));
                 if (!isEmptyObject(osd['avg_bw'])){
                     if($.isNumeric(osd['avg_bw']['reads_kbytes']) && $.isNumeric(osd['avg_bw']['writes_kbytes'])){
-                        osd['y'] = osd['avg_bw']['reads_kbytes'] + osd['avg_bw']['writes_kbytes'];
-                        osd['tot_avg_bw'] = formatBytes(osd['y'] * 1024);
+                        osd['y'] = (osd['avg_bw']['reads_kbytes'] + osd['avg_bw']['writes_kbytes']) * 1024;
+                        osd['tot_avg_bw'] = formatBytes(osd['y']);
                         osd['avg_bw']['read'] = formatBytes(osd['avg_bw']['reads_kbytes'] * 1024);
                         osd['avg_bw']['write'] = formatBytes(osd['avg_bw']['writes_kbytes'] * 1024);
                     } else {
@@ -887,8 +893,9 @@ storageNodeView = function() {
                         title: 'Disks',
                         xLbl: 'Used (%)',
                         xLblFormat: d3.format('.02f'),
-                        yLbl: 'Avg BW (Read + Write)',
+                        yLbl: 'Avg BW (Read + Write) ',
                         forceX: xscale,
+                        yDataType: 'bytes',
                         chartOptions: {
                             xPositive: true,
                             tooltipFn: storageChartUtils.diskTooltipFn,
