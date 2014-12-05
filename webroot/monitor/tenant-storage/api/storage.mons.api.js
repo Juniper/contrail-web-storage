@@ -72,35 +72,52 @@ function consolidateMonitors(resultJSON){
     var emptyObj = {};
     var monJSON = {};
     var monitor = jsonPath(resultJSON, "$..mons");
+    var tmpMonitors = new Object();
+
     if(monitor != undefined && monitor.length > 0) {
         var monCnt = monitor.length;
         var status = jsonPath(resultJSON, "$..health.overall_status")[0];
         monJSON['overall_status'] = status;
         var details = jsonPath(resultJSON, "$..details");
         monJSON['details'] = details;
+
         if (monitor.length > 2) {
-            var monitors = monitor[0];
-            monitors.merge(monitor[1]);
-            monitors.merge(monitor[2]);
+            tmpMonitors = monitor[1];
+
             var jsonstr = JSON.stringify(monitor[1]);
             var new_jsonstr = jsonstr.replace(/health/g, "act_health");
-            monitor[1] = JSON.parse(new_jsonstr);
-            monitors.merge(monitor[1]);
-            monitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
-            monJSON['monitors'] = monitors;
-        } else if (monitor.length > 1) {
-            var monitors = monitor[0];
-            monitors.merge(monitor[1]);
-            var jsonstr = JSON.stringify(monitor[1]);
-            var new_jsonstr = jsonstr.replace(/health/g, "act_health");
-            monitor[1] = JSON.parse(new_jsonstr);
-            monitors.merge(monitor[1]);
-            monitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
-            monJSON['monitors'] = monitors;
-        } else {
+            tmpMonitors = JSON.parse(new_jsonstr);
+            tmpMonitors['act_health'] = jsonPath(monitor[1], "$..health")[0];
+
+            tmpMonitors.merge(monitor[2]);
+
+
+        }
+
+        if (monitor.length > 1) {
+            var all_mons = monitor[0];
+            if (all_mons != undefined && all_mons.length > 0) {
+                for (i = 0; i < all_mons.length; i++) {
+                    var monName= all_mons[i].name;
+                    if (tmpMonitors != undefined && tmpMonitors.length > 0) {
+                        for (j = 0; j < tmpMonitors.length; j++) {
+                            var tmpName = tmpMonitors[j].name;
+                            if (monName == tmpName) {
+                                all_mons[i].merge(tmpMonitors[j]);
+                            }
+                        }
+                    }
+
+
+                }
+            }
+            monJSON['monitors'] = all_mons;
+        }else{
             var monitors = monitor[0];
             monJSON['monitors'] = monitors;
         }
+        monJSON['monitors']['mons_total'] =jsonPath(resultJSON, "$..monmap.mons.length");
+        monJSON['monitors']['mons_active'] =jsonPath(resultJSON, "$..health.health_services..mons.length");
     }
     return monJSON;
 }

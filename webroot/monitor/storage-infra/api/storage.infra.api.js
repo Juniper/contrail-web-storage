@@ -85,6 +85,8 @@ function parseStorageTopologyTree(osdJSON, callback){
     var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     var osds = jsonPath(osdDump, "$..osds");
     var monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
+    var mons_total = jsonPath(monsApi.consolidateMonitors(status), "$..mons_total")[0];
+    var mons_active = jsonPath(monsApi.consolidateMonitors(status), "$..mons_active")[0];
     if (osds != undefined && osds.length > 0) {
         var osdName='undefined';
         for(i=0; i < tOSDs.length;i++){
@@ -101,7 +103,8 @@ function parseStorageTopologyTree(osdJSON, callback){
                 hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
                 osdList.topology = parseRootFromHost(rootMap, hostMap);
                 osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
-                osdList.cluster_status.monitor_count= monsJSON.length;
+                osdList.cluster_status.monitor_count= mons_total[0];
+                osdList.cluster_status.monitor_active= mons_active[0];
                 callback(osdList);
             });
          });
