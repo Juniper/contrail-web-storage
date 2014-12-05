@@ -3,10 +3,8 @@
  */
 var storageApi= require('../../../common/api/storage.api.constants');
 var storageGlobal = require('../../../common/config/storage.global');
-var cacheApi = require(process.mainModule.exports["corePath"] +
-    '/src/serverroot/web/core/cache.api'),
-    commonUtils = require(process.mainModule.exports["corePath"]  +
-                    '/src/serverroot/utils/common.utils'),
+var cacheApi = require(process.mainModule.exports["corePath"] + '/src/serverroot/web/core/cache.api'),
+    commonUtils = require(process.mainModule.exports["corePath"]  + '/src/serverroot/utils/common.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
     global = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/global'),
     config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
@@ -85,6 +83,8 @@ function parseStorageTopologyTree(osdJSON, callback){
     var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     var osds = jsonPath(osdDump, "$..osds");
     var monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
+    var mons_total = jsonPath(monsApi.consolidateMonitors(status), "$..mons_total")[0];
+    var mons_active = jsonPath(monsApi.consolidateMonitors(status), "$..mons_active")[0];
     if (osds != undefined && osds.length > 0) {
         var osdName='undefined';
         for(i=0; i < tOSDs.length;i++){
@@ -101,16 +101,17 @@ function parseStorageTopologyTree(osdJSON, callback){
                 hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
                 osdList.topology = parseRootFromHost(rootMap, hostMap);
                 osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
-                osdList.cluster_status.monitor_count= monsJSON.length;
+                osdList.cluster_status.monitor_count= mons_total[0];
+                osdList.cluster_status.monitor_active= mons_active[0];
                 callback(osdList);
             });
-         });
+        });
     }
 }
 
 function parseMonitorWithHost(monsJSON, hostJSON){
-     var hstCnt= hostJSON.length;
-    for(i=0;i< hstCnt;i++){       
+    var hstCnt= hostJSON.length;
+    for(i=0;i< hstCnt;i++){
         var hostName= hostJSON[i].name;
         var monCnt = monsJSON.length;
         hostJSON[i].monitor = "Not Available";
@@ -118,7 +119,7 @@ function parseMonitorWithHost(monsJSON, hostJSON){
         hostJSON[i].kb_used = "Not Available";
         hostJSON[i].avail_percent= "Not Available";
         hostJSON[i].kb_avail= "Not Available";
-       for(j=0;j< monCnt; j++){
+        for(j=0;j< monCnt; j++){
             var monName= monsJSON[j].name;
             if(hostName == monName){
                 hostJSON[i].kb_total= monsJSON[j].kb_total;
@@ -127,60 +128,60 @@ function parseMonitorWithHost(monsJSON, hostJSON){
                 hostJSON[i].kb_avail= monsJSON[j].kb_avail;
                 hostJSON[i].monitor = monsJSON[j];
             }
-            
+
         }
     }
-   return hostJSON;
+    return hostJSON;
 }
 
 function parseRootFromHost(rootJSON, hostJSON){
-   var rootCnt = rootJSON.length;
-   for(q=0;q<rootCnt; q++) {
-       var total_up_node =0;
-       var total_down_node =0;
-       var total_warn_node =0;
+    var rootCnt = rootJSON.length;
+    for(q=0;q<rootCnt; q++) {
+        var total_up_node =0;
+        var total_down_node =0;
+        var total_warn_node =0;
 
-       var chldCnt = rootJSON[q].children.length;
-       for (i = 0; i < chldCnt; i++) {
-           var chldId = rootJSON[q].children[i];
-           var hostCnt = hostJSON.length;
-           for (j = 0; j < hostCnt; j++) {
-               var hostId = hostJSON[j].id;
-               if (chldId == hostId) {
-                   rootJSON[q].children[i] = hostJSON[j];
-                   var osdStatusJSON = jsonPath(hostJSON[j], "$.osds[*].status");
-                   var osdCnt = osdStatusJSON.length
-                   var hostStatus = "warn";
-                   var osdUp = 0, osdDown = 0;
-                   for (k = 0; k < osdCnt; k++) {
-                       var osdStatus = osdStatusJSON[k];
-                       if (osdStatus == "down") {
-                           osdDown = osdDown+1;
-                       }else if(osdStatus=="up"){
-                           osdUp= osdUp+1;
-                       }
-                   }
-                   if(osdDown == 0){
-                       hostStatus = "up";
-                   } else if(osdCnt ==osdDown){
-                       hostStatus = "down";
-                   }
-                   hostJSON[j].status = hostStatus;
-                   if (hostStatus == "up") {
-                       total_up_node = total_up_node + 1;
-                   } else if (hostStatus == "warn") {
-                       total_warn_node = total_warn_node + 1;
-                   } else{
-                       total_down_node = total_down_node + 1;
-                   }
-               }
-           }
-           rootJSON[q].total_node = chldCnt;
-           rootJSON[q].total_up_node = total_up_node;
-           rootJSON[q].total_warn_node = total_warn_node;
-           rootJSON[q].total_down_node = total_down_node;
-       }
-   }
+        var chldCnt = rootJSON[q].children.length;
+        for (i = 0; i < chldCnt; i++) {
+            var chldId = rootJSON[q].children[i];
+            var hostCnt = hostJSON.length;
+            for (j = 0; j < hostCnt; j++) {
+                var hostId = hostJSON[j].id;
+                if (chldId == hostId) {
+                    rootJSON[q].children[i] = hostJSON[j];
+                    var osdStatusJSON = jsonPath(hostJSON[j], "$.osds[*].status");
+                    var osdCnt = osdStatusJSON.length
+                    var hostStatus = "warn";
+                    var osdUp = 0, osdDown = 0;
+                    for (k = 0; k < osdCnt; k++) {
+                        var osdStatus = osdStatusJSON[k];
+                        if (osdStatus == "down") {
+                            osdDown = osdDown+1;
+                        }else if(osdStatus=="up"){
+                            osdUp= osdUp+1;
+                        }
+                    }
+                    if(osdDown == 0){
+                        hostStatus = "up";
+                    } else if(osdCnt ==osdDown){
+                        hostStatus = "down";
+                    }
+                    hostJSON[j].status = hostStatus;
+                    if (hostStatus == "up") {
+                        total_up_node = total_up_node + 1;
+                    } else if (hostStatus == "warn") {
+                        total_warn_node = total_warn_node + 1;
+                    } else{
+                        total_down_node = total_down_node + 1;
+                    }
+                }
+            }
+            rootJSON[q].total_node = chldCnt;
+            rootJSON[q].total_up_node = total_up_node;
+            rootJSON[q].total_warn_node = total_warn_node;
+            rootJSON[q].total_down_node = total_down_node;
+        }
+    }
     var jsonstr = JSON.stringify(rootJSON);
     var new_jsonstr = jsonstr.replace(/children/g, "hosts");
     rootJSON = JSON.parse(new_jsonstr);
