@@ -96,13 +96,15 @@ function addStorageTabs() {
         this.updateStorageInfoBoxes = function(data) {
 
             var nodeData = [],
-                totMonCnt = 0;
+                totMonCnt = 0,
+                totActiveMonCnt = 0;
 
             $.map(data, function(val, idx) {
                 if (val['name'] != 'CLUSTER_HEALTH') {
                     nodeData.push(val);
                 } else {
                     totMonCnt = val['monitor_count'];
+                    totActiveMonCnt = val['monitor_active'];
                 }
             });
 
@@ -161,7 +163,8 @@ function addStorageTabs() {
             var monElem = $('<div></div>').html(sparkLineMonTemplate({
                 title: monCnt > 1 ? 'Monitors':'Monitor',
                 totalCnt: monCnt,
-                monOnlyCnt: totMonCnt - monCnt,
+                monOnlyCnt: totActiveMonCnt - monCnt,
+                downCnt: totMonCnt - totActiveMonCnt,
                 id: 'infobox-mons'
             }));
 
@@ -223,6 +226,26 @@ function addStorageTabs() {
 
                         if (event.target.id == 'infoboxMonOnlyCnt')
                             content = "Monitor only Node";
+
+                        div.html('<span class="lbl">' + content +'</span>')
+                            .style("left", (event.pageX) + "px")
+                            .style("top", (event.pageY - 50) + "px");
+
+                    }, function() {
+                        $('body').find('.nvtooltip').remove();
+                    }
+                );
+            }
+
+            if($('#infoboxMonDownCnt').length) {
+                $('#infoboxMonDownCnt').hover(
+                    function(event) {
+                        $('body').find('.nvtooltip').remove();
+                        var div = d3.select('body').append("div")
+                            .attr("class", "nvtooltip");
+                        div.transition().duration(10);
+
+                        var content = "Monitor Down. Check alerts for more details..";
 
                         div.html('<span class="lbl">' + content +'</span>')
                             .style("left", (event.pageX) + "px")

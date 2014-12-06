@@ -175,6 +175,7 @@ var infraMonitorStorageUtils = {
         * this includes monitor only and storage + monitor nodes.
          */
         clusterObj['monitor_count'] = result['cluster_status']['monitor_count'];
+        clusterObj['monitor_active'] = result['cluster_status']['monitor_count'];
         //adding clusterObj to the top of the returned array
         retArr.unshift(clusterObj);
 
