@@ -80,13 +80,15 @@ function parseStorageTopologyTree(osdJSON, callback){
     var osdDump= osdJSON[2];
     var status= osdJSON[3];
 
-    var rootMap = jsonPath(osdTree, "$..nodes[?(@.name=='default')]");
+    //var rootMap = jsonPath(osdTree, "$..nodes[?(@.name=='default')]");
+    var rootMap = jsonPath(osdTree, "$..nodes[?(@.type=='root')]");
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
     var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     var osds = jsonPath(osdDump, "$..osds");
     var monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
-    var mons_total = jsonPath(monsApi.consolidateMonitors(status), "$..mons_total")[0];
-    var mons_active = jsonPath(monsApi.consolidateMonitors(status), "$..mons_active")[0];
+    var mons_total = jsonPath(status, "$..monmap.mons.length")[0];
+    var mons_active = jsonPath(status, "$..health.health_services..mons.length")[0];
+
     if (osds != undefined && osds.length > 0) {
         var osdName='undefined';
         for(i=0; i < tOSDs.length;i++){
@@ -101,10 +103,45 @@ function parseStorageTopologyTree(osdJSON, callback){
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
             osdApi.getAvgBWHostToOSD(osds,hostMap, function(osds){
                 hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
-                osdList.topology = parseRootFromHost(rootMap, hostMap);
+                //osdList.topology = parseRootFromHost(rootMap, hostMap);
+                var treeList ={};
+                treeList= parseRootFromHost(rootMap, hostMap);
+                var defaultList = jsonPath(treeList, "$..[?(@.name=='default')]")[0];
+
+                var ssdList = jsonPath(treeList, "$..[?(@.name=='ssd')]")[0];
+                var ssdOsdList= jsonPath(treeList, "$..[?(@.name=='ssd')]..osds[*].name");
+                if(ssdOsdList != undefined && ssdOsdList.length > 0){
+                  for(i=0;i< ssdOsdList.length;i++){
+                    var osdName= ssdOsdList[i];
+                    for(j=0;j< defaultList.hosts.length; j++){
+                        for(k=0;k< defaultList.hosts[j].osds.length; k++){
+                            if(osdName == defaultList.hosts[j].osds[k].name){
+                              defaultList.hosts[j].osds[k]['ceph_crush_name']="ssd";
+                            }
+                        }
+                    }
+                  }
+                }
+                var hddList = jsonPath(treeList, "$..[?(@.name=='hdd')]")[0];
+                var hddOsdList= jsonPath(treeList, "$..[?(@.name=='hdd')]..osds[*].name");
+                if(hddOsdList != undefined && hddOsdList.length > 0){
+                  for(i=0;i< hddOsdList.length;i++){
+                  var osdName= hddOsdList[i];
+                    for(j=0;j< defaultList.hosts.length; j++){
+                      for(k=0;k< defaultList.hosts[j].osds.length; k++){
+                              if(osdName == defaultList.hosts[j].osds[k].name){
+                              defaultList.hosts[j].osds[k]['ceph_crush_name']="hdd";
+                            }
+                        }
+                    }
+                  }
+                }
+                var tempDefaultList =[];
+                tempDefaultList[0]= defaultList;
+                osdList.topology= tempDefaultList;
                 osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
-                osdList.cluster_status.monitor_count= mons_total[0];
-                osdList.cluster_status.monitor_active= mons_active[0];
+                osdList.cluster_status.monitor_count= JSON.parse(mons_total);
+                osdList.cluster_status.monitor_active= JSON.parse(mons_active);
                 callback(osdList);
             });
          });
