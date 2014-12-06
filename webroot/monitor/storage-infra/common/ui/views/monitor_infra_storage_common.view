@@ -138,6 +138,9 @@
             </span>
             <div class="infobox-content">{{title}}</div>
         </div>
+        {{#IfCompare downCnt 0 operator='>' }}
+        <div id="infoboxMonDownCnt" class="monstat monstat-important">{{downCnt}}</div>
+        {{/IfCompare}}
     </div>
 </script>
 
