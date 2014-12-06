@@ -23,6 +23,7 @@ and need to add the iconClass tag wherever we need to show some icons
               <rootDir>/monitor/storage-infra/common/ui</rootDir>
               <js>monitor_infra_storage_constants.js</js>
               <js>monitor_infra_storage_utils.js</js>
+              <css>contrail.storage.infra.css</css>
               <view>monitor_infra_storage_common.view</view>
             </resource>
           </resources>
