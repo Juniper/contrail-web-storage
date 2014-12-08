@@ -13,6 +13,16 @@ globalObj['dataSources']['storageNodeDS'] = {
 var storageNodeTabs = ['details', 'disks', 'monitor'];
 var storageChartsInitializationStatus = {storageDashboard: false, storageNodes:false};
 
+var pool_prefix = {
+    VOLUME  : 'volumes_',
+    IMAGE   : 'images_'
+}
+
+var pools_name = {
+    DEFAULT :  'volumes, images',
+    HDD     :  'volumes, images, ' + pool_prefix['VOLUME'] + 'hdd',
+    SSD     :  pool_prefix['VOLUME'] + 'ssd'
+}
 
 var monitorInfraStorageUrls = {
     STORAGENODES_SUMMARY    : '/api/admin/monitor/infrastructure/storagenodes/summary',

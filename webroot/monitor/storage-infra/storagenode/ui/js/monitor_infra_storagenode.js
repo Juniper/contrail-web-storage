@@ -345,6 +345,16 @@ storageNodeView = function() {
                         sevLevels: sevLevels
                     }) + " out</span>";
 
+                if(osd.ceph_crush_name == 'default') {
+                    osd.disk_pool = pools_name['DEFAULT'];
+                } else if(osd.ceph_crush_name == 'hdd') {
+                    osd.disk_pool = pools_name['HDD'];
+                } else if(osd.ceph_crush_name == 'ssd') {
+                    osd.disk_pool = pools_name['SSD'];
+                } else {
+                    osd.disk_pool = "N/A"
+                }
+
                 osdArr.push(osd);
             });
 
@@ -380,7 +390,7 @@ storageNodeView = function() {
                         minWidth: 40
                     }, {
                         field: "name",
-                        name: "Disk name",
+                        name: "Disk",
                         events: {
                             onClick: function(e, dc) {
                                 onDisksRowSelChange(dc);
@@ -388,6 +398,10 @@ storageNodeView = function() {
                         },
                         cssClass: 'cell-hyperlink-blue',
                         minWidth: 40
+                    }, {
+                        field: "disk_pool",
+                        name: "Pool",
+                        minWidth: 200
                     }, {
                         field: "gb",
                         name: "Total",
