@@ -99,15 +99,23 @@ function parseStorageTopologyTree(osdJSON, callback){
         }
         osdApi.parseOSDVersion(osdName, function(version) {
             osds=osdApi.parseOSDFromTree(osdDump,tOSDs);
+            /*
+               Add a ceph_crush_name deafult values as 'default' all osd's
+            */
+            for(i=0; i < osds.length;i++){
+                  osds[i]['ceph_crush_name']= "default";
+            }
             osdApi.parseOSDFromPG(osds, osdPG);
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
             osdApi.getAvgBWHostToOSD(osds,hostMap, function(osds){
                 hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
-                //osdList.topology = parseRootFromHost(rootMap, hostMap);
                 var treeList ={};
                 treeList= parseRootFromHost(rootMap, hostMap);
                 var defaultList = jsonPath(treeList, "$..[?(@.name=='default')]")[0];
-
+                /*
+                   Get all the ssd-root osds from tree and compare with default-tree osds,
+                   replace the ceph_crush_name to 'ssd'
+                */
                 var ssdList = jsonPath(treeList, "$..[?(@.name=='ssd')]")[0];
                 var ssdOsdList= jsonPath(treeList, "$..[?(@.name=='ssd')]..osds[*].name");
                 if(ssdOsdList != undefined && ssdOsdList.length > 0){
@@ -122,6 +130,10 @@ function parseStorageTopologyTree(osdJSON, callback){
                     }
                   }
                 }
+                /*
+                   Get all the hdd-root osds from tree and compare with default-tree osds,
+                   replace the ceph_crush_name to 'hdd'
+                */
                 var hddList = jsonPath(treeList, "$..[?(@.name=='hdd')]")[0];
                 var hddOsdList= jsonPath(treeList, "$..[?(@.name=='hdd')]..osds[*].name");
                 if(hddOsdList != undefined && hddOsdList.length > 0){
