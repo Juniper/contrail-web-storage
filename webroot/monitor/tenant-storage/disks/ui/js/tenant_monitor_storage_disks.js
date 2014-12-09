@@ -51,11 +51,7 @@ cephOSDsView = function() {
     }
 
     this.setOSDsData = function(data) {
-        if (self.getOSDsData().length == 0) {
-            self.osdsDV.setData(data);
-        } else {
-            self.osdsDV.updateData(data);
-        }
+        self.osdsDV.setData(data);
     }
 
     this.getOSDsData = function() {
