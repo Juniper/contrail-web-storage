@@ -320,7 +320,7 @@ function parseOSDVersion(name, callback){
     if(name !== 'undefined') {
         var url = storageApi.url.osdVersion, appData = {};
         url = url.replace(":osdName", name);
-        cookieCephVersion = url;
+        cookieCephVersion = "storage_cephversion";
         redisClient.get(cookieCephVersion, function (error, cachedJSONStr) {
             if (error || cachedJSONStr == null) {
                 storageRest.apiGet(url, appData, function (error, resultJSON) {
