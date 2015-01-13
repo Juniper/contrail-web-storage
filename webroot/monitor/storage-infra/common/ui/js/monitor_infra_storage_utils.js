@@ -154,7 +154,7 @@ var infraMonitorStorageUtils = {
             /*
             * build_info response holds version string or could be empty array.
              */
-            if (host['build_info'].length < 0) {
+            if (host['build_info'].length > 0) {
                 var versionArr = host['build_info'].split(" ");
                 obj['version'] = "Ceph " + versionArr[2];
             } else {
