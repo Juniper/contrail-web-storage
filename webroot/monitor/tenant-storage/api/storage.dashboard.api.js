@@ -51,7 +51,7 @@ function getStorageJobClusterStatus(req, res ){
 }
 
 function getStorageClusterHealthStatus(req, res, appData){
-    var urlHealth = storageApi.url.status;
+    var urlHealth = storageApi.url.health;
     cookieClusterStatus= "/api/tenant/storage/cluster/status";
     redisClient.get(cookieClusterStatus, function(error, cachedJSONStr) {
         if (error || cachedJSONStr == null) {
@@ -76,10 +76,10 @@ function getStorageClusterHealthStatus(req, res, appData){
 function parseStorageHealthStatusData(resultJSON){
     var emptyObj = {};  
         var healthJSON = {};
-        var status = jsonPath(resultJSON, "$..health.overall_status");
+        var status = jsonPath(resultJSON, "$..overall_status");
         var summary= jsonPath(resultJSON, "$..summary");
         var details= jsonPath(resultJSON, "$..detail");
-        var pgmap= jsonPath(resultJSON, "$..pgmap");
+       // var pgmap= jsonPath(resultJSON, "$..pgmap");
         if (status.length > 0 ) {
             var temp = new Object();
             temp['last_updated_time']= new Date();
@@ -87,7 +87,7 @@ function parseStorageHealthStatusData(resultJSON){
             temp["health"]={};
             temp["health"]["details"] = details[0];
             temp["health"]["summary"] = summary[0];
-            temp["pgmap"] = pgmap[0];
+          //  temp["pgmap"] = pgmap[0];
             healthJSON['cluster_status']= temp;
             return healthJSON;
         }

@@ -6,7 +6,7 @@ storage.rest.serverVersion = "/api/v0.1";
 storage.expireTimeSecs= 25;
 
 storage.url={};
-storage.url.health = "/health";
+storage.url.health = "/health?detail=detail";
 storage.url.status = "/status";
 storage.url.monStatus = "/mon_status";
 storage.url.df = "/df";
