@@ -207,7 +207,7 @@ cephOSDsView = function() {
                 dataSource: {
                     dataView: self.osdsDV,
                     events: {
-                        onUpdateDataCB: function() {
+                        onDataUpdateCB: function() {
                             var dvGrid = $('#gridOSDs').data('contrailGrid');
                             dvGrid.removeGridLoading();
                         }
@@ -238,11 +238,20 @@ cephOSDsView = function() {
         });
 
         var result = disksDS.getDataSourceObj();
-        var dataSource = result['dataSource'];
-        var deferredObj = result['deferredObj'];
+        var disksDataSource = result['dataSource'];
+        var disksDeferredObj = result['deferredObj'];
+
+        var disksGrid = $('#gridOSDs').data('contrailGrid');
+        disksDeferredObj.done(function() {
+            disksGrid.removeGridLoading();
+        });
+        disksDeferredObj.fail(function() {
+            disksGrid.showGridMessage('errorGettingData');
+        });
+
         //Update the viewModel
         $(disksDS).on('change',function() {
-            var data = dataSource.getItems();
+            var data = disksDataSource.getItems();
             if (data.length != 0)
                 updateDisksView(data);
         });

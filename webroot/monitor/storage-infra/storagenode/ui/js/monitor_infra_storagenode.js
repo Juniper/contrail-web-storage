@@ -484,7 +484,7 @@ storageNodeView = function() {
                     dataSource: {
                         dataView: osdsDV,
                         events: {
-                            onUpdateDataCB: function() {
+                            onDataUpdateCB: function() {
                                 var dvGrid = $("#gridDisksDash").data('contrailGrid');
                                 dvGrid.removeGridLoading();
                             }
