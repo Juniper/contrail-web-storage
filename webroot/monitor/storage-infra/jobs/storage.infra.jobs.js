@@ -8,7 +8,6 @@ var commonUtils = require(process.mainModule.exports["corePath"]  + '/src/server
     util = require('util'),
     qs = require('querystring'),
     async = require('async'),
-    jsonPath = require('JSONPath').eval,
     storageRest= require('../../../common/api/storage.rest.api'),
     storageCommon= require('../../../common/api/storage.common.api'),
     assert = require('assert'),

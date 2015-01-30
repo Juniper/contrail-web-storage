@@ -11,6 +11,7 @@ var cacheApi = require(process.mainModule.exports["corePath"] +
     global = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/global'),
     config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
     logutils = require(process.mainModule.exports["corePath"] + '/src/serverroot/utils/log.utils'),
+    opApiServer = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/opServer.api'),
     stMonUtils= require('../../../common/utils/storage.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
     async = require('async'),
@@ -159,8 +160,6 @@ function parseStorageOSDDetails(req, res, resultJSON){
 
 }
 
-
-
 function parseOSDFromTree(osdDump, osdTree){
     var osds = jsonPath(osdDump, "$..osds")[0];
     var nodeCnt= osds.length;
@@ -288,31 +287,42 @@ function parseHostFromOSD(hostJSON,osdsJSON, version, treeReplace) {
 
 
 function getAvgBWHostToOSD(osds,hostJSON, callback){
-    var hstCnt= hostJSON.length;
-    for(i=0;i< hstCnt;i++){
-        var cldCnt= hostJSON[i].children.length;
-        for(j=0;j< cldCnt; j++){
-            var chlId= hostJSON[i].children[j];
-            for(k=0;k< osds.length;k++){
-                var osdId= osds[k].id;
-                if(chlId==osdId){
-                    osds[k].host = hostJSON[i].name;
-               }
+    postParseStorageOSDAvgBW(function(resultJSON){
+        var hstCnt= hostJSON.length;
+        for(i=0;i< hstCnt;i++){
+            var cldCnt= hostJSON[i].children.length;
+            for(j=0;j< cldCnt; j++){
+                var chlId= hostJSON[i].children[j];
+                for(k=0;k< osds.length;k++){
+                    var osdId= osds[k].id;
+                    if(chlId==osdId){
+                        osds[k].host = hostJSON[i].name;
+                        var results = new Object();
+                           results['Date']= new Date();
+                           results['name']= hostJSON[i].name+":"+osds[k].name;
+                           results['reads']= "Not Available";
+                           results['writes']= "Not Available";
+                           results['reads_kbytes']= "Not Available";
+                           results['writes_kbytes']= "Not Available";
+                           results['op_r_latency']= "Not Available";
+                           results['op_w_latency']= "Not Available";
+                        osds[k].avg_bw =results;
+                   }
+                }
             }
         }
-    }
-    async.map(osds, praseStorageOsds, function(err, osds){
+        var osdLen = osds.length;
+        for(i=0; i< osdLen; i++){
+            var osdName = osds[i].avg_bw.name;
+            var avgBWLen = resultJSON.length;
+            for(j=0;j< avgBWLen;j++){
+                   if(osdName == resultJSON[j].name){
+                    osds[i].avg_bw = resultJSON[j];
+                   }
+            }
+        }
         callback(osds);
     });
-}
-
-function praseStorageOsds(osd, callback){
-    parseStorageOSDAvgBW(osd.name, osd.host, function(resultJSON){
-        osd['avg_bw'] = resultJSON;
-        callback(null, osd);
-    });
-
-
 }
 
 function parseOSDVersion(name, callback){
@@ -577,6 +587,76 @@ function formatOsdAvgBWLoadXMLData(resultJSON){
     }
 }
 
+function getStorageOsdsUVEsList (req, res){
+    postParseStorageOSDAvgBW(function(resultJSON){
+            commonUtils.handleJSONResponse(null, res, resultJSON);
+        });
+}
+function processStorgaeOsdsNames(callback){
+     var results = [];
+    var url = '/analytics/uves/storage-osds';
+
+    opServer.api.get(url, function(err, data) {
+        if (err || (null == data)) {
+            callback(results)
+        } else {
+            callback(jsonPath(data,"$..name"));
+        }
+    });
+}
+function createClause(fieldName, fieldValue, operator){
+    var whereClause = {};
+    if (fieldValue != null) {
+        whereClause = {};
+        whereClause.name = fieldName;
+        whereClause.value = fieldValue;
+        whereClause.op = operator;
+    }
+    return whereClause;
+}
+
+function postParseStorageOSDAvgBW(callback){
+    var sampleCnt = 10, minsSince = 30, endTime ='now';
+    var intervalSecs = 3600;
+    var emptyObj = {};
+
+    var tableName, whereClause=[],
+        selectArr = ["name", "uuid", "SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
+            "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)", "COUNT(info_stats)" ];
+
+    tableName = 'StatTable.ComputeStorageOsd.info_stats';
+    processStorgaeOsdsNames(function(sourceJSON){
+            if (sourceJSON != undefined && sourceJSON.length > 0) {
+                var count = sourceJSON.length;
+                for (i = 0; i < count; i += 1) {
+                    var whereClauseArray = [];
+                    whereClauseArray.push(createClause('name', sourceJSON[i], 1));
+                    whereClause.push(whereClauseArray);
+                }
+                var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+                var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+                var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+                delete queryJSON['limit'];
+                delete queryJSON['dir'];
+                var selectEleCnt = queryJSON['select_fields'].length;
+                queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+                queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+                stMonUtils.executeQueryString(queryJSON,
+                commonUtils.doEnsureExecution(function(err, resultJSON)  {
+                    if(resultJSON !== 'undefined' && typeof resultJSON['value'] !== "undefined") {
+                        resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
+                        callback(resultJSON);
+                    }
+                }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+            }else{
+                callback(emptyObj);
+            }
+        });
+}
+
+
+
+
 /* List all public functions */
 exports.getStorageOSDsSummary=getStorageOSDsSummary;
 exports.parseStorageOSDSummary=parseStorageOSDSummary;
@@ -596,6 +676,8 @@ exports.parseRootFromHost=parseRootFromHost;
 exports.getStorageOSDFlowSeries= getStorageOSDFlowSeries;
 exports.getStorageOSDAvgBW= getStorageOSDAvgBW;
 exports.getAvgBWHostToOSD=getAvgBWHostToOSD;
+
+exports.getStorageOsdsUVEsList=getStorageOsdsUVEsList;
 
 
 
