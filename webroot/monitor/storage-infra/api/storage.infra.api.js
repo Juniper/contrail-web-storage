@@ -88,7 +88,6 @@ function parseStorageTopologyTree(osdJSON, callback){
     var monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
     var mons_total = jsonPath(status, "$..monmap.mons.length")[0];
     var mons_active = jsonPath(status, "$..health.health_services..mons.length")[0];
-
     if (osds != undefined && osds.length > 0) {
         var osdName='undefined';
         for(i=0; i < tOSDs.length;i++){
@@ -100,7 +99,7 @@ function parseStorageTopologyTree(osdJSON, callback){
         osdApi.parseOSDVersion(osdName, function(version) {
             osds=osdApi.parseOSDFromTree(osdDump,tOSDs);
             /*
-               Add a ceph_crush_name deafult values as 'default' to all osd's
+               Add a ceph_crush_name default values as 'default' to all osd's
             */
             for(i=0; i < osds.length;i++){
                   osds[i]['ceph_crush_name']= "default";
@@ -191,7 +190,6 @@ function parseRootFromHost(rootJSON, hostJSON){
        var total_up_node =0;
        var total_down_node =0;
        var total_warn_node =0;
-
        var chldCnt = rootJSON[q].children.length;
        for (i = 0; i < chldCnt; i++) {
            var chldId = rootJSON[q].children[i];

@@ -21,6 +21,8 @@ storage.url.osdDump = "/osd/dump";
 storage.url.osdStat = "/osd/stat";
 storage.url.osdVersion="/tell/:osdName/version";
 
+storage.url.osdUVEs = "/analytics/uves/storage-osds"
+
 // Export this as a module.
 module.exports = storage;
 
