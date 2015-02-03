@@ -85,9 +85,25 @@ function parseStorageTopologyTree(osdJSON, callback){
     var hostMap = jsonPath(osdTree, "$..nodes[?(@.type=='host')]");
     var tOSDs = jsonPath(osdTree, "$..nodes[?(@.type=='osd')]");
     var osds = jsonPath(osdDump, "$..osds");
-    var monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
-    var mons_total = jsonPath(status, "$..monmap.mons.length")[0];
-    var mons_active = jsonPath(status, "$..health.health_services..mons.length")[0];
+    
+    var monsJSON = {}
+    var mons_len =jsonPath(status, "$..monmap.mons.length");
+    if (mons_len != undefined && mons_len.length > 0) {
+      monsJSON = jsonPath(monsApi.consolidateMonitors(status), "$..monitors")[0];
+    }
+
+    var mons_total = {};
+    var mommap_len =jsonPath(status, "$..monmap.mons.length");
+    if (mommap_len != undefined && mommap_len.length > 0) {
+      mons_total = jsonPath(status, "$..monmap.mons.length")[0];
+    }
+    
+    var mons_active ={};
+    var ser_mons_len = jsonPath(status, "$..health.health_services..mons.length")
+    if (ser_mons_len != undefined && ser_mons_len.length > 0) {
+        mons_active = jsonPath(status, "$..health.health_services..mons.length")[0];
+    }
+    
     if (osds != undefined && osds.length > 0) {
         var osdName='undefined';
         for(i=0; i < tOSDs.length;i++){
@@ -156,6 +172,8 @@ function parseStorageTopologyTree(osdJSON, callback){
                 callback(osdList);
             });
         });
+    }else{
+      callback(osdList);
     }
 }
 
