@@ -264,31 +264,32 @@ function formatOsdSeriesLoadXMLData(resultJSON){
     var counter = 0,secTime;
     try {
         resultJSON = resultJSON['value'];
-        counter = resultJSON.length;
-        for (var i = 0; i < counter; i++) {
-            results[i] = {};
+        counter = resultJSON.length-1;
+        for (var i = 1; i < counter; i++) {
+             results[i-1] = {};
             secTime = Math.floor(resultJSON[i]['T='] / 1000);
-            results[i]['Date']= new Date(secTime);
+            results[i-1]['Date']= new Date(secTime);
             var count = resultJSON[i]['COUNT(info_stats)'];
-            results[i]['MessageTS'] = resultJSON[i]['T='];
-            results[i]['sampleCnt'] = count;
+            results[i-1]['MessageTS'] = resultJSON[i]['T='];
+            results[i-1]['sampleCnt'] = count;
+            
             var reads = resultJSON[i]['SUM(info_stats.reads)'];
-            results[i]['reads'] =  Math.ceil(reads/count);
-
+            results[i-1]['reads'] =  Math.ceil(reads/60);
+            
             var writes= resultJSON[i]['SUM(info_stats.writes)'];
-            results[i]['writes'] = Math.ceil(writes/count);
-
+            results[i-1]['writes'] = Math.ceil(writes/60);
+            
             var reads_kbytes= resultJSON[i]['SUM(info_stats.read_kbytes)'];
-            results[i]['reads_kbytes'] = reads_kbytes/count;
-
+            results[i-1]['reads_kbytes'] = reads_kbytes/60;
+            
             var writes_kbytes= resultJSON[i]['SUM(info_stats.write_kbytes)'];
-            results[i]['writes_kbytes'] = writes_kbytes/count;
-
+            results[i-1]['writes_kbytes'] = writes_kbytes/60;
+            
             var op_r_latency = resultJSON[i]['SUM(info_stats.op_r_latency)'];
-            results[i]['op_r_latency'] = op_r_latency/count;
+            results[i-1]['op_r_latency'] = op_r_latency/(count*60);
 
             var op_w_latency = resultJSON[i]['SUM(info_stats.op_w_latency)'];
-            results[i]['op_w_latency'] = op_w_latency/count;
+            results[i-1]['op_w_latency'] = op_w_latency/(count*60);
         }
         return results;
     } catch (e) {
