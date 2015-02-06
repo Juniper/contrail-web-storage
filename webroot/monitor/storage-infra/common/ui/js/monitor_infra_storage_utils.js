@@ -337,7 +337,7 @@ function updateStorageChartsForSummary(dsData, nodeType) {
         title: title,
         xLbl: 'Used (%)',
         xLblFormat: d3.format('.02f'),
-        yLbl: 'Avg BW (Read + Write)',
+        yLbl: 'Avg 30 Min BW (Read + Write)',
         yDataType: 'bytes',
         chartOptions: {
             xPositive: true,
@@ -426,7 +426,7 @@ var storageChartUtils = {
             lbl: 'Disks',
             value: currObj['osds'].length
         }, {
-            lbl: 'Avg BW',
+            lbl: 'Avg 30Min BW',
             value: formatBytes(currObj['tot_avg_bw'] * 1024) +
                 ' [ Read ' + formatBytes(currObj['tot_avg_read_kb'] * 1024) + ', Write ' +
                 formatBytes(currObj['tot_avg_write_kb'] * 1024) + ']'
@@ -445,7 +445,7 @@ var storageChartUtils = {
             value: formatBytes((currObj['kb'] - currObj['kb_used']) * 1024) +
                 ' [ ' + currObj['available_perc'] + '%' + ' ]'
         }, {
-            lbl: 'Avg BW',
+            lbl: 'Avg 30Min BW',
             value: currObj['tot_avg_bw'] + ' [ Read ' +
             currObj['avg_bw']['read'] + ', Write ' + currObj['avg_bw']['write'] + ' ]'
         }, {
