@@ -907,7 +907,7 @@ storageNodeView = function() {
                         title: 'Disks',
                         xLbl: 'Used (%)',
                         xLblFormat: d3.format('.02f'),
-                        yLbl: 'Avg BW (Read + Write) ',
+                        yLbl: 'Avg 30 Min BW (Read + Write) ',
                         forceX: xscale,
                         yDataType: 'bytes',
                         chartOptions: {
