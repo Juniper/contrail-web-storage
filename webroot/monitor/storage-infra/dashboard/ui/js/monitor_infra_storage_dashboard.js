@@ -55,7 +55,7 @@ function addStorageTabs() {
                 title: 'Storage Nodes',
                 xLbl: 'Used (%)',
                 xLblFormat: d3.format('.02f'),
-                yLbl: 'Avg BW (Read + Write)',
+                yLbl: 'Avg 30 Min BW (Read + Write)',
                 yDataType: 'bytes',
                 chartOptions: {
                     xPositive: true,

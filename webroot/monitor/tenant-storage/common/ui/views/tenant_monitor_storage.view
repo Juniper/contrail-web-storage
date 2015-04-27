@@ -106,34 +106,3 @@
     {{/IfCompare}}
     {{/IfCompare}}
 </script>
-
-<script type="text/x-handlebars-template" id="dashboard-body-template">
-<div class="widget-main row-fluid">
-    {{#IfCompare showSettings true options='=='}}
-    <div id="divAdvanced" class="row-fluid hide">
-        <div><pre>{{{displayJson nodeData}}}</pre></div>
-    </div>
-    {{/IfCompare}}
-    <div id="divBasic" class="row-fluid">
-        <ul id="detail-columns" class="item-list">
-            {{#each d}}
-            <li>
-                <label class="inline row-fluid">
-                    <div class="key span5">{{{this.lbl}}}</div>
-                    <div class="value span7">
-                        {{#if this.value}}
-                        {{{this.value}}}
-                        {{else}}
-                        --
-                        {{/if}}
-                    </div>
-                </label>
-            </li>
-            {{/each}} <!-- /each d -->
-        </ul>
-    </div><!--/span-->
-    <div id="divStatus" hidden="true" class="row-fluid">
-        <div id="divContrailStatus" class="row-fluid"></div>
-    </div>
-</div><!-- /widget-main -->
-</script>

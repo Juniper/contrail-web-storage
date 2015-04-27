@@ -194,11 +194,24 @@ cephMonitorView = function () {
                 dataSource : {
                     dataView : monitorsDV,
                     events: {
-                        onUpdateDataCB: function() {
+                        onDataUpdateCB: function() {
                             var dvGrid = $('#gridMonitors').data('contrailGrid');
                             dvGrid.removeGridLoading();
                         }
                     }
+                }
+            },
+            statusMessages: {
+                loading: {
+                    text: 'Loading Storage Monitors..'
+                },
+                empty: {
+                    text: 'No Storage Monitors to display'
+                },
+                errorGettingData: {
+                    type: 'error',
+                    iconClasses: 'icon-warning',
+                    text: 'Error in getting Data.'
                 }
             },
             footer : {
@@ -292,7 +305,7 @@ function getMonitorsSummary(){
             if(errObj['errTxt'] != null)
                 cGrid.showGridMessage('error', errObj['errTxt']);
             else
-                cGrid.showGridMessage('error', 'Error in fetching Monitor Node details');
+                cGrid.showGridMessage('errorGettingData');
     });
 }
 
