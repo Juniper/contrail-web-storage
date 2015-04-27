@@ -347,11 +347,11 @@ tenantStorageDisksView = new cephOSDsView();
 function updateDisksChart(data) {
     var chartsData = {
         title: 'Disks',
-        xLbl: 'Used (%)',
-        xLblFormat: d3.format('.02f'),
-        yLbl: 'Avg BW (Read + Write)',
-        yDataType: 'bytes',
         chartOptions: {
+            xLbl: 'Used (%)',
+            xLblFormat: d3.format('.02f'),
+            yLbl: 'Avg BW (Read + Write)',
+            yDataType: 'bytes',
             xPositive: true,
             tooltipFn: tenantStorageChartUtils.diskTooltipFn,
             clickFn: tenantStorageChartUtils.onDiskDrillDown,
@@ -384,7 +384,7 @@ function updateDisksChart(data) {
         xscale[1] = 100.00;
         xscale[0] = parseFloat((xscale[0] - 5).toFixed(2));
     }
-    chartsData['forceX'] = xscale;
+    chartsData['chartOptions']['forceX'] = xscale;
     //chartsData['forceY'] = yscale;
 
     if (!tenantStorageChartsInitializationStatus['disks']){//!isScatterChartInitialized('#osds-bubble')) {

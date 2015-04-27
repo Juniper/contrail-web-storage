@@ -53,11 +53,11 @@ function addStorageTabs() {
             var chartObj = {};
             var chartsData = {
                 title: 'Storage Nodes',
-                xLbl: 'Used (%)',
-                xLblFormat: d3.format('.02f'),
-                yLbl: 'Avg 30 Min BW (Read + Write)',
-                yDataType: 'bytes',
                 chartOptions: {
+                    xLbl: 'Used (%)',
+                    xLblFormat: d3.format('.02f'),
+                    yLbl: 'Avg 30 Min BW (Read + Write)',
+                    yDataType: 'bytes',
                     xPositive: true,
                     tooltipFn: storageChartUtils.storageNodeTooltipFn,
                     clickFn: storageChartUtils.onStorageNodeDrillDown,

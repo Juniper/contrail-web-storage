@@ -335,11 +335,11 @@ function updateStorageChartsForSummary(dsData, nodeType) {
     }
     var chartsData = {
         title: title,
-        xLbl: 'Used (%)',
-        xLblFormat: d3.format('.02f'),
-        yLbl: 'Avg 30 Min BW (Read + Write)',
-        yDataType: 'bytes',
         chartOptions: {
+            xLbl: 'Used (%)',
+            xLblFormat: d3.format('.02f'),
+            yLbl: 'Avg 30 Min BW (Read + Write)',
+            yDataType: 'bytes',
             xPositive: true,
             tooltipFn: tooltipFn,
             clickFn: clickFn,
@@ -358,8 +358,8 @@ function updateStorageChartsForSummary(dsData, nodeType) {
         chartsData['selector'] = $('#content-container').find('#' + chartId + ' > svg').first()[0];
         var chart = $(chartsData['selector']).parent('div').data('chart');
         var result = formatByteAxis(chartsData['d']);
-        chartsData['d'] = result['data'];
-        chart.yAxis.axisLabel(chartsData['yLbl']+" "+result['yLbl']);
+        chartsData['data'] = result['data'];
+        chart.yAxis.axisLabel(chartsData['chartOptions']['yLbl']+" "+result['yLbl']);
         d3.select(chartObj['selector']).datum(chartsData['data']);
         if(chart != null)
             chart.update();
