@@ -484,7 +484,7 @@ storageNodeView = function() {
                     dataSource: {
                         dataView: osdsDV,
                         events: {
-                            onUpdateDataCB: function() {
+                            onDataUpdateCB: function() {
                                 var dvGrid = $("#gridDisksDash").data('contrailGrid');
                                 dvGrid.removeGridLoading();
                             }
@@ -905,12 +905,12 @@ storageNodeView = function() {
                 parseFn: function(response) {
                     return {
                         title: 'Disks',
-                        xLbl: 'Used (%)',
-                        xLblFormat: d3.format('.02f'),
-                        yLbl: 'Avg BW (Read + Write) ',
-                        forceX: xscale,
-                        yDataType: 'bytes',
                         chartOptions: {
+                            xLbl: 'Used (%)',
+                            xLblFormat: d3.format('.02f'),
+                            yLbl: 'Avg 30 Min BW (Read + Write) ',
+                            forceX: xscale,
+                            yDataType: 'bytes',
                             xPositive: true,
                             tooltipFn: storageChartUtils.diskTooltipFn,
                             clickFn: storageChartUtils.onDiskDrillDown,
