@@ -146,13 +146,9 @@ storageNodesView = function() {
                     name: "Disks Used Space",
                     minWidth: 60,
                 }, {
-                    field: "total",
-                    name: "Root HD Space",
-                    minWidth: 60
-                }, {
-                    field: "available_perc",
-                    name: "Root HD Available (%)",
-                    minWidth: 60
+                    field: "osds_available_perc",
+                    name: "Disks Available %",
+                    minWidth: 60,
                 }],
             }
         });
@@ -762,18 +758,6 @@ storageNodeView = function() {
             }, {
                 lbl: 'Status',
                 value: storNodeData['status'] != '-' ? storNodeData['status'] : noDataStr
-            }, {
-                lbl: 'Root HD',
-                value: ' '
-            }, {
-                lbl: INDENT_RIGHT + 'Total',
-                value: formatBytes(storNodeData['kb_total'] * 1024)
-            }, {
-                lbl: INDENT_RIGHT + 'Used',
-                value: formatBytes(storNodeData['kb_used'] * 1024)
-            }, {
-                lbl: INDENT_RIGHT + 'Available',
-                value: storNodeData['avail_percent'] + "%"
             }, {
                 lbl: 'Disks',
                 value: ' '
