@@ -1,0 +1,125 @@
+<!-- Copyright (c) 2014 Juniper Networks, Inc. All rights reserved. -->
+<script type = "text/x-handlebars-template" id = "disk-status-template">
+    {{#IfCompare sevLevel sevLevels.ERROR }}
+        <span class="status-badge-rounded-small status-inactive"></span>
+    {{else}}
+        {{#IfCompare sevLevel sevLevels.WARNING}}
+            <span class="status-badge-rounded-small status-partially-active"></span>
+        {{else}}
+            {{#IfCompare sevLevel sevLevels.NOTICE}}
+                <span class="status-badge-rounded-small status-idle"></span>
+            {{else}}
+                <span class="status-badge-rounded-small status-active"></span>
+            {{/IfCompare}}
+        {{/IfCompare}}
+    {{/IfCompare}}
+</script>
+
+<script type="text/x-handlebars-template" id="disk-activity-stats-template">
+    <div id="{{chartId}}" class="traffic-stats-chart row-fluid"></div>
+</script>
+
+<script type="text/x-handlebars-template" id="basic-stats-widget-template">
+    <div id="cluster-stats-box" class="widget-box transparent">
+        <div class="widget-header">
+            <h4 class="smaller">{{title}}</h4>
+        </div>
+        <div class="widget-body">
+            <div class="widget-main padding-4">
+                <div id="{{chart1Id}}" class="stats-chart row-fluid"></div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars-template" id="cluster-usage-widget-template">
+    <div id="cluster-usage-box" class="widget-box transparent">
+        <div class="widget-header">
+            <h4 class="smaller">{{title}}</h4>
+            <div class="widget-toolbar pull-right">
+                <a data-action="widget-collapse">
+                    <i class="icon-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+        <div class="widget-body">
+            <div class="widget-main padding-4">
+                <div class="row-fluid">
+                    <div class="cluster-replica" style="text-align:center">
+                        <span>{{replicaFactorTitle}}</span>
+                        <span id="{{replicaFactorId}}"></span>
+                    </div>
+                    <div id="{{usageChartId}}" class="stats-chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars-template" id="cluster-usage-details-template">
+    <div class="usage-details-container">
+        <div class="cluster-usage-perc">
+            <div>
+                <span class="cluster-usage-perc-label">{{percentage}}</span>
+            </div>
+        </div>
+        <div class="cluster-usage-labelbox">
+            <span class="label cluster-used-label">&nbsp;&nbsp; </span><span class="cluster-used">{{used}}</span>
+            <span class="label cluster-avail-label">&nbsp;&nbsp; </span><span class="cluster-avail">{{available}}</span>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars-template" id="cluster-status-template">
+    <div class="status-container row-fluid">
+        <div class="cluster-status">
+            <div>
+                <span class="cluster-status-label"> Overall Health:
+                    <span id="cluster-health-status" class="status-message">{{handleIfNull clusterHealth "N/A"}}</span>
+                    <i id="cluster-health-status-icon" class="icon-status"></i>
+                </span>
+            </div>
+            <div class="cluster-health-events">
+                {{#if clusterHealthEvents}}
+                    <span class="events-title">Events: </span>
+                    {{#each clusterHealthEvents}}
+                        <div class="health-event">
+                            <span class="health-event-severity">{{severity}}</span>
+                            <span class="health-event-summary">{{summary}}</span>
+                        </div>
+                    {{/each}}
+                {{else}}
+                    <span class="events-title">No Events found.</span>
+                {{/if}}
+            </div>
+
+            <div class="cluster-health-details">
+                {{#if clusterHealthDetails}}
+                    <span class="details-title">Details: </span>
+                    {{#each clusterHealthDetails}}
+                        <div class="health-detail">
+                            <span class="health-detail-count">{{count}}</span>
+                            <span class="health-detail-message">{{message}}</span>
+                        </div>
+                    {{/each}}
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-handlebars-template" id="storage-status-template">
+    {{#IfCompare sevLevel sevLevels.ERROR }}
+        <span class="status-badge-rounded-small status-inactive"></span>
+    {{else}}
+        {{#IfCompare sevLevel sevLevels.WARNING}}
+            <span class="status-badge-rounded-small status-partially-active"></span>
+        {{else}}
+            {{#IfCompare sevLevel sevLevels.NOTICE}}
+                <span class="status-badge-rounded-small status-idle"></span>
+            {{else}}
+                <span class="status-badge-rounded-small status-active"></span>
+            {{/IfCompare}}
+        {{/IfCompare}}
+    {{/IfCompare}}
+</script>

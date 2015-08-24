@@ -60,7 +60,18 @@ function addStorageTabs() {
                     yDataType: 'bytes',
                     xPositive: true,
                     tooltipFn: storageChartUtils.storageNodeTooltipFn,
-                    clickFn: storageChartUtils.onStorageNodeDrillDown,
+                    clickFn: function(chartConfig) {
+                        var storageNodeFQN = chartConfig['name'];
+                        var hashObj = {
+                            type: "storagenode",
+                            view: "details",
+                            focusedElement: {
+                                fqName: storageNodeFQN,
+                                type: 'storagenode'
+                            }
+                        };
+                        layoutHandler.setURLHashParams(hashObj, {p: "monitor_infra_storage", merge: false, triggerHashChange: true});
+                    },
                     addDomainBuffer: true
                 },
                 d: [{

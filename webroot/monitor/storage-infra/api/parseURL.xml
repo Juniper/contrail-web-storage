@@ -53,6 +53,12 @@
         <feature>storage</feature>
         <callback>storageInfraApi.getStorageTopologyDetails</callback>
     </item>
+    <item>
+        <url>/api/admin/monitor/infrastructure/storagenode/disks</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageInfraApi.getStorageNodeDisks</callback>
+    </item>
     <!-- Contrail Storage -->
 
 </urlLists>

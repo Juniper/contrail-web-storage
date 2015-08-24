@@ -255,11 +255,38 @@ function parseRootFromHost(rootJSON, hostJSON){
     return rootJSON;
 }
 
+function getStorageNodeDisks(req, res, appData) {
+    var reqUrl = "/storage-topology-summary";
+    var reqObj = {};
+    reqObj['req'] = req;
+    reqObj['res'] = res;
+    reqObj['jobType'] = storageGlobal.STR_JOB_TYPE_CACHE;;
+    reqObj['jobName'] = storageGlobal.STR_GET_STORAGE_SUMMARY;
+    reqObj['reqUrl'] = reqUrl;
+    reqObj['jobRunCount'] = 1;
+    reqObj['firstRunDelay'] = 0;
+    reqObj['nextRunDelay'] = storageGlobal.STORAGE_SUMM_JOB_REFRESH_TIME;
+    reqObj['sendToJobServerAlways'] = false;
+    reqObj['appData'] = null;
+    reqObj['postCallback'] = parseStorageNodeDisks;
+
+    cacheApi.queueDataFromCacheOrSendRequestByReqObj(reqObj);
+}
+
+function parseStorageNodeDisks(req, res, resultJSON) {
+    var hostName = req.param('hostname');
+    var disks = jsonPath(resultJSON, "$..hosts[?(@.name=='"+hostName+"')].osds")[0];
+    var retJSON = {
+        osds: disks
+    }
+    commonUtils.handleJSONResponse(null, res, retJSON);
+}
+
 /* List all public functions */
 exports.getStorageTopologyDetails= getStorageTopologyDetails;
 exports.getStorageSummary= getStorageSummary;
 exports.parseStorageTopologyTree=parseStorageTopologyTree;
-
+exports.getStorageNodeDisks = getStorageNodeDisks;
 
 
 
