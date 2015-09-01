@@ -68,7 +68,7 @@ define([
                     autoRefresh: false,
                     checkboxSelectable: false,
                     detail: {
-                        template: cowu.generateDetailTemplateHTML(getStorageMonsDetailsTemplateConfig(), cowc.APP_CONTRAIL_STORAGE, '{{{formatGridJSON2HTML this.rawData}}}')
+                        template: cowu.generateDetailTemplateHTML(getStorageMonsDetailsTemplateConfig(), cowc.APP_CONTRAIL_STORAGE, 'rawData')
                     },
                     fixedRowHeight: 30
                 },

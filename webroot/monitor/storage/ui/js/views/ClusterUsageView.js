@@ -1,4 +1,4 @@
-/*
+   /*
  * Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
  */
 
@@ -157,7 +157,7 @@ define([
         var chartViewConfig = {};
 
         var chartDefaultOptions = {
-            margin: {top: 20, right: 20, bottom: 20, left: 30},
+            margin: {top: 20, right: 0, bottom: 20, left: 0},
             width: 150,
             height: 150,
             innerArc: {

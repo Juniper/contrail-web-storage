@@ -6,6 +6,52 @@ define([
     'underscore'
 ], function (_) {
     var SDetailTemplates = function () {
+        this.getClusterStausDetailTemplate = function (detailTheme, detailActions) {
+            var detailTheme = contrail.checkIfExist(detailTheme) ? detailTheme : cowc.THEME_DETAIL_DEFAULT;
+            return {
+                advancedViewOptions: false,
+                templateGenerator: 'ColumnSectionTemplateGenerator',
+                templateGeneratorConfig: {
+                    columns: [
+                        {
+                            rows: [
+                                {
+                                    templateGenerator: 'BlockListTemplateGenerator',
+                                    advancedViewOptions: false,
+                                    title: swl.TITLE_CLUSTER_STATUS,
+                                    theme: detailTheme,
+                                    templateGeneratorData: 'rawData',
+                                    templateGeneratorConfig: [
+                                        {
+                                            key: 'overall_health',
+                                            templateGenerator: 'TextGenerator',
+                                            templateGeneratorConfig: {
+                                                formatter: 'health-status-state',
+                                                iconClass: 'icon-warning-sign'
+                                            },
+                                            events: {
+                                                click: function(event, detailsData) {
+                                                    swu.showStorageAlertsPopup(detailsData['alerts']);
+                                                }
+                                            }
+                                        },
+                                        {
+                                            key: 'health_summary.HEALTH_ERR',
+                                            templateGenerator: 'TextGenerator'
+                                        },
+                                        {
+                                            key: 'health_summary.HEALTH_WARN',
+                                            templateGenerator: 'TextGenerator'
+                                        }
+                                    ]
+                                },
+                            ]
+                        }
+                    ]
+                }
+            };
+        };
+
         this.getDiskDetailsTemplate = function (detailTheme, detailActions) {
             var detailTheme = contrail.checkIfExist(detailTheme) ? detailTheme : cowc.THEME_DETAIL_DEFAULT;
             return {

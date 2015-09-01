@@ -44,12 +44,16 @@
         </div>
         <div class="widget-body">
             <div class="widget-main padding-4">
-                <div class="row-fluid">
-                    <div class="cluster-replica" style="text-align:center">
-                        <span>{{replicaFactorTitle}}</span>
-                        <span id="{{replicaFactorId}}"></span>
+                <div class="row-fluid" style="height: 190px;">
+                    <div id="{{usageChartId}}" class="stats-chart span9"></div>
+                    <div class="cluster-usage-labelbox span3">
+                        <div><i class="icon-circle cluster-used-label"></i><span class="cluster-used">Used</span></div>
+                        <div><i class="icon-circle cluster-avail-label"></i><span class="cluster-avail">Available</span></div>
                     </div>
-                    <div id="{{usageChartId}}" class="stats-chart"></div>
+                </div>
+                <div class="cluster-replica row-fluid center">
+                    <span>{{replicaFactorTitle}}</span>
+                    <span id="{{replicaFactorId}}"></span>
                 </div>
             </div>
         </div>
@@ -62,10 +66,6 @@
             <div>
                 <span class="cluster-usage-perc-label">{{percentage}}</span>
             </div>
-        </div>
-        <div class="cluster-usage-labelbox">
-            <span class="label cluster-used-label">&nbsp;&nbsp; </span><span class="cluster-used">{{used}}</span>
-            <span class="label cluster-avail-label">&nbsp;&nbsp; </span><span class="cluster-avail">{{available}}</span>
         </div>
     </div>
 </script>

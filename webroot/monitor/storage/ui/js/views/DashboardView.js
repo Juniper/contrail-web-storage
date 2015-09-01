@@ -74,40 +74,17 @@ define([
                                         {
                                             columns: [
                                                 {
-                                                    elementId: swl.CLUSTER_STATUS_ID,
-                                                    view: "ClusterStatusView",
-                                                    app: cowc.APP_CONTRAIL_STORAGE,
+                                                    elementId: swl.CLUSTER_STATUS_ID+ '-rtd',
+                                                    view: "DetailsView",
                                                     viewConfig: {
                                                         class: 'span3',
-                                                        widgetConfig: {
-                                                            elementId: swl.CLUSTER_STATUS_ID + '-widget',
-                                                            view: "WidgetView",
-                                                            viewConfig: {
-                                                                header: {
-                                                                    title: swl.TITLE_CLUSTER_STATUS,
-                                                                    iconClass: false
-                                                                },
-                                                                controls: {
-                                                                    top: {
-                                                                        default: {
-                                                                            collapseable: true
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
+                                                        templateConfig: swdt.getClusterStausDetailTemplate(cowc.THEME_DETAIL_WIDGET, null),
+                                                        app: cowc.APP_CONTRAIL_STORAGE,
+                                                        ajaxConfig: {
+                                                            url: swc.URL_CLUSTER_STATUS,
+                                                            type: 'GET'
                                                         },
-                                                        modelConfig: {
-                                                            remote: {
-                                                                ajaxConfig: {
-                                                                    url: swc.URL_CLUSTER_STATUS,
-                                                                    type: 'GET'
-                                                                },
-                                                                dataParser: swp.clusterStatusDataParser
-                                                            },
-                                                            cacheConfig: {
-                                                                ucid: swc.UCID_CLUSTER_STATUS_LIST
-                                                            }
-                                                        },
+                                                        dataParser: swp.clusterStatusDataParser
                                                     }
                                                 },
                                                 {
@@ -173,7 +150,7 @@ define([
                                                             //margin: {top: 10, right: 10, bottom: 20, left: 40},
                                                             donutRatio: 0.6,
                                                             height: 200,
-                                                            showLegend: false,
+                                                            showLegend: true,
                                                             legendPosition: 'right',
                                                             showLabels: false,
                                                             legendRightAlign: true,
@@ -224,7 +201,7 @@ define([
                                                         chartOptions: {
                                                             donutRatio: 0.6,
                                                             height: 200,
-                                                            showLegend: false,
+                                                            showLegend: true,
                                                             legendPosition: 'right',
                                                             showLabels: false,
                                                             legendRightAlign: true,
@@ -285,8 +262,7 @@ define([
                                                             },
                                                             y1Formatter: function (d) {
                                                                 return swu.addUnits2IOPs(d, false, false, 1);
-                                                            },
-                                                            showLegend: false
+                                                            }
                                                         },
                                                         parseFn: swp.diskActivityThrptIOPsLineBarChartDataParser
                                                     }

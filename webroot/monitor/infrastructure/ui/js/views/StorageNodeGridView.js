@@ -70,7 +70,7 @@ define([
                     forceFitColumns: true,
                     checkboxSelectable: false,
                     detail: {
-                        template: cowu.generateDetailTemplateHTML(getStorageNodeDetailsTemplateConfig(), cowc.APP_CONTRAIL_STORAGE, '{{{formatGridJSON2HTML this.rawData}}}')
+                        template: cowu.generateDetailTemplateHTML(getStorageNodeDetailsTemplateConfig(), cowc.APP_CONTRAIL_STORAGE, 'rawData')
                     }
                 },
                 dataSource: {

@@ -34,11 +34,11 @@ define(['underscore'], function (_) {
 
         self.getClusterHealthTitle = function (status) {
             if (status == 'HEALTH_WARN')
-                retStatus = 'WARN';
+                retStatus = 'warn';
             else if (status == 'HEALTH_OK' || status == 'OK')
-                retStatus = 'OK';
+                retStatus = 'ok';
             else if (status == 'HEALTH_CRIT' || status == 'HEALTH_ERR')
-                retStatus = 'CRITICAL';
+                retStatus = 'critical';
             else
                 retStatus = status;
             return retStatus;

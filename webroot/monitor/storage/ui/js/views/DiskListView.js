@@ -49,21 +49,28 @@ define([
                                     loadChartInChunks: true,
                                     chartOptions: {
                                         xLabel: 'Usage (%)',
-                                        xLabelFormat: d3.format(".01f"),
-                                        forceX: [0, 1],
                                         yLabel: 'Avg. Bandwidth [R + W] ',
+                                        forceX: [0, 100],
+                                        forceY: [0, 10],
                                         yLabelFormat: function (yValue) {
                                             var formattedValue = formatThroughput(yValue, true);
                                             return formattedValue;
                                         },
-                                        dataParser: function (response) {
-                                            return response;
-                                        },
                                         tooltipConfigCB: getDiskTooltipConfig,
                                         clickCB: onScatterChartClick,
+                                        controlPanelConfig: {
+                                            filter: {
+                                                enable: true,
+                                                viewConfig: getControlPanelFilterConfig()
+                                            },
+                                            legend: {
+                                                enable: true,
+                                                viewConfig: getControlPanelLegendConfig()
+                                            }
+                                        },
                                         sizeFieldName: 'used_perc',
                                         margin: {left: 70},
-                                        noDataMessage: "Unable to get disk data."
+                                        noDataMessage: "No Disk data found."
                                     }
                                 }
                             },
@@ -97,6 +104,82 @@ define([
 
     function getDiskTooltipConfig(data) {
         return swu.getDiskTooltipConfig({data: data, actions: {linkCallbackFn: onScatterChartClick}});
+    };
+
+    function getControlPanelFilterConfig() {
+        return {
+            groups: [
+                {
+                    id: 'by-node-color',
+                    title: false,
+                    type: 'checkbox-circle',
+                    items: [
+                        {
+                            text: 'Up & In',
+                            labelCssClass: 'okay',
+                            filterFn: function(d) { return d['status'] === 'up' && d['cluster_status'] === 'in'; }
+                        },
+                        {
+                            text: 'Up & Out',
+                            labelCssClass: 'medium',
+                            filterFn: function(d) { return d['status'] === 'up' && d['cluster_status'] === 'out'; }
+                        },
+                        {
+                            text: 'Down',
+                            labelCssClass: 'error',
+                            filterFn: function(d) { return d['status'] === 'down'; }
+                        }
+                    ]
+                }
+            ]
+        };
+    };
+
+    function getControlPanelLegendConfig() {
+        return {
+            groups: [
+                {
+                    id: 'by-node-color',
+                    title: 'Disk Color',
+                    items: [
+                        {
+                            text: 'Up & In',
+                            labelCssClass: 'icon-circle okay',
+                            events: {
+                                click: function (event) {}
+                            }
+                        },
+                        {
+                            text: 'Up & Out',
+                            labelCssClass: 'icon-circle medium',
+                            events: {
+                                click: function (event) {}
+                            }
+                        },
+                        {
+                            text: 'Down',
+                            labelCssClass: 'icon-circle error',
+                            events: {
+                                click: function (event) {}
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: 'by-node-size',
+                    title: 'Disk Size',
+                    items: [
+                        {
+                            text: 'Total Disk Memory',
+                            labelCssClass: 'icon-circle',
+                            events: {
+                                click: function (event) {}
+                            }
+                        }
+                    ]
+                }
+            ]
+        };
     };
 
     return DiskListView;

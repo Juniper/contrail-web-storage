@@ -15,10 +15,6 @@
 
 .cluster-replica{
     font-size: 12px;
-    display:block;
-    width:250px;
-    height: 100%;
-    margin: 0 auto;
 }
 
 .cluster-status {
@@ -102,18 +98,8 @@
     font-family: Open Sans;
     color: #FF7F0E;
 }
-.cluster-usage-labelbox {
-    position: absolute;
-    top:100px;
-    width: 100%;
-    text-align: center;
-    z-index: 1;
-}
 .cluster-used-label{
-    line-height: 9px;
-    font-family: Open Sans;
-    font-weight: 400;
-    background-color: #1F77B4;
+    color: #1F77B4;
 }
 .cluster-total-label{
     margin-left: 2px;
@@ -123,26 +109,11 @@
     background-color: #C6DBEF;
 }
 .cluster-avail-label{
-    margin-left: 2px;
-    line-height: 9px;
-    font-family: Open Sans;
-    font-weight: 400;
-    background-color: #C6DBEF;
+    color: #C6DBEF;
 }
-.cluster-used{
+.cluster-used, .cluster-total, .cluster-avail{
     margin-left: 2px;
-    font-size: 12px;
-    font-weight: 400;
-}
-.cluster-total{
-    margin-left: 2px;
-    font-size: 12px;
-    font-weight: 400;
-}
-.cluster-avail{
-    margin-left: 2px;
-    font-size: 12px;
-    font-weight: 400;
+    font-size: 10px;
 }
 
 

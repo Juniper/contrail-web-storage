@@ -688,13 +688,19 @@ define([
         };
 
         this.clusterStatusDataParser = function (response) {
-            var retObj = [];
+            var healthSummary = {};
+            $.each(response['cluster_status']['health']['summary'], function(summaryKey, summaryValue) {
+                healthSummary[summaryValue.severity] = summaryValue.summary;
+            });
+
             if (response != null) {
-                retObj.push({
+                var retObj = {
+                    health_summary: healthSummary,
+                    overall_health: swu.getClusterHealthTitle(response['cluster_status']['overall_status']),
                     health_status: swu.getClusterHealthTitle(response['cluster_status']['overall_status']),
                     health: response['cluster_status']['health'],
                     alerts: swu.processStorageHealthAlerts(response['cluster_status'])
-                });
+                };
             }
             return retObj;
         }

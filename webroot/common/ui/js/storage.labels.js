@@ -60,7 +60,12 @@ define([
             pool: 'Pool ID',
             crush_ruleset: 'Crush Ruleset',
             snap_mode: 'Snapshot Mode',
-            cache_mode: 'Cache Mode'
+            cache_mode: 'Cache Mode',
+            /*Cluster status*/
+            overall_health: 'Overall Health',
+            HEALTH_ERR: 'Error',
+            HEALTH_CRIT: 'Error',
+            HEALTH_WARN: 'Warning'
         };
 
         this.MONITOR_STORAGENODE_LIST_PAGE_ID = "monitor-storagenode-list-page"

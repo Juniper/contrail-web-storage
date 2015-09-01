@@ -24,21 +24,26 @@ define([
      */
     var MultiDonutChartModel = function (chartOptions) {
 
-        chartOptions.width = ifNull(chartOptions.width, (200 - chartOptions.margin.left - chartOptions.margin.right));
-        chartOptions.height = ifNull(chartOptions.height, (chartOptions.width - chartOptions.margin.top - chartOptions.margin.bottom));
-
         var multiDonutChart = function (selection) {
 
             selection.each(function (data) {
 
-                var container = d3.select(this);
+                var container = d3.select(this),
+                    availableWidth = $(this).parent().width();
+
                 container.classed({'contrail-svg': true});
+
+                chartOptions.width = ifNull(chartOptions.width, (200 - chartOptions.margin.left - chartOptions.margin.right));
+                chartOptions.width = (availableWidth < chartOptions.width) ? availableWidth : chartOptions.width;
+                chartOptions.height = ifNull(chartOptions.height, (chartOptions.width - chartOptions.margin.top - chartOptions.margin.bottom));
+
+                var transformX = (availableWidth > chartOptions.width) ? availableWidth / 2 : chartOptions.width / 2;
 
                 var containerWrap = container.selectAll("g.contrail-wrap.donut-chart").data([data]);
                 var containerGEnter = containerWrap.enter()
                     .append("g")
                     .attr('class', 'contrail-svg contrail-wrap donut-chart').append('g')
-                    .attr("transform", "translate(" + ((chartOptions.width / 2) + chartOptions.margin.left) + "," + ((chartOptions.height / 2) + chartOptions.margin.top) + ")");
+                    .attr("transform", "translate(" + transformX + "," + ((chartOptions.height / 2) + chartOptions.margin.top) + ")");
 
                 multiDonutChart.update = function () {
                     container.transition().call(multiDonutChart);

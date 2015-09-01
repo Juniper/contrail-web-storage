@@ -69,7 +69,7 @@ define([
                     autoRefresh: false,
                     checkboxSelectable: false,
                     detail: {
-                        template: cowu.generateDetailTemplateHTML(getPoolsDetailTemplateConfig(), cowc.APP_CONTRAIL_STORAGE, '{{{formatGridJSON2HTML this.rawData}}}')
+                        template: cowu.generateDetailTemplateHTML(getPoolsDetailTemplateConfig(), cowc.APP_CONTRAIL_STORAGE, 'rawData')
                     },
                     fixedRowHeight: 30
                 },
