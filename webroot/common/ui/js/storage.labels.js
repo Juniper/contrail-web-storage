@@ -64,7 +64,7 @@ define([
             /*Cluster status*/
             overall_health: 'Overall Health',
             HEALTH_ERR: 'Error',
-            HEALTH_CRIT: 'Error',
+            HEALTH_CRIT: 'Crtical',
             HEALTH_WARN: 'Warning'
         };
 

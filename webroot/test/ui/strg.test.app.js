@@ -10,7 +10,7 @@ var coreBaseDir = "/base/contrail-web-core/webroot",
 var swu, swc, swgc, swl, swm, swp, swvc;
 
 require([
-    coreBaseDir + '/js/core-app-utils.js',
+    coreBaseDir + '/js/common/core.app.utils.js',
     coreBaseDir + '/test/ui/js/co.test.app.utils.js'
 ], function () {
     globalObj = {'env': "test"};
@@ -47,8 +47,8 @@ require([
             }
         }
 
-        storageTestAppPathObj["s-test-utils"] = ctBaseDir + "/test/ui/ct.test.utils";
-        storageTestAppPathObj["s-test-messages"] = ctBaseDir + "/test/ui/ct.test.messages";
+        storageTestAppPathObj["strg-test-utils"] = strgBaseDir + "/test/ui/strg.test.utils";
+        storageTestAppPathObj["strg-test-messages"] = strgBaseDir + "/test/ui/strg.test.messages";
 
         return storageTestAppPathObj;
     };

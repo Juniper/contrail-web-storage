@@ -30,7 +30,7 @@ module.exports = function (grunt) {
         //Everything except library test suites and test files.
         {pattern: 'contrail-web-core/webroot/test/ui/js/**/{!(*.test.js), !(*.lib.test.suite.js)}', included: false},
 
-        {pattern: 'contrail-web-storage/webroot/test/ui/s.test.app.js'},
+        {pattern: 'contrail-web-storage/webroot/test/ui/strg.test.app.js'},
         {pattern: 'contrail-web-storage/webroot/test/ui/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/monitor/**/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/common/ui/templates/*.tmpl', included: false},
