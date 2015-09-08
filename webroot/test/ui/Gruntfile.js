@@ -34,8 +34,10 @@ module.exports = function (grunt) {
         {pattern: 'contrail-web-storage/webroot/test/ui/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/monitor/**/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/common/ui/templates/*.tmpl', included: false},
+
         {pattern: 'contrail-web-storage/webroot/common/**/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/monitor/**/*.js', included: false},
+        //{pattern: 'contrail-web-storage/webroot/monitor/storage/ui/js/views/MonitorStorageView.js', included: false},
         {pattern: 'contrail-web-storage/webroot/*.xml', included: false},
 
         {pattern: 'contrail-web-core/webroot/js/**/*.js', included: false},
@@ -48,8 +50,12 @@ module.exports = function (grunt) {
         storageNodeListView: {
             options: {
                 files: [
+                 {
+                    pattern: 'contrail-web-storage/webroot/monitor/storage/ui/test/ui/PoolListView.test.js', included: false
+                 }
                 ],
                 preprocessors: {
+                    'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js': ['coverage']
                 }
             }
         }

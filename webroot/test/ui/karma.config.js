@@ -20,9 +20,9 @@ module.exports = function (config) {
             'karma-chrome-launcher'
         ],
         browsers: [
-            'PhantomJS',
+            //'PhantomJS',
             //'Firefox',
-            //'Chrome'
+            'Chrome'
         ],
 
         //port: 8143,
@@ -44,7 +44,7 @@ module.exports = function (config) {
             type : 'html',
             dir : __dirname + '/reports/coverage/'
         },
-        singleRun: true,
+        singleRun: false,
         colors: true
     });
 };
