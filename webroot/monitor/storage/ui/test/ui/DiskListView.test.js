@@ -5,15 +5,15 @@ define([
     'co-test-unit',
     'strg-test-utils',
     'strg-test-messages',
-    'strg-pools-list-view-mock-data',
+    'strg-disks-list-view-mock-data',
     'co-grid-contrail-list-model-test-suite',
     'co-grid-view-test-suite',
     'co-chart-view-zoom-scatter-test-suite',
-    'strg-pools-list-view-custom-test-suite'
+    'strg-disks-list-view-custom-test-suite'
 ], function (CUnit, stu, stm, TestMockdata, GridListModelTestSuite, GridViewTestSuite, ZoomScatterChartTestSuite, 
     CustomTestSuite) {
 
-    var moduleId = stm.STORAGE_POOL_LIST_VIEW_COMMON_TEST_MODULE;
+    var moduleId = stm.STORAGE_DISK_LIST_VIEW_COMMON_TEST_MODULE;
 
     var fakeServerConfig = CUnit.getDefaultFakeServerConfig();
 
@@ -21,8 +21,8 @@ define([
         var responses = [];
 
         responses.push(CUnit.createFakeServerResponse( {
-            url: stu.getRegExForUrl('/api/tenant/storage/cluster/pools/summary'),
-            body: JSON.stringify(TestMockdata.poolsMockData)
+            url: stu.getRegExForUrl('/api/tenant/storage/cluster/osds/summary'),
+            body: JSON.stringify(TestMockdata.disksMockData)
         }));
         return responses;
     };
@@ -30,10 +30,10 @@ define([
 
     var pageConfig = CUnit.getDefaultPageConfig();
     pageConfig.hashParams = {
-        p: 'monitor_storage_pools',
+        p: 'monitor_storage_disks',
         q: {
             view: 'list',
-            type: 'pool'
+            type: 'disk'
         }
     };
     pageConfig.loadTimeout = 2000;
@@ -43,7 +43,7 @@ define([
             rootView: storagePageLoader.monStorageView,
             tests: [
                 {
-                    viewId: swl.MONITOR_POOL_SCATTER_CHART_ID,
+                    viewId: swl.MONITOR_DISK_SCATTER_CHART_ID,
                     suites: [
                         {
                             class: ZoomScatterChartTestSuite,
@@ -51,9 +51,9 @@ define([
                             severity: cotc.SEVERITY_LOW
                         }
                     ]
-                },
+                },  
                 {
-                    viewId: swl.MONITOR_POOL_GRID_ID,
+                    viewId: swl.MONITOR_DISK_GRID_ID,
                     suites: [
                          {
                             class: GridViewTestSuite,

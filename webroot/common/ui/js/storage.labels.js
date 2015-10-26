@@ -81,6 +81,7 @@ define([
         this.MONITOR_DISK_LIST_ID = "monitor-disk-list";
         this.MONITOR_DISK_GRID_ID = "monitor-disk-grid";
         this.MONITOR_DISK_ACTIVITY_STATS_ID = "monitor-disk-activity-stats";
+        this.MONITOR_DISK_SCATTER_CHART_ID ='disk-scatter-chart'
 
         this.MONITOR_STORAGE_MONITORS_ID = "monitor-storagemons";
         this.MONITOR_STORAGE_MONITOR_LIST_PAGE_ID = "monitor-storagemon-list-page";
@@ -95,6 +96,7 @@ define([
         this.MONITOR_POOL_LIST_ID = "monitor-pool-list";
         this.MONITOR_POOL_GRID_ID = "monitor-pool-grid";
         this.MONITOR_POOL_STATS_ID = "monitor-pool-stats";
+        this.MONITOR_POOL_SCATTER_CHART_ID ='pool-scatter-chart'
 
         this.MONITOR_STORAGE_DASHBOARD_PAGE_ID = "monitor-storage-dashboard-page";
         this.MONITOR_STORAGE_DASHBOARD_LIST_ID = "monitor-storage-dashboard-list";

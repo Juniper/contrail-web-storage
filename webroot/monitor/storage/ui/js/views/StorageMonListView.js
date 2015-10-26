@@ -48,7 +48,7 @@ define([
                                 viewConfig: {
                                     loadChartInChunks: true,
                                     chartOptions: {
-                                        xLabel: 'Total ',
+                                        xLabel: 'Total',
                                         xLabelFormat: function (xValue) {
                                             return formatBytes(xValue, true);
                                         },

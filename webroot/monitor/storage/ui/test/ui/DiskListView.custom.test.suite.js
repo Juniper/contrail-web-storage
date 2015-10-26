@@ -22,7 +22,7 @@ define([
             viewConfigBody = viewConfig.elementConfig.body,
             viewConfigFooter = viewConfig.elementConfig.footer;
 
-        module(cotu.formatTestModuleMessage(stm.STORAGE_POOLS_LIST_VIEW_CUSTOM_TEST, el.id));
+        module(cotu.formatTestModuleMessage(stm.STORAGE_DISK_LIST_VIEW_CUSTOM_TEST, el.id));
 
         var gridViewCustomTestSuite = CUnit.createTestSuite('GridViewCustomTestSuite');
 
@@ -40,7 +40,7 @@ define([
 
         bodyTestGroup.registerTest(CUnit.test(stm.POOLS_GRID_COLUMN_VALUE_CHECK, function() {
             expect(1);
-            equal($($(el).find('.grid-body .slick_row_id_1 .slick-cell')[4]).text().trim(), "241.6 GB",
+            equal($($(el).find('.grid-body .slick_row_id_1 .slick-cell')[4]).text().trim(), "345.03 GB",
                "Custom test to assert 2nd row 5th col value");
 
         }, cotc.SEVERITY_MEDIUM));
