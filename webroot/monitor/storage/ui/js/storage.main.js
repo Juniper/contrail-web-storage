@@ -8,8 +8,8 @@ function MonitorStorageLoader() {
     this.load = function (paramObject) {
         var self = this, currMenuObj = globalObj.currMenuObj,
             hashParams = paramObject['hashParams'],
-            rootDir = currMenuObj['resources']['resource'][0]['rootDir'],
-            pathMSView = rootDir + '/js/views/MonitorStorageView.js',
+           // rootDir = currMenuObj['resources']['resource'][0]['rootDir'],
+            pathMSView = strgBaseDir + '/monitor/storage/ui/js/views/MonitorStorageView.js',
             renderFn = paramObject['function'],
             loadingStartedDefObj = paramObject['loadingStartedDefObj'];
 

@@ -3,8 +3,8 @@
  */
 
 var coreBaseDir = "/base/contrail-web-core/webroot",
-    sBaseDir = "/base/contrail-web-storage/webroot",
-    pkgBaseDir = sBaseDir,
+    strgBaseDir = "/base/contrail-web-storage/webroot",
+    pkgBaseDir = strgBaseDir,
     featurePkg = 'webStorage';
 
 var swu, swc, swgc, swl, swm, swp, swvc;
@@ -16,7 +16,7 @@ require([
     globalObj = {'env': "test"};
 
     requirejs.config({
-        baseUrl: sBaseDir,
+        baseUrl: strgBaseDir,
         paths: getStorageTestAppPaths(coreBaseDir),
         map: coreAppMap,
         shim: getStorageTestAppShim(),
@@ -48,7 +48,22 @@ require([
         }
 
         storageTestAppPathObj["strg-test-utils"] = strgBaseDir + "/test/ui/strg.test.utils";
-        storageTestAppPathObj["strg-test-messages"] = strgBaseDir + "/test/ui/strg.test.messages";
+        storageTestAppPathObj["strg-test-messages"] = strgBaseDir + "/test/ui/strg.test.message";
+
+        //Storage Disks Page
+        storageTestAppPathObj["strg-disks-list-view-mock-data"] = strgBaseDir + "/monitor/storage/ui/test/ui/DiskListView.mock.data";
+        storageTestAppPathObj["strg-disks-list-view-custom-test-suite"] = strgBaseDir + "/monitor/storage/ui/test/ui/DiskListView.custom.test.suite";
+        
+        //Storage Disk Details page
+        storageTestAppPathObj["strg-disk-view-mock-data"] = strgBaseDir + "/monitor/storage/ui/test/ui/DiskView.mock.data";
+
+       //Storage Pools Page
+        storageTestAppPathObj["strg-pools-list-view-mock-data"] = strgBaseDir + "/monitor/storage/ui/test/ui/PoolListView.mock.data";
+        storageTestAppPathObj["strg-pools-list-view-custom-test-suite"] = strgBaseDir + "/monitor/storage/ui/test/ui/PoolListView.custom.test.suite";
+
+        // Storage Monitors Page
+        storageTestAppPathObj["strg-mons-list-view-mock-data"] = strgBaseDir + "/monitor/storage/ui/test/ui/StorageMonListView.mock.data";
+        storageTestAppPathObj["strg-mons-list-view-custom-test-suite"] = strgBaseDir + "/monitor/storage/ui/test/ui/StorageMonListView.custom.test.suite";
 
         return storageTestAppPathObj;
     };

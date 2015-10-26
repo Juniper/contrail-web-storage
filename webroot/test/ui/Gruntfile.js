@@ -12,13 +12,14 @@ module.exports = function (grunt) {
     grunt.option('stack', true);
 
     var commonFiles = [
-        {pattern: 'contrail-web-core/webroot/assets/**/!(tests)/*.js', included: false},
+       {pattern: 'contrail-web-core/webroot/assets/**/!(tests)/*.js', included: false},
 
         {pattern: 'contrail-web-core/webroot/assets/**/*.css', included: false},
         {pattern: 'contrail-web-core/webroot/css/**/*.css', included: false},
+        {pattern: 'contrail-web-core/webroot/css/**/*.ttf', included: false},
+        {pattern: 'contrail-web-core/webroot/css/**/*.woff', included: false},
         {pattern: 'contrail-web-core/webroot/test/ui/**/*.css', included: false},
 
-        {pattern: 'contrail-web-core/webroot/font/**/*.woff', included: false},
         {pattern: 'contrail-web-core/webroot/assets/**/*.woff', included: false},
         {pattern: 'contrail-web-core/webroot/assets/**/*.ttf', included: false},
 
@@ -35,21 +36,65 @@ module.exports = function (grunt) {
         {pattern: 'contrail-web-storage/webroot/monitor/**/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/common/ui/templates/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/common/**/*.js', included: false},
-        {pattern: 'contrail-web-storage/webroot/monitor/**/*.js', included: false},
+        {pattern: 'contrail-web-storage/webroot/monitor/infrastructure/**/*.js', included: false},
+
+
+        {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js', included: false},
+
+        {pattern: 'contrail-web-storage/webroot/config/linklocalservices/**/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/*.xml', included: false},
 
+
+
         {pattern: 'contrail-web-core/webroot/js/**/*.js', included: false},
-        {pattern: 'contrail-web-core/webroot/templates/*.tmpl', included: false}
+        {pattern: 'contrail-web-core/webroot/templates/*.tmpl', included: false},
+
+        {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/test/ui/*.mock.data.js', included: false}
     ];
     var karmaConfig = {
         options: {
             configFile: 'karma.config.js'
         },
-        storageNodeListView: {
+        storageDiskListView: {
             options: {
                 files: [
+                    {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/test/ui/DiskListView.custom.test.suite.js', included: false},
+                    {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/test/ui/DiskListView.test.js', included: false}
                 ],
                 preprocessors: {
+                    'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js': ['coverage']
+                }
+            }
+        },
+        storageDiskView: {
+            options: {
+                files: [
+                    {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/test/ui/DiskView.test.js', included: false}
+                ],
+                preprocessors: {
+                    'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js': ['coverage']
+                }
+            }
+        },
+        storagePoolListView: {
+            options: {
+                files: [
+                    {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/test/ui/PoolListView.custom.test.suite.js', included: false},
+                    {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/test/ui/PoolListView.test.js', included: false}
+                ],
+                preprocessors: {
+                    'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js': ['coverage']
+                }
+            }
+        },
+        storageMonitorListView: {
+            options: {
+                files: [
+                    {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/test/ui/StorageMonListView.custom.test.suite.js', included: false},
+                    {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/test/ui/StorageMonListView.test.js', included: false}
+                ],
+                preprocessors: {
+                    'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js': ['coverage']
                 }
             }
         }
@@ -71,13 +116,22 @@ module.exports = function (grunt) {
             files: ["Gruntfile.js"]
         },
         sm : {
-            storageNodeListView: 'storageNodeListview'
+            storageDiskListView: 'storageDiskListView',
+            storageDiskView: 'storageDiskView',
+            storagePoolListView: 'storagePoolListView',
+            storageMonitorListView: 'storageMonitorListView'
         }
     });
 
     grunt.registerMultiTask('sm', 'Storage Monitoring Test Cases', function () {
-        if (this.target == 'storageNodeListView') {
-            grunt.task.run('karma:storageNodeListView');
+        if (this.target == 'storageDiskListView') {
+            grunt.task.run('karma:storageDiskListView');
+        }else if (this.target == 'storageDiskView') {
+            grunt.task.run('karma:storageDiskView');
+        }else if (this.target == 'storagePoolListView') {
+            grunt.task.run('karma:storagePoolListView');
+        }else if (this.target == 'storageMonitorListView') {
+            grunt.task.run('karma:storageMonitorListView');
         }
     });
 };
