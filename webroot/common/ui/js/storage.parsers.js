@@ -11,6 +11,8 @@ define([
         this.storagenodeDataParser = function (response) {
             var retArr = [], def_topology = {};
 
+            var gVar =0;
+
             // with multi-backend support, there are different topology output in response.
             // currently only using 'default' type which is the common pool.
             $.each(response.topology, function (idx, topology) {
@@ -23,6 +25,7 @@ define([
 
             $.each(def_topology.hosts, function (idx, host) {
                 var obj = {};
+                var diskCnt = 0;
                 obj['rawData'] = $.extend(true, {}, host);
                 obj['available_perc'] = $.isNumeric(host['avail_percent']) ? host['avail_percent'].toFixed(2) : '-';
                 obj['total'] = formatBytes(host['kb_total'] * 1024);
@@ -31,6 +34,17 @@ define([
                 obj['type'] = 'storageNode';
                 obj['display_type'] = 'Storage Node';
                 obj['name'] = host['name'];
+                obj['link'] = {
+                            p: 'monitor_infra_storage',
+                            q: {
+                                type: "storagenode",
+                                view: "details",
+                                focusedElement: {
+                                    node: obj['name'],
+                                    tab: 'details'
+                                }
+                            }
+                        };
                 obj['isPartialUveMissing'] = false;
                 obj['osds'] = host['osds'];
                 obj['osds_count'] = obj['osds'].length;
@@ -44,6 +58,7 @@ define([
                 obj['tot_avg_read_kb'] = 0;
                 obj['tot_avg_write_kb'] = 0;
                 $.each(host.osds, function (idx, osd) {
+                    diskCnt++;
                     if (osd.hasOwnProperty('kb') && osd.hasOwnProperty('kb_used')) {
                         obj['osds_total'] += osd['kb'] * 1024;
                         obj['osds_used'] += osd['kb_used'] * 1024;
@@ -67,6 +82,7 @@ define([
                     else if (osd['cluster_status'] == 'out')
                         ++obj['osds_out'];
                 });
+                obj['diskCnt']= diskCnt;
                 obj['osds_status'] = "up: " + obj['osds_up'] + ", down: " + obj['osds_down'] + " / in: " + obj['osds_in'] + ", out: " + obj['osds_out'];
                 obj['osds_available_perc'] = swu.calcPercent((obj['osds_total'] - obj['osds_used']), obj['osds_total']);
                 obj['osds_used_perc'] = 100.00 - obj['osds_available_perc'];
@@ -76,15 +92,30 @@ define([
                 obj['osds_total'] = formatBytes(obj['osds_total']);
                 obj['osds_used'] = formatBytes(obj['osds_used']);
                 obj['monitor'] = host['monitor'];
+                if (!isEmptyObject(obj['monitor']) && obj['monitor'] != "Not Available") {
+                    obj['monCnt']= 1;
+                }else{
+                    obj['monCnt']= 0;
+                }
                 obj['status'] = host['status'];
                 //obj['color'] = swu.getStorageNodeColor(host, obj);
                 obj['downNodeCnt'] = 0;
                 //initialize for alerts
                 obj['isDiskDown'] = obj['isDiskOut'] = false;
                 obj['nodeAlerts'] = swu.processStorageNodeAlerts(obj);
-                obj['alerts'] = obj['nodeAlerts'].sort(dashboardUtils.sortInfraAlerts);
-                //currently we are not tracking any storage process alerts.
-                obj['processAlerts'] = [];
+                obj['processAlerts'] = [];//swu.processStorageHealthAlerts(obj);
+                obj['alerts'] =
+                            obj['nodeAlerts'].concat(obj['processAlerts'])
+                                                .sort(dashboardUtils.sortInfraAlerts);
+                
+                if (gVar <1){
+                    var clusterObj = {};
+                    clusterObj['nodeAlerts'] = swu.processStorageHealthAlerts(response['cluster_status']);
+                    obj['alerts'] = obj['alerts'].concat(clusterObj['nodeAlerts']).sort(dashboardUtils.sortInfraAlerts);
+                  gVar++;
+                }  
+
+
                 /*
                  * build_info response holds version string or could be empty array.
                  */
@@ -106,6 +137,7 @@ define([
              * for charts and other cases that only require storage node details.
              */
             var clusterObj = {};
+            clusterObj['id'] = 0;
             clusterObj['name'] = 'CLUSTER_HEALTH';
             clusterObj['nodeAlerts'] = swu.processStorageHealthAlerts(response['cluster_status']);
             clusterObj['alerts'] = clusterObj['nodeAlerts'].sort(dashboardUtils.sortInfraAlerts);
@@ -117,7 +149,7 @@ define([
             clusterObj['monitor_count'] = response['cluster_status']['monitor_count'];
             clusterObj['monitor_active'] = response['cluster_status']['monitor_active'];
             //adding clusterObj to the top of the returned array
-            //retArr.unshift(clusterObj);
+           // retArr.unshift(clusterObj);
 
             retArr.sort(dashboardUtils.sortNodesByColor);
             return retArr;
@@ -703,6 +735,18 @@ define([
                 };
             }
             return retObj;
+        };
+
+        function calcPercent(val1, val2) {
+            return ((val1 / val2) * 100).toFixed(2);
+        }
+        function getStorageNodeColor(d, obj) {
+            obj = ifNull(obj, {});
+            if (obj['status'] == "down")
+                return d3Colors['red'];
+            if (obj['status'] == "warn")
+                return d3Colors['orange'];
+            return d3Colors['blue'];
         }
     };
 

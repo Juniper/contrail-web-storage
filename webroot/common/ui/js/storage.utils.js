@@ -213,8 +213,9 @@ define(['underscore'], function (_) {
         self.processStorageNodeAlerts = function (obj) {
             var alertsList = [];
             var infoObj = {
+                tooltipAlert: false,
                 name: obj['name'],
-                type: 'Storage Node',
+                pName: obj['display_type'],
                 ip: obj['ip']
             };
 
@@ -222,6 +223,7 @@ define(['underscore'], function (_) {
                 if (osd['status'] == 'down') {
                     alertsList.push($.extend({}, {
                         ip: osd['public_addr'],
+                        type: 'Storage Disk',
                         sevLevel: sevLevels['ERROR'],
                         msg: swm.DISK_DOWN_LIST.format(osd['name']),
                         timeStamp: new Date(osd['osd_xinfo']['down_stamp']).getTime() * 1000
@@ -238,6 +240,7 @@ define(['underscore'], function (_) {
 
             if (obj['isDiskOut'] == true)
                 alertsList.push($.extend({}, {
+                    type: 'Storage Disk',
                     sevLevel: sevLevels['WARNING'],
                     msg: swm.DISK_OUT.format(obj['disk_out_list'].length, obj['disk_out_list'])
                 }, infoObj));
@@ -258,8 +261,8 @@ define(['underscore'], function (_) {
             var _this = self;
             var timeStamp = new Date(obj['last_updated_time']).getTime() * 1000;
             var defInfoObj = {
+                tooltipAlert: false,
                 name: 'Storage Cluster',
-                type: 'Storage',
                 ip: '',
                 timeStamp: timeStamp
             };
@@ -285,6 +288,7 @@ define(['underscore'], function (_) {
 
             $.each(obj['health']['summary'], function (idx, msg) {
                 alertsList.push($.extend({}, {
+                    type: 'Health',
                     sevLevel: sevLevels[_this.getHealthSevLevelLbl(msg['severity'])],
                     msg: msg['summary']
                 }, defInfoObj));

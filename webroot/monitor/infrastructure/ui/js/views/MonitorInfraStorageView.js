@@ -4,11 +4,24 @@
 
 define([
     'underscore',
+    'backbone',
     'contrail-view',
-    './StorageBreadcrumbView.js'
-], function (_, ContrailView, BreadcrumbView) {
-    var MonitorStorageView = ContrailView.extend({
+    'storage-bread-crumb-view',
+    'storage-dashboard-model',
+    'mon-infra-dashboard-view',
+    'storage-dashboard-view',
+    
+], function (_, Backbone, ContrailView, BreadcrumbView,StorageDashboardListModel, 
+    MonitorInfraDashboardView, StorageDashboardView ) {
+    var MonitorStorageView = Backbone.View.extend({
         el: $(contentContainer),
+
+        renderDashboard: function () {
+           var self = this;
+            //No need to instantiate as it's a singleton class
+            var monitorInfraDashboardView = MonitorInfraDashboardView;
+            monitorInfraDashboardView.addInfoboxes(getInfoboxesConfig());
+        },
 
         renderStorageNode: function (viewConfig) {
             var self = this,
@@ -19,10 +32,10 @@ define([
             breadcrumbView.renderDomainBreadcrumbDropdown(fqName, function (domainSelectedValueData, domainBreadcrumbChanged) {
 
             });
-            self.renderView4Config(this.$el, null, getStorageNodeViewConfig(hashParams));
+            cowu.renderView4Config(this.$el, null, getStorageNodeViewConfig(hashParams));
         },
 
-        renderStorageNodeList: function () {
+        renderStorageNodeList: function (viewConfig) {
             cowu.renderView4Config(this.$el, null, getStorageNodeListConfig());
         },
 
@@ -33,10 +46,22 @@ define([
 
             //TBD breadcrumb update
 
-            self.renderView4Config(self.$el, null, getDiskViewConfig(hashParams));
+            cowu.renderView4Config(self.$el, null, getDiskViewConfig(hashParams));
         }
     });
 
+
+   function getInfoboxesConfig() {
+        var sDashListModel = new StorageDashboardListModel();
+
+        return [{
+            title: 'Storage Nodes',
+            view: StorageDashboardView,
+            model: sDashListModel,
+            downCntFn: dashboardUtils.getDownNodeCnt
+            
+        }];
+    };
     function getStorageNodeListConfig() {
         return {
             elementId: cowu.formatElementId([swl.MONITOR_STORAGENODE_LIST_PAGE_ID]),

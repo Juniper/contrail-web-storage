@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
  */
 define([
-    'co-test-unit',
+    'co-test-runner',
     'strg-test-utils',
     'strg-test-messages',
     'strg-disk-view-mock-data',
@@ -15,7 +15,7 @@ define([
     LineWithFocusBarChartViewTestSuite, LineWithFocusChartViewTestSuite) {
 
     var moduleId = stm.STORAGE_DETAILS_VIEW_COMMON_TEST_MODULE;
-
+    var testType = cotc.VIEW_TEST;
     var fakeServerConfig = CUnit.getDefaultFakeServerConfig();
 
     var fakeServerResponsesConfig = function() {
@@ -59,7 +59,7 @@ define([
             rootView: storagePageLoader.monStorageView,
             tests: [
                
-                {
+               /* {
                     viewId: swl.DISK_DETAILS_ID,
                     suites: [
                         {
@@ -71,7 +71,7 @@ define([
                             }
                         }
                     ]
-                },
+                },*/
                 {
                     viewId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
                     suites: [
@@ -93,7 +93,6 @@ define([
                     ]
                 }
 
-                // TODO add heat chart view test suite
             ]
         } ;
 
@@ -101,7 +100,7 @@ define([
 
     
 
-    var pageTestConfig = CUnit.createPageTestConfig(moduleId, fakeServerConfig, pageConfig, getTestConfig);
+    var pageTestConfig = CUnit.createPageTestConfig(moduleId, testType, fakeServerConfig, pageConfig, getTestConfig);
 
     CUnit.startTestRunner(pageTestConfig);
 

@@ -17,7 +17,13 @@ require.config({
         'storage-parsers': strgBaseDir + '/common/ui/js/storage.parsers',
         'storage-init': strgBaseDir + '/common/ui/js/storage.init',
         'storage-view-config': strgBaseDir + '/common/ui/js/storage.view.config',
-        'storage-detail-templates': strgBaseDir + '/common/ui/js/storage.detail.templates'
+        'storage-detail-templates': strgBaseDir + '/common/ui/js/storage.detail.templates',
+        'storage-bread-crumb-view': strgBaseDir + '/monitor/infrastructure/ui/js/views/StorageBreadcrumbView',
+        'storage-dashboard-view': strgBaseDir + '/monitor/infrastructure/ui/js/views/StorageDashboardView',
+        'mon-infra-storage-dashboard': strgBaseDir + '/monitor/infrastructure/ui/js/views/MonitorInfraStorageView',
+        'storage-dashboard-model': strgBaseDir + '/monitor/infrastructure/ui/js/model/StorageDashboardListModel',
+        'storage-node-scatter-chart-view': strgBaseDir + '/monitor/infrastructure/ui/js/views/StorageNodeScatterChartView',
+        'storage-bar-chart-info-view': strgBaseDir + '/monitor/infrastructure/ui/js/views/StorageBarChartInfoView'
     },
     waitSeconds: 0
 });

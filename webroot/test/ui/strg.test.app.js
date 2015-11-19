@@ -49,21 +49,31 @@ require([
 
         storageTestAppPathObj["strg-test-utils"] = strgBaseDir + "/test/ui/strg.test.utils";
         storageTestAppPathObj["strg-test-messages"] = strgBaseDir + "/test/ui/strg.test.message";
+        
+        //Storage Disks Page
+        storageTestAppPathObj["strg-nodes-list-view-mock-data"] = strgBaseDir + "/monitor/infrastructure/test/ui/views/StorageNodeListView.mock.data";
+        storageTestAppPathObj["strg-nodes-list-view-custom-test-suite"] = strgBaseDir + "/monitor/infrastructure/test/ui/views/StorageNodeListView.custom.test.suite";
+
+        // Storage Dashboard Page
+        storageTestAppPathObj["strg-dashboard-view-mock-data"] = strgBaseDir + "/monitor/storage/test/ui/views/DashboardView.mock.data";
+        storageTestAppPathObj["strg-dashboard-piechart-custom-test-suite"] = strgBaseDir + "/monitor/storage/test/ui/views/PieChartView.custom.test.suite";
+        storageTestAppPathObj["strg-dashboard-cluster-status-custom-test-suite"] = strgBaseDir + "/monitor/storage/test/ui/views/ClusterStatusView.custom.test.suite";
+
 
         //Storage Disks Page
-        storageTestAppPathObj["strg-disks-list-view-mock-data"] = strgBaseDir + "/monitor/storage/ui/test/ui/DiskListView.mock.data";
-        storageTestAppPathObj["strg-disks-list-view-custom-test-suite"] = strgBaseDir + "/monitor/storage/ui/test/ui/DiskListView.custom.test.suite";
+        storageTestAppPathObj["strg-disks-list-view-mock-data"] = strgBaseDir + "/monitor/storage/test/ui/views/DiskListView.mock.data";
+        storageTestAppPathObj["strg-disks-list-view-custom-test-suite"] = strgBaseDir + "/monitor/storage/test/ui/views/DiskListView.custom.test.suite";
         
         //Storage Disk Details page
-        storageTestAppPathObj["strg-disk-view-mock-data"] = strgBaseDir + "/monitor/storage/ui/test/ui/DiskView.mock.data";
+        storageTestAppPathObj["strg-disk-view-mock-data"] = strgBaseDir + "/monitor/storage/test/ui/views/DiskView.mock.data";
 
        //Storage Pools Page
-        storageTestAppPathObj["strg-pools-list-view-mock-data"] = strgBaseDir + "/monitor/storage/ui/test/ui/PoolListView.mock.data";
-        storageTestAppPathObj["strg-pools-list-view-custom-test-suite"] = strgBaseDir + "/monitor/storage/ui/test/ui/PoolListView.custom.test.suite";
+        storageTestAppPathObj["strg-pools-list-view-mock-data"] = strgBaseDir + "/monitor/storage/test/ui/views/PoolListView.mock.data";
+        storageTestAppPathObj["strg-pools-list-view-custom-test-suite"] = strgBaseDir + "/monitor/storage/test/ui/views/PoolListView.custom.test.suite";
 
         // Storage Monitors Page
-        storageTestAppPathObj["strg-mons-list-view-mock-data"] = strgBaseDir + "/monitor/storage/ui/test/ui/StorageMonListView.mock.data";
-        storageTestAppPathObj["strg-mons-list-view-custom-test-suite"] = strgBaseDir + "/monitor/storage/ui/test/ui/StorageMonListView.custom.test.suite";
+        storageTestAppPathObj["strg-mons-list-view-mock-data"] = strgBaseDir + "/monitor/storage/test/ui/views/StorageMonListView.mock.data";
+        storageTestAppPathObj["strg-mons-list-view-custom-test-suite"] = strgBaseDir + "/monitor/storage/test/ui/views/StorageMonListView.custom.test.suite";
 
         return storageTestAppPathObj;
     };

@@ -123,3 +123,22 @@
         {{/IfCompare}}
     {{/IfCompare}}
 </script>
+
+<script type="text/x-handlebars-template" id="storage-barchart-info-template">
+    <div id={{id}} class="infobox infobox-blue infobox-dynamic">
+        <div class="infobox-chart">
+            <span class="sparkline"></span>
+        </div>
+        <div class="infobox-data">
+            <span id="infoboxMonCnt" class="infobox-data-number">{{totalCnt}}
+                {{#IfCompare monOnlyCnt 0 operator='>' }}
+                <span id="infoboxMonOnlyCnt" style="color: #c8c8c8">+ {{monOnlyCnt}}</span>
+                {{/IfCompare}}
+            </span>
+            <div class="infobox-content">{{title}}</div>
+        </div>
+        {{#IfCompare downCnt 0 operator='>' }}
+        <div id="infoboxMonDownCnt" class="monstat monstat-important">{{downCnt}}</div>
+        {{/IfCompare}}
+    </div>
+</script>

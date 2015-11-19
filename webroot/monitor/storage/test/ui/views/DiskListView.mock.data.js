@@ -88,8 +88,7 @@ define(['underscore'], function (_) {
           "avg_bw": {
             "Date": "2015-10-22T02:00:42.930Z",
             "name": "cmbu-vxa2100-proto3:osd.1",
-            "uuid": "\n9b50a2d1-7672-4614-9b10-2d941f095f35\nfff77db7-38e6-49b2-8f81-c2f4b68efa15\n9c671fc3-10d7-4b0e-83b5-03f56857788d"
-    ,
+            "uuid": "\n9b50a2d1-7672-4614-9b10-2d941f095f35\nfff77db7-38e6-49b2-8f81-c2f4b68efa15\n9c671fc3-10d7-4b0e-83b5-03f56857788d",
             "sampleCnt": 100,
             "reads": 0,
             "writes": 0,

@@ -77,6 +77,8 @@ define([
         this.TMPL_CLUSTER_USAGE_DETAILS = 'cluster-usage-details-template';
         this.TMPL_CLUSTER_STATUS = 'cluster-status-template';
 
+        this.TMPL_STORAGE_CHARTINFO = "storage-barchart-info-template";
+
         this.DISK_USAGE_WARN = 85.00;
         this.DISK_USAGE_CRITICAL = 95.00;
         this.DISK_OKAY_COLOR = 'okay';

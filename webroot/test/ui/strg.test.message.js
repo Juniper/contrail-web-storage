@@ -6,6 +6,14 @@ define([
     'underscore'
 ], function (_) {
     var TMessages = function() {
+        //Storage Dashboard Constants
+        this.STORAGE_DASHBOARD_COMMON_TEST_MODULE = 'Storage Dashboard view - Common Tests';
+        this.STORAGE_DASHBOARD_PIECHART_CUSTOM_TEST = "Storage Dashboard view - Custom Tests";
+        this.STORAGE_DASHBOARD_NAME_VALUE_CHECK = "Storage Dashboard Piechart grid check for a particular column value equality";
+        
+        this.STORAGE_DASHBOARD_CLUSTER_STATUS_CUSTOM_TEST = "Storage Dashboard view - Custom Tests";
+        this.STORAGE_DASHBOARD_CLUSTER_STATUS_DETAILSVIEW ="Storage Cluster Status Details View";
+
         //Disk Constants
         this.STORAGE_DISK_GRID_MODULE  = 'Storage Disk Grid -  SM Tests';
         this.STORAGE_DISK_LIST_VIEW_COMMON_TEST_MODULE = 'Storage Disks List view - Common Tests';

@@ -8,6 +8,9 @@ define([
 ], function (cotu, ContrailListModel, ContrailViewModel) {
     this.getRegExForUrl = function (url) {
         var regexUrlMap = {
+            '/api/tenant/storage/cluster/osd/status': /\/api\/tenant\/storage\/cluster\/osd\/status.*$/,
+            '/api/tenant/storage/cluster/status': /\/api\/tenant\/storage\/cluster\/status.*$/,
+            '/api/tenant/storage/cluster/usage': /\/api\/tenant\/storage\/cluster\/usage.*$/,
             '/api/tenant/storage/cluster/osds/summary': /\/api\/tenant\/storage\/cluster\/osds\/summary.*$/,
             '/api/tenant/storage/cluster/pools/summary': /\/api\/tenant\/storage\/cluster\/pools\/summary.*$/,
             '/api/tenant/storage/cluster/monitors/summary': /\/api\/tenant\/storage\/cluster\/monitors\/summary.*$/,

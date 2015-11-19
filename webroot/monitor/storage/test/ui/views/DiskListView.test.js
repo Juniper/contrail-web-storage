@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
  */
 define([
-    'co-test-unit',
+    'co-test-runner',
     'strg-test-utils',
     'strg-test-messages',
     'strg-disks-list-view-mock-data',
@@ -14,6 +14,8 @@ define([
     CustomTestSuite) {
 
     var moduleId = stm.STORAGE_DISK_LIST_VIEW_COMMON_TEST_MODULE;
+
+    var testType = cotc.VIEW_TEST;
 
     var fakeServerConfig = CUnit.getDefaultFakeServerConfig();
 
@@ -84,8 +86,7 @@ define([
 
     };
 
-    var pageTestConfig = CUnit.createPageTestConfig(moduleId, fakeServerConfig, pageConfig, getTestConfig);
-    console.log(pageTestConfig);
+    var pageTestConfig = CUnit.createPageTestConfig(moduleId, testType, fakeServerConfig, pageConfig, getTestConfig);
     CUnit.startTestRunner(pageTestConfig);
 
 });

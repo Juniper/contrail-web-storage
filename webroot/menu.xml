@@ -11,43 +11,64 @@ and need to add the iconClass tag wherever we need to show some icons
 <menu>
     <items>
         <item>
-            <label>Monitor</label>
+           <label>Monitor</label>
             <name>monitor</name>
+            <resources>
+                <resource>
+                    <rootDir>/common/ui</rootDir>
+                    <template>storage.tmpl</template>
+                </resource>
+            </resources>
             <iconClass>icon-bar-chart</iconClass>
             <items>
                 <item>
                     <label>Infrastructure</label>
-                    <iconClass>icon-desktop</iconClass>
+                   <init>/common/ui/js/storage.init.js</init>
                     <resources>
                         <resource>
-                            <rootDir>/monitor/storage-infra/common/ui</rootDir>
-                            <js>monitor_infra_storage_constants.js</js>
-                            <js>monitor_infra_storage_utils.js</js>
-                            <css>contrail.storage.infra.css</css>
-                            <view>monitor_infra_storage_common.view</view>
-                        </resource>
-                        <resource>
-                            <rootDir>/common/ui</rootDir>
-                            <template>storage.tmpl</template>
-                            <class>msPageLoader</class>
-                        </resource>
-                        <resource>
                             <rootDir>/monitor/infrastructure/ui</rootDir>
-                            <js>infra.storage.main.js</js>
-                            <class>msPageLoader</class>
                         </resource>
                     </resources>
-                    <access>
+                     <iconClass>icon-desktop</iconClass>
+                     <access>
                         <roles>
-                            <role>admin</role>
+                            <role>superAdmin</role>
                         </roles>
                         <orchModels>
                             <model>openstack</model>
                             <model>cloudstack</model>
+                            <model>vcenter</model>
                         </orchModels>
+                        <accessFn>hideInFederatedvCenter</accessFn>
                     </access>
                     <items>
                         <item>
+                            <hash>mon_infra_dashboard</hash>
+                            <label>Dashboard</label>
+                            <searchStrings>Infrastructure Dashboard</searchStrings>
+                             <resources>
+                                 <resource>
+                                    <rootDir>/common/ui</rootDir>
+                                    <css>contrail.storage.css</css>
+                                </resource>
+                                <resource>
+                                    <rootDir>.</rootDir>
+                                    <js>monInfraDashboard.main.js</js>
+                                    <class>monInfraDashboardLoader</class>
+                                </resource>
+                                <resource>
+                                    <rootDir>/monitor/infrastructure/ui</rootDir>
+                                    <js>infra.storage.main.js</js>
+                                    <class>infraStoragePageLoader </class>
+                                    <function>renderDashboard</function>
+                                </resource>
+                            </resources>
+                            <queryParams>
+                                <tab>storageNode</tab>
+                                <type>dashboard</type>
+                            </queryParams>
+                        </item>
+                        <!-- <item>
                             <hash>mon_infra_dashboard</hash>
                             <label>Dashboard</label>
                             <resources>
@@ -63,27 +84,14 @@ and need to add the iconClass tag wherever we need to show some icons
                             </queryParams>
                             <searchStrings>Infrastructure Dashboard</searchStrings>
                         </item>
-                        <!--
-                        <item>
-                            <hash>mon_infra_storage</hash>
-                            <label>Storage Nodes</label>
-                            <resources>
-                                <resource>
-                                    <rootDir>/monitor/storage-infra/storagenode/ui</rootDir>
-                                    <js>monitor_infra_storagenode.js</js>
-                                    <view>monitor_infra_storagenode.view</view>
-                                    <class>storNodesView</class>
-                                </resource>
-                            </resources>
-                            <searchStrings>Monitor Storage Nodes</searchStrings>
-                        </item>
-                        -->
+                    -->
                         <item>
                             <hash>monitor_infra_storage</hash>
                             <label>Storage Nodes</label>
                             <resources>
                                 <resource>
                                     <rootDir>/monitor/infrastructure/ui</rootDir>
+                                    <js>infra.storage.main.js</js>
                                     <class>infraStoragePageLoader</class>
                                     <function>renderStorageNodes</function>
                                 </resource>
@@ -97,73 +105,6 @@ and need to add the iconClass tag wherever we need to show some icons
                         </item>
                     </items>
                 </item>
-                <!--
-                <item>
-                    <name>storage</name>
-                    <label>Storage</label>
-                    <resources>
-                        <resource>
-                            <rootDir>/monitor/tenant-storage/common/ui</rootDir>
-                            <js>tenant_monitor_storage_constants.js</js>
-                            <js>tenant_monitor_storage_utils.js</js>
-                            <js>tenant_monitor_storage.js</js>
-                            <css>contrail.storage.css</css>
-                            <view>tenant_monitor_storage.view</view>
-                        </resource>
-                    </resources>
-                    <iconClass>icon-tasks</iconClass>
-                    <access>
-                        <roles>
-                            <role>admin</role>
-                        </roles>
-                        <orchModels>
-                            <model>openstack</model>
-                            <model>cloudstack</model>
-                        </orchModels>
-                    </access>
-                    <items>
-                        <item>
-                            <hash>mon_storage_dashboard</hash>
-                            <label>Dashboard</label>
-                            <resources>
-                                <resource>
-                                    <rootDir>/monitor/tenant-storage/dashboard/ui</rootDir>
-                                    <js>tenant_monitor_storage_dashboard.js</js>
-                                    <view>tenant_monitor_storage_dashboard.view</view>
-                                    <class>tenantStorageDashboardView</class>
-                                </resource>
-                            </resources>
-                            <searchStrings>Storage Dashboard</searchStrings>
-                        </item>
-                        <item>
-                            <hash>mon_storage_disks</hash>
-                            <label>Disks</label>
-                            <resources>
-                                <resource>
-                                    <rootDir>/monitor/tenant-storage/disks/ui</rootDir>
-                                    <js>tenant_monitor_storage_disks.js</js>
-                                    <view>tenant_monitor_storage_disks.view</view>
-                                    <class>tenantStorageDisksView</class>
-                                </resource>
-                            </resources>
-                            <searchStrings>Storage Disks</searchStrings>
-                        </item>
-                        <item>
-                            <hash>mon_storage_monitor</hash>
-                            <label>Monitor</label>
-                            <resources>
-                                <resource>
-                                    <rootDir>/monitor/tenant-storage/monitor/ui</rootDir>
-                                    <js>tenant_monitor_storage_monitor.js</js>
-                                    <view>tenant_monitor_storage_monitor.view</view>
-                                    <class>tenantStorageMonitorView</class>
-                                </resource>
-                            </resources>
-                            <searchStrings>Storage Monitor</searchStrings>
-                        </item>
-                    </items>
-                </item>
-                -->
                 <item>
                     <label>Storage</label>
                     <iconClass>icon-tasks</iconClass>

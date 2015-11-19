@@ -382,6 +382,19 @@
     display: inline;
     margin-top: -10px;
 }
+#storage-dashboard-sparkline .infobox {
+    display:block;
+}
+#storage-dashboard-sparkline {
+    width:155px;
+    float:left;
+}
+#storage-dashboard-chart {
+    margin-left: 160px;
+}
+#storage-dashboard-chart .zoom-scatter-chart-container.colmask {
+    clear:none;
+}
 
 /*
 #usage-gauge-container {

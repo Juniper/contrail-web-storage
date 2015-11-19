@@ -9,24 +9,24 @@ function MonitorInfraStorageLoader() {
         var self = this, currMenuObj = globalObj.currMenuObj,
             hashParams = paramObject['hashParams'],
             rootDir = currMenuObj['resources']['resource'][0]['rootDir'],
-            pathMSView = rootDir + '/js/views/MonitorInfraStorageView.js',
             renderFn = paramObject['function'],
             loadingStartedDefObj = paramObject['loadingStartedDefObj'];
 
         check4StorageInit(function () {
-            requirejs([pathMSView], function (MonitorInfraStorageView) {
-                self.infraStorageView = new MonitorInfraStorageView();
+            require(['mon-infra-storage-dashboard'], function (MonitorInfraStorageView) {
+                self.infraStorageView = new MonitorInfraStorageView({
+                    el: $(contentContainer)
+                });
                 self.renderView(renderFn, hashParams);
-                if(contrail.checkIfExist(loadingStartedDefObj)) {
-                    loadingStartedDefObj.resolve();
-                }
+                
             });
         });
     };
     this.renderView = function (renderFn, hashParams) {
-        $(contentContainer).html("");
+        
         switch (renderFn) {
             case 'renderStorageNodes':
+                $(contentContainer).html("");
                 if (hashParams.type == "storagenode") {
                     if (hashParams.view == "details") {
                         this.infraStorageView.renderStorageNode({hashParams: hashParams});
@@ -37,11 +37,18 @@ function MonitorInfraStorageLoader() {
                 break;
 
             case 'renderDisks':
+                $(contentContainer).html("");
                 if (hashParams.type == "disk") {
                     if (hashParams.view == "details") {
                         this.infraStorageView.renderDisk({hashParams: hashParams});
                     }
                 }
+                break;
+            case 'renderDashboard':
+               // if (hashParams.type == "dashboard") {
+                    el: $(contentContainer)
+                    this.infraStorageView.renderDashboard();
+               // }
                 break;
         }
     };

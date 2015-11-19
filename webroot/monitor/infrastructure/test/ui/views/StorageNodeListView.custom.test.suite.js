@@ -6,7 +6,7 @@ define([
     'underscore',
     'co-test-utils',
     'co-test-constants',
-    'co-test-unit',
+    'co-test-runner',
     'strg-test-messages',
 ], function (_, cotu, cotc, CUnit, stm) {
 
@@ -22,7 +22,7 @@ define([
             viewConfigBody = viewConfig.elementConfig.body,
             viewConfigFooter = viewConfig.elementConfig.footer;
 
-        module(cotu.formatTestModuleMessage(stm.STORAGE_MON_LIST_VIEW_CUSTOM_TEST, el.id));
+        module(cotu.formatTestModuleMessage(stm.STORAGE_DISK_LIST_VIEW_CUSTOM_TEST, el.id));
 
         var gridViewCustomTestSuite = CUnit.createTestSuite('GridViewCustomTestSuite');
 
@@ -34,14 +34,14 @@ define([
 
 
         /**
-         * This is a sample custom test for network list grid.
+         * This is a sample custom test for InfraStructure Storage Node list grid.
          * In this testcase, we'll check for second row Traffic in/out value (5th Column).
          */
 
-        bodyTestGroup.registerTest(CUnit.test(stm.STORAGE_MON_GRID_COLUMN_VALUE_CHECK, function() {
+        bodyTestGroup.registerTest(CUnit.test(stm.POOLS_GRID_COLUMN_VALUE_CHECK, function() {
             expect(1);
-            equal($($(el).find('.grid-body .slick_row_id_1 .slick-cell')[4]).text().trim(), "ok",
-                "Custom test to assert 2nd row 5th col value");
+            equal($($(el).find('.grid-body .slick_row_id_1 .slick-cell')[4]).text().trim(), "345.03 GB",
+               "Custom test to assert 2nd row 5th col value");
 
         }, cotc.SEVERITY_MEDIUM));
 
