@@ -13,12 +13,13 @@ function MonitorInfraStorageLoader() {
             loadingStartedDefObj = paramObject['loadingStartedDefObj'];
 
         check4StorageInit(function () {
-            require(['mon-infra-storage-dashboard'], function (MonitorInfraStorageView) {
-                self.infraStorageView = new MonitorInfraStorageView({
-                    el: $(contentContainer)
+            require(['mon-infra-dashboard-view'],function() {
+               require(['mon-infra-storage-dashboard'], function (MonitorInfraStorageView) {
+                    self.infraStorageView = new MonitorInfraStorageView({
+                        el: $(contentContainer)
+                    });
+                    self.renderView(renderFn, hashParams);
                 });
-                self.renderView(renderFn, hashParams);
-                
             });
         });
     };

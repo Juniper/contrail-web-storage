@@ -100,13 +100,15 @@ define([
                                 config:[{
                                     field:'diskCnt',
                                     title:'Disks',
-                                    id:'infobox-mons'
+                                    id:'infobox-mons',
+                                    yLbl: 'Hosts',
                                 },{
                                     field:'monCnt',
                                     monOnly: 'monOnlyCnt',
                                     downCnt: 'downCnt',
                                     title:'Monitor',
-                                    id: 'infobox-mons'
+                                    id: 'infobox-mons',
+                                    yLbl: 'Hosts',
                                 }],
                                 totalCntModel: cfgObj['totalCntModel']
                             },

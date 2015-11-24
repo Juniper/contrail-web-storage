@@ -107,15 +107,6 @@ define([
                 obj['alerts'] =
                             obj['nodeAlerts'].concat(obj['processAlerts'])
                                                 .sort(dashboardUtils.sortInfraAlerts);
-                
-                if (gVar <1){
-                    var clusterObj = {};
-                    clusterObj['nodeAlerts'] = swu.processStorageHealthAlerts(response['cluster_status']);
-                    obj['alerts'] = obj['alerts'].concat(clusterObj['nodeAlerts']).sort(dashboardUtils.sortInfraAlerts);
-                  gVar++;
-                }  
-
-
                 /*
                  * build_info response holds version string or could be empty array.
                  */
@@ -150,6 +141,12 @@ define([
             clusterObj['monitor_active'] = response['cluster_status']['monitor_active'];
             //adding clusterObj to the top of the returned array
            // retArr.unshift(clusterObj);
+
+            var clusterObj = {};
+            clusterObj = swu.processStorageHealthAlerts(response['cluster_status']);
+            //globalAlerts.push(clusterObj.sort(dashboardUtils.sortInfraAlerts));
+            //globalAlerts.push()
+           //retArr.push(globalAlerts);
 
             retArr.sort(dashboardUtils.sortNodesByColor);
             return retArr;

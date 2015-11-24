@@ -39,7 +39,7 @@ define([
          * In this testcase, we'll check for second row Traffic in/out value (5th Column).
          */
 
-        bodyTestGroup.registerTest(CUnit.test(stm.POOLS_GRID_COLUMN_VALUE_CHECK, function() {
+        bodyTestGroup.registerTest(CUnit.test(stm.STORAGE_POOLS_GRID_COLUMN_VALUE_CHECK, function() {
             expect(1);
             equal($($(el).find('.grid-body .slick_row_id_1 .slick-cell')[4]).text().trim(), "241.6 GB",
                "Custom test to assert 2nd row 5th col value");
