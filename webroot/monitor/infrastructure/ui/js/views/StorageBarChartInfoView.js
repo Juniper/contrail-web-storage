@@ -74,7 +74,7 @@ define([
                     return d[currCfg['field']];
                 });
                 //Draw sparkline
-                drawSparkLineBar(currElem.find('.sparkline')[0], {
+                chUtils.drawSparkLineBar(currElem.find('.sparkline')[0], {
                     data: sparkLineData['data'],
                     //title: chartCfg['title'],
                     xLbl: currCfg['title'],

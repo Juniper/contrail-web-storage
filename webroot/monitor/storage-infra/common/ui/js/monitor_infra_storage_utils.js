@@ -123,7 +123,7 @@ var infraMonitorStorageUtils = {
                     obj['osds_total'] += osd['kb'] * 1024;
                     obj['osds_used'] += osd['kb_used'] * 1024;
                 }
-                if (!isEmptyObject(osd['avg_bw'])){
+                if (!cowu.isEmptyObject(osd['avg_bw'])){
                     if($.isNumeric(osd['avg_bw']['reads_kbytes']) && $.isNumeric(osd['avg_bw']['writes_kbytes'])){
                         obj['tot_avg_bw'] += osd['avg_bw']['reads_kbytes'] + osd['avg_bw']['writes_kbytes'];
                         obj['tot_avg_read_kb'] += osd['avg_bw']['reads_kbytes'];

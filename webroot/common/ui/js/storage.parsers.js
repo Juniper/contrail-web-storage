@@ -63,7 +63,7 @@ define([
                         obj['osds_total'] += osd['kb'] * 1024;
                         obj['osds_used'] += osd['kb_used'] * 1024;
                     }
-                    if (!isEmptyObject(osd['avg_bw'])) {
+                    if (!cowu.isEmptyObject(osd['avg_bw'])) {
                         if ($.isNumeric(osd['avg_bw']['reads_kbytes']) && $.isNumeric(osd['avg_bw']['writes_kbytes'])) {
                             obj['tot_avg_bw'] += osd['avg_bw']['reads_kbytes'] + osd['avg_bw']['writes_kbytes'];
                             obj['tot_avg_read_kb'] += osd['avg_bw']['reads_kbytes'];
@@ -92,9 +92,9 @@ define([
                 obj['osds_total'] = formatBytes(obj['osds_total']);
                 obj['osds_used'] = formatBytes(obj['osds_used']);
                 obj['monitor'] = host['monitor'];
-                if (!isEmptyObject(obj['monitor']) && obj['monitor'] != "Not Available") {
+                if (!cowu.isEmptyObject(obj['monitor']) && obj['monitor'] != "Not Available") {
                     obj['monCnt']= 1;
-                }else{
+                } else{
                     obj['monCnt']= 0;
                 }
                 obj['status'] = host['status'];
@@ -182,12 +182,12 @@ define([
                 osdObj.x = 'N/A';
             }
 
-            if(!isEmptyObject(osdObj.fs_perf_stat)) {
+            if(!cowu.isEmptyObject(osdObj.fs_perf_stat)) {
                 osdObj.apply_latency = osdObj.fs_perf_stat.apply_latency_ms + " ms";
                 osdObj.commit_latency = osdObj.fs_perf_stat.commit_latency_ms + " ms";
             }
 
-            if (!isEmptyObject(osdObj.avg_bw)) {
+            if (!cowu.isEmptyObject(osdObj.avg_bw)) {
                 if ($.isNumeric(osdObj.avg_bw.reads_kbytes) && $.isNumeric(osdObj.avg_bw.writes_kbytes)) {
                     osdObj.y = (osdObj.avg_bw.reads_kbytes + osdObj.avg_bw.writes_kbytes) * 1024;
                     osdObj.tot_avg_bw = formatBytes(osdObj.y);
@@ -321,32 +321,32 @@ define([
             var readThrptData = {
                     values: [],
                     key: 'Read',
-                    color: d3_category5[1]
+                    color: cowc.D3_COLOR_CATEGORY5[1]
                 },
                 writeThrptData = {
                     values: [],
                     key: 'Write',
-                    color: d3_category5[0]
+                    color: cowc.D3_COLOR_CATEGORY5[0]
                 },
                 readIopsData = {
                     values: [],
                     key: 'Read',
-                    color: d3_category5[1]
+                    color: cowc.D3_COLOR_CATEGORY5[1]
                 },
                 writeIopsData = {
                     values: [],
                     key: 'Write',
-                    color: d3_category5[0]
+                    color: cowc.D3_COLOR_CATEGORY5[0]
                 },
                 readLatData = {
                     values: [],
                     key: 'Read',
-                    color: d3_category5[1]
+                    color: cowc.D3_COLOR_CATEGORY5[1]
                 },
                 writeLatData = {
                     values: [],
                     key: 'Write',
-                    color: d3_category5[0]
+                    color: cowc.D3_COLOR_CATEGORY5[0]
                 };
 
             if (response != null && response.hasOwnProperty('flow-series')) {
@@ -403,10 +403,10 @@ define([
             if (responseArray.length == 0) {
                 return [];
             } else {
-                var thrptWrite = {key: "Throughput Write", values: [], color: d3_category5[2]},
-                    thrptRead = {key: "Throughput Read", values: [], color: d3_category5[3]},
-                    iopsWrite = {key: "IOPs Write", values: [], bar: true, color: d3_category5[0]},
-                    iopsRead = {key: "IOPs Read", values: [], bar: true, color: d3_category5[1]},
+                var thrptWrite = {key: "Throughput Write", values: [], color: cowc.D3_COLOR_CATEGORY5[2]},
+                    thrptRead = {key: "Throughput Read", values: [], color: cowc.D3_COLOR_CATEGORY5[3]},
+                    iopsWrite = {key: "IOPs Write", values: [], bar: true, color: cowc.D3_COLOR_CATEGORY5[0]},
+                    iopsRead = {key: "IOPs Read", values: [], bar: true, color: cowc.D3_COLOR_CATEGORY5[1]},
                     chartData = [thrptWrite, thrptRead, iopsWrite, iopsRead];
 
                 $.each(responseArray[0], function (idx, thrpt) {
