@@ -59,7 +59,7 @@ define([
                         nodeData = swp.storagenodeDataParser(response);
                         $.each(nodeData, function(idx, obj) {
                             if (obj.hasOwnProperty('monitor')) {
-                                if (!isEmptyObject(obj['monitor']) && obj['monitor'] != "Not Available") {
+                                if (!cowu.isEmptyObject(obj['monitor']) && obj['monitor'] != "Not Available") {
                                     monCnt += 1;
                                 } 
                             }

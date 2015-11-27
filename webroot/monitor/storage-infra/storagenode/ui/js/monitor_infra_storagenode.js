@@ -825,7 +825,7 @@ storageNodeView = function() {
 
             $.each(osds, function(idx, osd) {
                 osd['x'] = parseFloat((100 -((osd.kb_avail / osd.kb) * 100)).toFixed(2));
-                if (!isEmptyObject(osd['avg_bw'])){
+                if (!cowu.isEmptyObject(osd['avg_bw'])){
                     if($.isNumeric(osd['avg_bw']['reads_kbytes']) && $.isNumeric(osd['avg_bw']['writes_kbytes'])){
                         osd['y'] = (osd['avg_bw']['reads_kbytes'] + osd['avg_bw']['writes_kbytes']) * 1024;
                         osd['tot_avg_bw'] = formatBytes(osd['y']);
@@ -1034,7 +1034,7 @@ function drawDisksBarChart(selector, data, chart, chartOptions) {
         }
 
         nv.utils.windowResize(function() {
-            updateChartOnResize(selector, chart);
+            chUtils.updateChartOnResize(selector, chart);
 
             return chart;
         });

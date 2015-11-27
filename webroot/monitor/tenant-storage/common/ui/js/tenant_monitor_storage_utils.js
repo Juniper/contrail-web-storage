@@ -820,7 +820,7 @@ var tenantStorageUtils = {
                     osd.available_perc = 'N/A';
                     osd.x = 'N/A';
                 }
-                if (!isEmptyObject(osd.avg_bw)) {
+                if (!cowu.isEmptyObject(osd.avg_bw)) {
                     if ($.isNumeric(osd.avg_bw.reads_kbytes) && $.isNumeric(osd.avg_bw.writes_kbytes)) {
                         osd.y = (osd.avg_bw.reads_kbytes + osd.avg_bw.writes_kbytes) * 1024;
                         osd.tot_avg_bw = formatBytes(osd.y);
@@ -1041,7 +1041,7 @@ var tenantStorageUtils = {
                 }
 
                 nv.utils.windowResize(function() {
-                    updateChartOnResize(selector, chart);
+                    chUtils.updateChartOnResize(selector, chart);
                 });
 
                 return chart
