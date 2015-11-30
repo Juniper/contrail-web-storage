@@ -32,12 +32,9 @@ define([
     pageConfig.hashParams = {
         p: 'monitor_infra_storage',
         q: {
-            view: 'details',
+            view: 'list',
             type: 'storagenode',
-            "focusedElement": {
-                "fqName": "cmbu-vxa2010-17",
-                "type": "storagenode"
-            }
+            source:'uve'
         }
     };
     pageConfig.loadTimeout = 2000;
