@@ -98,8 +98,6 @@ define([
                     obj['monCnt']= 0;
                 }
                 obj['status'] = host['status'];
-                //obj['color'] = swu.getStorageNodeColor(host, obj);
-                obj['downNodeCnt'] = 0;
                 //initialize for alerts
                 obj['isDiskDown'] = obj['isDiskOut'] = false;
                 obj['nodeAlerts'] = swu.processStorageNodeAlerts(obj);
@@ -116,9 +114,23 @@ define([
                 } else {
                     obj['version'] = "Ceph N/A";
                 }
+
+                obj['color'] = swu.getStorageNodeColor(host, obj);
+                obj['downNodeCnt'] = 0;
                 if (obj['color'] == d3Colors['red']) {
                     obj['downNodeCnt']++;
                 }
+                obj['color']="default";
+                /*
+                  Its temporary fix to push the global alerts
+                */
+                if (gVar <1){
+                    var clusterObj = {};
+                    clusterObj['nodeAlerts'] = swu.processStorageHealthAlerts(response['cluster_status']);
+                    obj['alerts'] = obj['alerts'].concat(clusterObj['nodeAlerts']).sort(dashboardUtils.sortInfraAlerts);
+                  gVar++;
+                }
+
                 retArr.push(obj);
             });
 
@@ -142,6 +154,9 @@ define([
             //adding clusterObj to the top of the returned array
            // retArr.unshift(clusterObj);
 
+           /*
+              Set the Global Alerts
+           */
             var clusterObj = {};
             clusterObj = swu.processStorageHealthAlerts(response['cluster_status']);
             //globalAlerts.push(clusterObj.sort(dashboardUtils.sortInfraAlerts));

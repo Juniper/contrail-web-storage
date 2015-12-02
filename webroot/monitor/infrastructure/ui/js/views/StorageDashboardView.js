@@ -15,7 +15,6 @@ define([
                 //Returning inside IIFE to make private static variable
                 var totalCntModel = new Backbone.Model({
                     //diskCnt:'',
-                    monCnt:'',
                     monOnlyCnt:'',
                     downCnt:''
                 });
@@ -28,13 +27,13 @@ define([
                                 sDashBoardListModel,
                                 getStorageDashboardListViewConfig({totalCntModel:totalCntModel}),null,null,null,
                                 function() {
-                                    updateVnCnt(totalCntModel);
+                                    updateMonCnt(totalCntModel);
                                 });
                         }
                     }
             })()
         );
-        function updateVnCnt(totalCntModel) {
+        function updateMonCnt(totalCntModel) {
             var self = this;
             $.ajax({
                     url: swc.get(swc.URL_STORAGENODES_SUMMARY) ,
@@ -73,7 +72,7 @@ define([
                         }
                         downCnt = totMonCnt - totActiveMonCnt,
 
-                        totalCntModel.set({monCnt:totMonCnt, monOnlyCnt:monOnlyCnt, downCnt:downCnt});
+                        totalCntModel.set({monOnlyCnt:monOnlyCnt, downCnt:downCnt});
                     }
                 });
         }

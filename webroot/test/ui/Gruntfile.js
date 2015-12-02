@@ -33,20 +33,14 @@ module.exports = function (grunt) {
 
         {pattern: 'contrail-web-storage/webroot/test/ui/strg.test.app.js'},
         {pattern: 'contrail-web-storage/webroot/test/ui/*.js', included: false},
-        {pattern: 'contrail-web-storage/webroot/monitor/**/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/common/ui/templates/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/common/**/*.js', included: false},
         
         {pattern: 'contrail-web-storage/webroot/monitor/infrastructure/ui/js/**/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/monitor/infrastructure/ui/js/*.js', included: false},
 
-        {pattern: 'contrail-web-storage/webroot/monitor/storage-infra/**/*.js', included: false},
-        {pattern: 'contrail-web-storage/webroot/monitor/storage-infra/**/*.view', included: false},
-
-       // {pattern: 'contrail-web-storage/webroot/monitor/infrastructure/ui/js/**/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js', included: false},
 
-        {pattern: 'contrail-web-storage/webroot/config/linklocalservices/**/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/*.xml', included: false},
         {pattern: 'contrail-web-storage/webroot/common/ui/css/*.css', included: false},
 
@@ -69,7 +63,7 @@ module.exports = function (grunt) {
         options: {
             configFile: 'karma.config.js'
         },
-       infraStorageNodeListView: {
+       storageNodeListView: {
             options: {
                 files: [
                     {
@@ -87,7 +81,7 @@ module.exports = function (grunt) {
                 junitReporter: {
                     outputFile: __dirname + '/reports/tests/stgm/views/',
                     outputFile: 'storage-node-list-view-test-results.xml',
-                    suite: 'infraStorageNodeListView',
+                    suite: 'storageNodeListView',
                     useBrowserName: false
                 },
                 htmlReporter: {
@@ -95,7 +89,7 @@ module.exports = function (grunt) {
                 },
                 coverageReporter: {
                     type: 'html',
-                    dir: __dirname + '/reports/coverage/stgm/views/infraStorageNodeListView/',
+                    dir: __dirname + '/reports/coverage/stgm/views/storageNodeListView/',
                     subdir: browserSubdirFn
                 },
                 feature: 'stgm'
@@ -376,7 +370,7 @@ module.exports = function (grunt) {
             files: ["Gruntfile.js"]
         },
         stgmNoMerge : {
-            infraStorageNodeListView:'infraStorageNodeListView',
+            storageNodeListView:'storageNodeListView',
             storageDiskListView: 'storageDiskListView',
             storageDiskView: 'storageDiskView',
             storagePoolListView: 'storagePoolListView',
@@ -425,8 +419,8 @@ module.exports = function (grunt) {
             grunt.task.run('karma:runAllStgmTests');
             grunt.log.writeln('Test results: ' + karmaConfig['runAllStgmTests']['options']['htmlReporter']['outputFile']);
             printCoverageReportLoc(karmaConfig['runAllStgmTests']['options']['coverageReporter']);
-        } else if (target == 'infraStorageNodeListView') {
-            grunt.task.run('karma:infraStorageNodeListView');
+        } else if (target == 'storageNodeListView') {
+            grunt.task.run('karma:storageNodeListView');
         }else if (target == 'storageDashboardView') {
             grunt.task.run('karma:storageDashboardView');
         }else if (target == 'storageDiskListView') {
