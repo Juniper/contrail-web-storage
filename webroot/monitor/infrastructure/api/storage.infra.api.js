@@ -12,9 +12,9 @@ var cacheApi = require(process.mainModule.exports["corePath"] +
     config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
     async = require('async'),
     jsonPath = require('JSONPath').eval,
-    osdApi= require('../../tenant-storage/api/storage.osd.api'),
-    monsApi= require('../../tenant-storage/api/storage.mons.api'),
-    dashApi= require('../../tenant-storage/api/storage.dashboard.api'),
+    osdApi= require('../../storage/api/storage.osd.api'),
+    monsApi= require('../../storage/api/storage.mons.api'),
+    dashApi= require('../../storage/api/storage.dashboard.api'),
     storageInfraApi = module.exports;
 
 var  expireTime= storageApi.expireTimeSecs;

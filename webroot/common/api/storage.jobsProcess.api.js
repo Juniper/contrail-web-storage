@@ -2,8 +2,8 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 
-var storageTenantJobApi = require('../../monitor/tenant-storage/jobs/storage.tenant.jobs.js');
-var storageInfraJobApi = require('../../monitor/storage-infra/jobs/storage.infra.jobs.js');
+var storageTenantJobApi = require('../../monitor/storage/jobs/storage.tenant.jobs.js');
+var storageInfraJobApi = require('../../monitor/infrastructure/jobs/storage.infra.jobs.js');
 var jobsProcess = module.exports;
 
 jobsProcess.processStorageClusterStatusRequestByJob =
