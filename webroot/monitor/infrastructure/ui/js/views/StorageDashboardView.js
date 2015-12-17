@@ -63,15 +63,8 @@ define([
                                 } 
                             }
                         });
-
                         monOnlyCnt = totActiveMonCnt - monCnt;
-                        if(monOnlyCnt > 0){
-                            monCnt1 = totMonCnt+' + '+ monOnlyCnt ;
-                        }else{
-                            monCnt1 = totMonCnt;
-                        }
                         downCnt = totMonCnt - totActiveMonCnt,
-
                         totalCntModel.set({monOnlyCnt:monOnlyCnt, downCnt:downCnt});
                     }
                 });

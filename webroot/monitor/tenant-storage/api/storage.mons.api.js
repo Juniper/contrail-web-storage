@@ -117,7 +117,7 @@ function consolidateMonitors(resultJSON){
             monJSON['monitors'] = monitors;
         }
         monJSON['monitors']['mons_total'] =jsonPath(resultJSON, "$..monmap.mons.length");
-        monJSON['monitors']['mons_active'] =jsonPath(resultJSON, "$..health.health_services..mons.length");
+        monJSON['monitors']['mons_active'] =jsonPath(resultJSON, "$..health.health_services.data_health.mons.length");
     }
     return monJSON;
 }

@@ -162,22 +162,31 @@ function parseStorageOSDDetails(req, res, resultJSON){
 
 function parseOSDFromTree(osdDump, osdTree){
     var osds = jsonPath(osdDump, "$..osds")[0];
-    var nodeCnt= osds.length;
+    var osdCnt= osds.length;
+    var treeCnt = osdTree.length;
     var osdList=[];
     var osdDumpCnt = jsonPath(osdDump,"$.output.osds.length")[0];
-
-    for (i = 0; i < nodeCnt; i++) {
-        var treeId=osdTree[i].id;
         for(j=0; j< osdDumpCnt; j++){
             var dumpOSDId= jsonPath(osdDump,"$.output.osds["+j+"].osd")[0];
             var temp = new Object();
-            if( treeId == dumpOSDId){
-                var status= osdTree[i].status;
-                temp['status'] = osdTree[i].status;
-                temp['name'] = osdTree[i].name;
-                temp['type_id'] = osdTree[i].type_id;
-                temp['type'] = osdTree[i].type;
-                temp['id'] = osdTree[i].id;
+            var tmpOsdTree = {};
+            var tmpId;
+            for(k=0; k < treeCnt; k++){
+                treeId=osdTree[k].id;
+                if( treeId == dumpOSDId){
+                    tmpId= osdTree[k].id;
+                    tmpOsdTree =osdTree[k];
+                    break;
+                }
+            }
+
+            if( tmpId == dumpOSDId){
+                var status= tmpOsdTree.status;
+                temp['status'] = tmpOsdTree.status;
+                temp['name'] = tmpOsdTree.name;
+                temp['type_id'] = tmpOsdTree.type_id;
+                temp['type'] = tmpOsdTree.type;
+                temp['id'] = tmpOsdTree.id;
                 temp['public_addr']=jsonPath(osdDump, "$.output.osds["+j+"].public_addr")[0];
                 temp['uuid']=jsonPath(osdDump, "$.output.osds["+j+"].uuid")[0];
                 temp['down_at']=jsonPath(osdDump, "$.output.osds["+j+"].down_at")[0];
@@ -200,7 +209,7 @@ function parseOSDFromTree(osdDump, osdTree){
             }
         }
 
-    }
+    
     return osdList;
 }
 
