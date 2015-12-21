@@ -12,7 +12,8 @@ function MonitorInfraStorageLoader() {
             renderFn = paramObject['function'],
             loadingStartedDefObj = paramObject['loadingStartedDefObj'];
 
-        check4StorageInit(function () {
+       // check4StorageInit(function () {
+        if (self.infraStorageView == null) {
             require(['mon-infra-dashboard-view'],function() {
                require(['mon-infra-storage-dashboard'], function (MonitorInfraStorageView) {
                     self.infraStorageView = new MonitorInfraStorageView({
@@ -21,7 +22,10 @@ function MonitorInfraStorageLoader() {
                     self.renderView(renderFn, hashParams);
                 });
             });
-        });
+        }else {
+            self.renderView(renderFn, hashParams);
+        }
+       // });
     };
     this.renderView = function (renderFn, hashParams) {
         

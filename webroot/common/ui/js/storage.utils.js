@@ -377,7 +377,7 @@ define(['underscore'], function (_) {
 
         self.addUnits2Latency = function (data, noDecimal, maxPrecision, precision) {
             var dataPrefixes = ['ms', 's', 'm', 'hr'],
-                formatStr = '', decimalDigits = 2, size = 60;
+                formatStr = '', decimalDigits = 2, size = 1000;
 
             if (!$.isNumeric(data)) {
                 return '-';

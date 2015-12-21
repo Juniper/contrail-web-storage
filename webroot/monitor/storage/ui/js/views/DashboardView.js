@@ -2,18 +2,15 @@
  * Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
  */
 
-define([
-    'underscore',
-    'contrail-view',
-    'contrail-list-model'
-], function (_, ContrailView, ContrailListModel) {
-    var DashboardView = ContrailView.extend({
-        el: $(contentContainer),
 
-        render: function () {
-            var self = this;
-            self.renderView4Config(self.$el, null, getDashboardViewConfig());
-        }
+define(['underscore', 'contrail-view'], function(_, ContrailView) {
+    var DashboardView = ContrailView.extend({
+     el: $(contentContainer),
+       render: function() {
+           this.renderView4Config(this.$el,
+           null,
+           getDashboardViewConfig());
+       }
     });
 
     function getDashboardViewConfig() {

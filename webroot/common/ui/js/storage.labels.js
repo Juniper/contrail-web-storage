@@ -98,11 +98,20 @@ define([
         this.MONITOR_POOL_STATS_ID = "monitor-pool-stats";
         this.MONITOR_POOL_SCATTER_CHART_ID ='pool-scatter-chart'
 
+        this.MONITOR_STORAGE_DASHBOARD_SECTION_ID ="storage-dashboard-section";
         this.MONITOR_STORAGE_DASHBOARD_PAGE_ID = "monitor-storage-dashboard-page";
         this.MONITOR_STORAGE_DASHBOARD_LIST_ID = "monitor-storage-dashboard-list";
         this.MONITOR_STORAGE_DASHBOARD_USAGE_SECTION_ID = "monitor-storage-dashboard-usage-section";
         this.MONITOR_STORAGE_DASHBOARD_CLUSTER_USAGE_ID = "monitor-storage-dashboard-usage";
         this.MONITOR_STORAGE_DASHBOARD_CLUSTER_STATS_ID = "monitor-storage-dashboard-stats";
+
+
+        this.STORAGENODE_SUMMARY_SCATTERCHART_SECTION_ID ="storage-nodes-scatterchart-section";
+        this.STORAGENODE_DASHBOARD_SECTION_ID="storage-dashboard-section";
+        this.STORAGENODE_DASHBOARD_SPARKLINE_ID="storage-dashboard-sparkline";
+        this.STORAGENODE_SUMMARY_TITLE="Storage Nodes";
+        this.STORAGENODE_DASHBOARD_CHART_ID ="storage-dashboard-chart";
+
 
         this.MONITOR_CLUSTER_USAGE_ID = "monitor-storage-cluster-usage";
 

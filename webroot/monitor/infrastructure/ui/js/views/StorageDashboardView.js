@@ -2,13 +2,9 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 
-define([
-    'underscore', 
-    'contrail-view', 
-    'storage-dashboard-model',
-    'storage-node-scatter-chart-view',
-    ],
-    function(_, ContrailView, StorageDashboardListModel, StorageNodeScatterChartView) {
+define(
+    ['underscore', 'contrail-view', 'storage-dashboard-model'],
+    function(_, ContrailView, StorageDashboardListModel) {
         var StorageDashboardView = ContrailView.extend(
            (function() {
                 var self = this;
@@ -73,16 +69,15 @@ define([
         function getStorageDashboardListViewConfig(cfgObj) {
             return {
                 elementId: cowu.formatElementId([
-                    'storage-dashboard-section'
-                    //ctwl.VROUTER_DASHBOARD_SECTION_ID
+                    swl.STORAGENODE_DASHBOARD_SECTION_ID
                 ]),
                 view: "SectionView",
                 viewConfig: {
                     rows: [{
                         columns: [
                         {
-                            elementId: 'storage-dashboard-sparkline',//ctwl.VROUTER_DASHBOARD_SPARKLINE_ID,
-                            title: 'Storage Nodes',//ctwl.VROUTER_SUMMARY_TITLE,
+                            elementId: swl.STORAGENODE_DASHBOARD_SPARKLINE_ID,
+                            title: swl.STORAGENODE_SUMMARY_TITLE,
                             view: "StorageBarChartInfoView",
                             viewConfig: {
                                 // class:' width:155px
@@ -109,8 +104,8 @@ define([
                             app: cowc.APP_CONTRAIL_STORAGE,
                         },
                         {
-                            elementId: 'storage-dashboard-chart',//ctwl.VROUTER_DASHBOARD_CHART_ID,
-                            title: 'Storage Nodes',//ctwl.VROUTER_SUMMARY_TITLE,
+                            elementId: swl.STORAGENODE_DASHBOARD_CHART_ID,
+                            title: swl.STORAGENODE_SUMMARY_TITLE,
                             view: "StorageNodeScatterChartView",
                             viewConfig : {
                                 // class: 'span9'

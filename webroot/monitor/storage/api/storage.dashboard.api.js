@@ -204,7 +204,7 @@ function getStorageClusterOSDActivity(req, res,appData){
 
     var tableName, whereClause=[],
     selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
-            "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)", "COUNT(info_stats)" ];
+            "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)", "COUNT(info_stats)", "uuid" ];
 
     tableName = 'StatTable.ComputeStorageOsd.info_stats';
     selectArr.push("T="+intervalSecs);
@@ -262,37 +262,51 @@ function parseStorageClusterOSDActivityData(activityJSON, timeObj, timeGran, sou
 function formatOsdSeriesLoadXMLData(resultJSON){
     var results = [];
     var counter = 0,secTime;
-    try {
-        resultJSON = resultJSON['value'];
-        counter = resultJSON.length-1;
-        for (var i = 1; i < counter; i++) {
-             results[i-1] = {};
-            secTime = Math.floor(resultJSON[i]['T='] / 1000);
-            results[i-1]['Date']= new Date(secTime);
-            var count = resultJSON[i]['COUNT(info_stats)'];
-            results[i-1]['MessageTS'] = resultJSON[i]['T='];
-            results[i-1]['sampleCnt'] = count;
-            
-            var reads = resultJSON[i]['SUM(info_stats.reads)'];
-            results[i-1]['reads'] =  Math.ceil(reads/60);
-            
-            var writes= resultJSON[i]['SUM(info_stats.writes)'];
-            results[i-1]['writes'] = Math.ceil(writes/60);
-            
-            var reads_kbytes= resultJSON[i]['SUM(info_stats.read_kbytes)'];
-            results[i-1]['reads_kbytes'] = reads_kbytes/60;
-            
-            var writes_kbytes= resultJSON[i]['SUM(info_stats.write_kbytes)'];
-            results[i-1]['writes_kbytes'] = writes_kbytes/60;
-            
-            var op_r_latency = resultJSON[i]['SUM(info_stats.op_r_latency)'];
-            results[i-1]['op_r_latency'] = op_r_latency/(count*60);
+     try {
+            resultJSON = resultJSON['value'];
+            counter = resultJSON.length-1;
+            for (var i = 1,j=1; j < counter; i++) {
 
-            var op_w_latency = resultJSON[i]['SUM(info_stats.op_w_latency)'];
-            results[i-1]['op_w_latency'] = op_w_latency/(count*60);
-        }
-        return results;
-    } catch (e) {
+                results[i-1] = {};
+                secTime = Math.floor(resultJSON[j]['T='] / 1000);
+                results[i-1]['Date']= new Date(secTime);
+
+                var count = resultJSON[j]['COUNT(info_stats)'];
+                results[i-1]['MessageTS'] = resultJSON[j]['T='];
+                results[i-1]['sampleCnt'] = count;
+                results[i-1]['reads'] = 0;
+                results[i-1]['writes'] = 0;
+                results[i-1]['reads_kbytes'] = 0;
+                results[i-1]['writes_kbytes'] = 0;
+                results[i-1]['op_r_latency'] = 0;
+                results[i-1]['op_w_latency'] = 0;
+
+                while (1) {
+                    var reads = resultJSON[j]['SUM(info_stats.reads)'];
+                    results[i-1]['reads'] +=  Math.ceil(reads/count);
+
+                    var writes= resultJSON[j]['SUM(info_stats.writes)'];
+                    results[i-1]['writes'] += Math.ceil(writes/count);
+
+                    var reads_kbytes= resultJSON[j]['SUM(info_stats.read_kbytes)'];
+                    results[i-1]['reads_kbytes'] += reads_kbytes/count;
+
+                    var writes_kbytes= resultJSON[j]['SUM(info_stats.write_kbytes)'];
+                    results[i-1]['writes_kbytes'] += writes_kbytes/count;
+
+                    var op_r_latency = resultJSON[j]['SUM(info_stats.op_r_latency)'];
+                    results[i-1]['op_r_latency'] += op_r_latency/(count);
+
+                    var op_w_latency = resultJSON[j]['SUM(info_stats.op_w_latency)'];
+                    results[i-1]['op_w_latency'] += op_w_latency/(count);
+                    j++;
+                    if (j >= counter ||
+                        secTime != (Math.floor(resultJSON[j]['T='] / 1000)))
+                        break;
+                }
+            }
+            return results;
+        } catch (e) {
         logutils.logger.error("In formatOsdSeriesLoadXMLData(): JSON Parse error: " + e);
         return null;
     }

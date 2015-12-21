@@ -2,38 +2,24 @@
  * Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
  */
 
-define([
-    'underscore',
-    'contrail-view',
-    'contrail-list-model'
-], function (_, ContrailView, ContrailListModel) {
+define(['underscore', 'contrail-view'], function(_, ContrailView) {
     var StorageNodeListView = ContrailView.extend({
-        el: $(contentContainer),
-
-        render: function () {
-            var self = this, viewConfig = this.attributes.viewConfig;
-
-            var listModelConfig = {
-                remote: {
-                    ajaxConfig: {
-                        url: swc.get(swc.URL_STORAGENODES_SUMMARY),
-                        type: "GET"
-                    },
-                    dataParser: swp.storagenodeDataParser
-                },
-                cacheConfig: {
-                    ucid: swc.UCID_ALL_STORAGENODE_LIST
-                }
-            };
-
-            var contrailListModel = new ContrailListModel(listModelConfig);
-            self.renderView4Config(this.$el, contrailListModel, getStorageNodeListViewConfig());
-        }
+        render: function() {
+            var widgetConfig = getValueByJsonPath(this,'attributes;viewConfig;widgetConfig');
+            if(widgetConfig != null) {
+                this.renderView4Config(this.$el,
+                this.model,
+                widgetConfig
+                );
+            }
+           this.renderView4Config(this.$el,
+           this.model,
+           getStorageNodeListViewConfig());
+       }
     });
-
     var getStorageNodeListViewConfig = function () {
         return {
-            elementId: cowu.formatElementId([swl.MONITOR_STORAGENODE_LIST_ID]),
+            elementId: swl.STORAGENODE_SUMMARY_SCATTERCHART_SECTION_ID,
             view: "SectionView",
             viewConfig: {
                 rows: [
