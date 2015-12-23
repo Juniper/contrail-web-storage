@@ -304,7 +304,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                             height: 300,
                                                             yAxisLabel: swl.CLUSTER_DISK_ACTIVITY_LATENCY_CHART_YAXIS_LABEL,
                                                             yFormatter: function (d) {
-                                                                return swu.addUnits2Latency(d, false, false, 1);
+                                                                return swu.addUnits2Latency(d, false, false, 4);
                                                             }
                                                         },
                                                         parseFn: swp.diskActivityLatencyLineBarChartDataParser

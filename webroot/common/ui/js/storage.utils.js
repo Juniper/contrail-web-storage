@@ -376,8 +376,8 @@ define(['underscore'], function (_) {
         };
 
         self.addUnits2Latency = function (data, noDecimal, maxPrecision, precision) {
-            var dataPrefixes = ['ms', 's', 'm', 'hr'],
-                formatStr = '', decimalDigits = 2, size = 1000;
+            var dataPrefixes = ['s', 'm', 'hr'],
+                formatStr = '', decimalDigits = 4, size = 60;
 
             if (!$.isNumeric(data)) {
                 return '-';
@@ -396,8 +396,7 @@ define(['underscore'], function (_) {
 
 
             data = parseInt(data);
-            data = makePositive(data);
-
+            data = makePositive(data) / 1000;
             $.each(dataPrefixes, function (idx, prefix) {
                 if (data < size) {
                     formatStr = contrail.format('{0} {1}', parseFloat(data.toFixed(decimalDigits)), prefix);
