@@ -92,10 +92,16 @@
     </item>
 
     <item>
-        <url>/api/tenant/storage/cluster/osd/activity</url>
+        <url>/api/tenant/storage/cluster/ceph/activity</url>
         <method>get</method>
         <feature>storage</feature>
-        <callback>storageDashboardApi.getStorageClusterOSDActivity</callback>
+        <callback>storageDashboardApi.getStorageClusterCephActivity</callback>
+    </item>
+     <item>
+        <url>/api/tenant/storage/cluster/raw/disk/activity</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageDashboardApi.getStorageClusterRawDiskActivity</callback>
     </item>
 
     <item>
@@ -104,13 +110,7 @@
         <feature>storage</feature>
         <callback>storageDashboardApi.getStorageClusterPoolActivity</callback>
     </item>
-    <item>
-        <url>/api/tenant/storage/cluster/disk/activity</url>
-        <method>get</method>
-        <feature>storage</feature>
-        <callback>storageDashboardApi.getStorageClusterDiskActivity</callback>
-    </item>
-
+   
     <item>
         <url>/api/tenant/storage/cluster/osd/status</url>
         <method>get</method>

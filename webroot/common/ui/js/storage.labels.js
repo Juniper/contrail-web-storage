@@ -142,8 +142,10 @@ define([
         this.TITLE_POOL_STATS = "Pool Stats";
 
         this.TITLE_CLUSTER_USAGE = "Cluster Usage";
-        this.TITLE_CLUSTER_THROUGHPUT = "Cluster Throughput";
-        this.TITLE_CLUSTER_LATENCY = "Cluster Latency";
+        this.TITLE_CLUSTER_CEPH_THROUGHPUT = "Ceph Throughput";
+        this.TITLE_CLUSTER_CEPH_LATENCY = "Ceph Latency";
+        this.TITLE_CLUSTER_RAW_DISK_THROUGHPUT = "Raw Disk Throughput";
+        this.TITLE_CLUSTER_RAW_DISK_LATENCY = "Raw Disk Latency";
         this.TITLE_CLUSTER_REPLICA_FACTOR = "Replication Factor: ";
 
         this.TITLE_CHART_ELEMENT_STORAGENODE = "storage node";
@@ -180,8 +182,11 @@ define([
         this.CLUSTER_DISK_ACTIVITY_VIEW_ID = "cluster-disk-activity-view";
         this.CLUSTER_DISK_ACTIVITY_THRPT_CHART_ID =  "cluster-disk-activity-thrpt-chart";
         this.CLUSTER_DISK_ACTIVITY_IOPS_CHART_ID =  "cluster-disk-activity-iops-chart";
-        this.CLUSTER_DISK_ACTIVITY_LATENCY_CHART_ID =  "cluster-disk-activity-latency-chart";
-        this.CLUSTER_DISK_ACTIVITY_THRPT_IOPS_CHART_ID =  "cluster-disk-activity-thrpt-iops-chart";
+
+        this.CLUSTER_RAW_DISK_ACTIVITY_LATENCY_CHART_ID =  "cluster-raw-disk-activity-latency-chart";
+        this.CLUSTER_RAW_DISK_ACTIVITY_THRPT_IOPS_CHART_ID =  "cluster-raw-disk-activity-thrpt-iops-chart";
+        this.CLUSTER_CEPH_DISK_ACTIVITY_LATENCY_CHART_ID =  "cluster-ceph-disk-activity-latency-chart";
+        this.CLUSTER_CEPH_DISK_ACTIVITY_THRPT_IOPS_CHART_ID =  "cluster-ceph-disk-activity-thrpt-iops-chart";
 
         this.CLUSTER_DISK_ACTIVITY_THRPT_CHART_YAXIS_LABEL = "Throughput";
         this.CLUSTER_DISK_ACTIVITY_IOPS_CHART_YAXIS_LABEL = "IOPs";

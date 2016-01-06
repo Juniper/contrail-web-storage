@@ -19,48 +19,6 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
             view: "SectionView",
             viewConfig: {
                 rows: [
-                    //{
-                    //    columns: [
-                    //        {
-                    //            elementId: swl.DISK_SCATTER_CHART_ID,
-                    //            title: swl.TITLE_DISKS,
-                    //            view: "ZoomScatterChartView",
-                    //            viewConfig: {
-                    //                modelConfig: {
-                    //                    remote: {
-                    //                        ajaxConfig: {
-                    //                            url: swc.URL_DISKS_SUMMARY,
-                    //                            type: "GET"
-                    //                        },
-                    //                        dataParser: swp.disksDataParser
-                    //                    },
-                    //                    cacheConfig: {
-                    //                        ucid: swc.UCID_ALL_DISK_LIST
-                    //                    }
-                    //                },
-                    //                loadChartInChunks: true,
-                    //                chartOptions: {
-                    //                    xLabel: 'Usage (%)',
-                    //                    xLabelFormat: d3.format(".01f"),
-                    //                    forceX: [0, 1],
-                    //                    forceY: [0, 10],
-                    //                    yLabel: 'Avg. Bandwidth',
-                    //                    yLabelFormat: function (yValue) {
-                    //                        return formatThroughput(yValue, true);
-                    //                    },
-                    //                    dataParser: function (response) {
-                    //                        return response;
-                    //                    },
-                    //                    tooltipConfigCB: getDiskTooltipConfig,
-                    //                    clickCB: onScatterChartClick,
-                    //                    sizeFieldName: 'used_perc',
-                    //                    margin: {left: 70},
-                    //                    noDataMessage: "Unable to get disk data."
-                    //                }
-                    //            }
-                    //        }
-                    //    ]
-                    //},
                     {
                         columns: [
                             {
@@ -209,21 +167,72 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     }
                                                 }
                                             ]
-                                        },
+                                        },/*{
+
+                                            columns: [
+                                                {
+                                                    elementId: swl.CLUSTER_ACTIVITY_TABS_CEPH_CHART_ID,
+                                                    title: swl.TITLE_CLUSTER_CEPH,
+                                                    view: "ClusterActivityCephStatsView1",
+                                                    viewPathPrefix: "monitor/storage/ui/js/views/",
+                                                    app: cowc.APP_CONTRAIL_STORAGE,
+                                                    viewConfig: {
+                                                        class: 'widget-box',
+                                                         modelConfig: {
+                                                            modelKey: swc.UMID_CLUSTER_CEPH_DISK_UVE,
+                                                            remote: {
+                                                                ajaxConfig: {
+                                                                    url: swc.URL_CLUSTER_DISK_ACTIVITY_STATS,
+                                                                    type: 'GET'
+                                                                },
+                                                                dataParser: swp.diskActivityStatsParser
+                                                            },
+                                                            cacheConfig: {
+                                                                ucid: swc.UCID_CLUSTER_CEPH_DISK_STATS
+                                                            }
+                                                        },
+                                                    },
+                                                   
+                                                },
+                                                {
+                                                    elementId: swl.CLUSTER_ACTIVITY_TABS_RAW_DISK_CHART_ID,
+                                                    title: swl.TITLE_CLUSTER_RAW_DISK,
+                                                    view: "ClusterActivityRawDiskStatsView",
+                                                    viewPathPrefix: "monitor/storage/ui/js/views/",
+                                                    app: cowc.APP_CONTRAIL_STORAGE,
+                                                    viewConfig: {
+                                                        class: 'widget-box',
+                                                         modelConfig: {
+                                                            modelKey: swc.UMID_CLUSTER_RAW_DISK_UVE,
+                                                            remote: {
+                                                                ajaxConfig: {
+                                                                    url: swc.URL_CLUSTER_DISK_ACTIVITY_STATS,
+                                                                    type: 'GET'
+                                                                },
+                                                                dataParser: swp.diskActivityStatsParser
+                                                            },
+                                                            cacheConfig: {
+                                                                ucid: swc.UCID_CLUSTER_RAW_DISK_STATS
+                                                            }
+                                                        },
+                                                    }
+                                                }
+                                            ]
+                                        },*/
                                         {
                                             columns: [
                                                 {
-                                                    elementId: swl.CLUSTER_DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
-                                                    title: swl.TITLE_CLUSTER_THROUGHPUT,
+                                                    elementId: swl.CLUSTER_CEPH_DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
+                                                    title: swl.TITLE_CLUSTER_CEPH_THROUGHPUT,
                                                     view: "LineBarWithFocusChartView",
                                                     viewConfig: {
                                                         class: 'span6',
                                                         widgetConfig: {
-                                                            elementId: swl.CLUSTER_DISK_ACTIVITY_THRPT_IOPS_CHART_ID + '-widget',
+                                                            elementId: swl.CLUSTER_CEPH_DISK_ACTIVITY_THRPT_IOPS_CHART_ID + '-widget',
                                                             view: "WidgetView",
                                                             viewConfig: {
                                                                 header: {
-                                                                    title: swl.TITLE_CLUSTER_THROUGHPUT,
+                                                                    title: swl.TITLE_CLUSTER_CEPH_THROUGHPUT,
                                                                     iconClass: false
                                                                 },
                                                                 controls: {
@@ -236,16 +245,16 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                             }
                                                         },
                                                         modelConfig: {
-                                                            modelKey: swc.UMID_CLUSTER_DISK_UVE,
+                                                            modelKey: swc.UMID_CLUSTER_CEPH_THRPT_UVE,
                                                             remote: {
                                                                 ajaxConfig: {
-                                                                    url: swc.URL_CLUSTER_DISK_ACTIVITY_STATS,
+                                                                    url: swc.URL_CLUSTER_CEPH_ACTIVITY_STATS,
                                                                     type: 'GET'
                                                                 },
                                                                 dataParser: swp.diskActivityStatsParser
                                                             },
                                                             cacheConfig: {
-                                                                ucid: swc.UCID_CLUSTER_DISK_STATS
+                                                                ucid: swc.UCID_CLUSTER_CEPH_THRPT_STATS
                                                             }
                                                         },
                                                         chartOptions: {
@@ -265,17 +274,17 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     }
                                                 },
                                                 {
-                                                    elementId: swl.CLUSTER_DISK_ACTIVITY_LATENCY_CHART_ID,
-                                                    title: swl.TITLE_CLUSTER_LATENCY,
+                                                    elementId: swl.CLUSTER_CEPH_DISK_ACTIVITY_LATENCY_CHART_ID,
+                                                    title: swl.TITLE_CLUSTER_CEPH_LATENCY,
                                                     view: "LineWithFocusChartView",
                                                     viewConfig: {
                                                         class: 'span6',
                                                         widgetConfig: {
-                                                            elementId: swl.CLUSTER_DISK_ACTIVITY_LATENCY_CHART_ID + '-widget',
+                                                            elementId: swl.CLUSTER_CEPH_DISK_ACTIVITY_LATENCY_CHART_ID + '-widget',
                                                             view: "WidgetView",
                                                             viewConfig: {
                                                                 header: {
-                                                                    title: swl.TITLE_CLUSTER_LATENCY,
+                                                                    title: swl.TITLE_CLUSTER_CEPH_LATENCY,
                                                                     iconClass: false
                                                                 },
                                                                 controls: {
@@ -288,16 +297,118 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                             }
                                                         },
                                                         modelConfig: {
-                                                            modelKey: swc.UMID_CLUSTER_DISK_UVE,
+                                                            modelKey: swc.UMID_CLUSTER_CEPH_LATENCY_UVE,
                                                             remote: {
                                                                 ajaxConfig: {
-                                                                    url: swc.URL_CLUSTER_DISK_ACTIVITY_STATS,
+                                                                    url: swc.URL_CLUSTER_CEPH_ACTIVITY_STATS,
                                                                     type: 'GET'
                                                                 },
                                                                 dataParser: swp.diskActivityStatsParser
                                                             },
                                                             cacheConfig: {
-                                                                ucid: swc.UCID_CLUSTER_DISK_STATS
+                                                                ucid: swc.UCID_CLUSTER_CEPH_LATENCY_STATS
+                                                            }
+                                                        },
+                                                        chartOptions: {
+                                                            height: 300,
+                                                            yAxisLabel: swl.CLUSTER_DISK_ACTIVITY_LATENCY_CHART_YAXIS_LABEL,
+                                                            yFormatter: function (d) {
+                                                                return swu.addUnits2Latency(d, false, false, 4);
+                                                            }
+                                                        },
+                                                        parseFn: swp.diskActivityLatencyLineBarChartDataParser
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            columns: [
+                                                {
+                                                    elementId: swl.CLUSTER_RAW_DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
+                                                    title: swl.TITLE_CLUSTER_RAW_DISK_THROUGHPUT,
+                                                    view: "LineBarWithFocusChartView",
+                                                    viewConfig: {
+                                                        class: 'span6',
+                                                        widgetConfig: {
+                                                            elementId: swl.CLUSTER_RAW_DISK_ACTIVITY_THRPT_IOPS_CHART_ID + '-widget',
+                                                            view: "WidgetView",
+                                                            viewConfig: {
+                                                                header: {
+                                                                    title: swl.TITLE_CLUSTER_RAW_DISK_THROUGHPUT,
+                                                                    iconClass: false
+                                                                },
+                                                                controls: {
+                                                                    top: {
+                                                                        default: {
+                                                                            collapseable: true
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        modelConfig: {
+                                                            modelKey: swc.UMID_CLUSTER_RAW_DISK_THRPT_UVE,
+                                                            remote: {
+                                                                ajaxConfig: {
+                                                                    url: swc.URL_CLUSTER_RAW_DISK_ACTIVITY_STATS,
+                                                                    type: 'GET'
+                                                                },
+                                                                dataParser: swp.diskActivityStatsParser
+                                                            },
+                                                            cacheConfig: {
+                                                                ucid: swc.UCID_CLUSTER_RAW_DISK_THRPT_STATS
+                                                            }
+                                                        },
+                                                        chartOptions: {
+                                                            height: 300,
+                                                            y2AxisLabel: swl.CLUSTER_DISK_ACTIVITY_THRPT_CHART_YAXIS_LABEL,
+                                                            y1AxisLabel: swl.CLUSTER_DISK_ACTIVITY_IOPS_CHART_YAXIS_LABEL,
+                                                            forceY1: [0, 10],
+                                                            forceY2: [0, 1024],
+                                                            y2Formatter: function (y2Value) {
+                                                                return formatBytes(y2Value, true);
+                                                            },
+                                                            y1Formatter: function (d) {
+                                                                return swu.addUnits2IOPs(d, false, false, 1);
+                                                            }
+                                                        },
+                                                        parseFn: swp.diskActivityThrptIOPsLineBarChartDataParser
+                                                    }
+                                                },
+                                                {
+                                                    elementId: swl.CLUSTER_RAW_DISK_ACTIVITY_LATENCY_CHART_ID,
+                                                    title: swl.TITLE_CLUSTER_RAW_DISK_LATENCY,
+                                                    view: "LineWithFocusChartView",
+                                                    viewConfig: {
+                                                        class: 'span6',
+                                                        widgetConfig: {
+                                                            elementId: swl.CLUSTER_RAW_DISK_ACTIVITY_LATENCY_CHART_ID + '-widget',
+                                                            view: "WidgetView",
+                                                            viewConfig: {
+                                                                header: {
+                                                                    title: swl.TITLE_CLUSTER_RAW_DISK_LATENCY,
+                                                                    iconClass: false
+                                                                },
+                                                                controls: {
+                                                                    top: {
+                                                                        default: {
+                                                                            collapseable: true
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        modelConfig: {
+                                                            modelKey: swc.UMID_CLUSTER_RAW_DISK_LATENCY_UVE,
+                                                            remote: {
+                                                                ajaxConfig: {
+                                                                    url: swc.URL_CLUSTER_RAW_DISK_ACTIVITY_STATS,
+                                                                    type: 'GET'
+                                                                },
+                                                                dataParser: swp.diskActivityStatsParser
+                                                            },
+                                                            cacheConfig: {
+                                                                ucid: swc.UCID_CLUSTER_RAW_DISK_LATENCY_STATS
                                                             }
                                                         },
                                                         chartOptions: {

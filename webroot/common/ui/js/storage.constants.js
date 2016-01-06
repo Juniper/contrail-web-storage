@@ -24,8 +24,8 @@ define([
         this.URL_CLUSTER_USAGE = '/api/tenant/storage/cluster/usage';
         this.URL_CLUSTER_STATUS = '/api/tenant/storage/cluster/status';
         this.URL_CLUSTER_THROUGHPUT_SUMMARY = '/api/tenant/storage/cluster/throughput/summary';
-        this.URL_CLUSTER_DISK_ACTIVITY_STATS = '/api/tenant/storage/cluster/osd/activity?minsSince=60&sampleCnt=60&endTime=now';
-        this.URL_CLUSTER_RAW_DISK_ACTIVITY_STATS = '/api/tenant/storage/cluster/disk/activity?minsSince=60&sampleCnt=60&endTime=now';
+        this.URL_CLUSTER_CEPH_ACTIVITY_STATS = '/api/tenant/storage/cluster/ceph/activity?minsSince=60&sampleCnt=60&endTime=now';
+        this.URL_CLUSTER_RAW_DISK_ACTIVITY_STATS = '/api/tenant/storage/cluster/raw/disk/activity?minsSince=60&sampleCnt=60&endTime=now';
 
         this.POOL_PREFIX = {
             VOLUME: 'volumes_',
@@ -44,7 +44,11 @@ define([
         };
 
         this.UMID_DISK_UVE = "uve:{0}:{1}";
-        this.UMID_CLUSTER_DISK_UVE = "uve:cluster:disk";
+        this.UMID_CLUSTER_CEPH_THRPT_UVE = "uve:cluster:ceph:thrpt";
+        this.UMID_CLUSTER_CEPH_LATENCY_UVE = "uve:cluster:ceph:latency";
+        this.UMID_CLUSTER_RAW_DISK_THRPT_UVE = "uve:cluster:raw:disk:thrpt";
+        this.UMID_CLUSTER_RAW_DISK_LATENCY_UVE = "uve:cluster:raw:disk:latency";
+
         this.UMID_CLUSTER_USAGE = "uve:cluster:usage"
 
         this.UCID_PREFIX_MS = "monitor-storage";
@@ -60,7 +64,12 @@ define([
         this.UCID_ALL_MONITOR_LIST = this.UCID_PREFIX_MS_LISTS + "all-monitors";
         this.UCID_ALL_POOL_LIST = this.UCID_PREFIX_MS_LISTS + "all-pools";
         this.UCID_CLUSTER_STATUS_LIST = this.UCID_PREFIX_MS_LISTS + "cluster-status";
-        this.UCID_CLUSTER_DISK_STATS = this.UCID_PREFIX_MS_CHARTS + "cluster-disk-stats";
+        
+        this.UCID_CLUSTER_CEPH_THRPT_STATS = this.UCID_PREFIX_MS_CHARTS + "cluster-ceph-thrpt-stats";
+        this.UCID_CLUSTER_CEPH_LATENCY_STATS = this.UCID_PREFIX_MS_CHARTS + "cluster-ceph-latency-stats";
+        this.UCID_CLUSTER_RAW_DISK_THRPT_STATS = this.UCID_PREFIX_MS_CHARTS + "cluster-raw-disk-thrpt-stats";
+        this.UCID_CLUSTER_RAW_DISK_LATENCY_STATS = this.UCID_PREFIX_MS_CHARTS + "cluster-raw-disk-latency-stats";
+
         this.UCID_CLUSTER_USAGE = this.UCID_PREFIX_MS_CHARTS + "cluster-usage"
 
         this.CHART_ELEMENT_STORAGENODE = 'storagenode';

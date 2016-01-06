@@ -175,7 +175,7 @@ function getSources(req, res, appData) {
     });
 }
 
-function getStorageClusterOSDActivity(req, res,appData){
+function getStorageClusterCephActivity(req, res,appData){
     var sampleCnt = req.query['sampleCnt'];
     if(typeof sampleCnt == "undefined"){
         sampleCnt =10;
@@ -233,6 +233,65 @@ function getStorageClusterOSDActivity(req, res,appData){
         }
     });
 }
+function getStorageClusterRawDiskActivity(req, res,appData){
+    var sampleCnt = req.query['sampleCnt'];
+    if(typeof sampleCnt == "undefined"){
+        sampleCnt =10;
+    }else if(isNaN(sampleCnt)){
+        sampleCnt =10;
+    }
+
+    var minsSince = req.query['minsSince'];
+    if(typeof minsSince == "undefined"){
+        minsSince =60;
+    }else if(isNaN(minsSince)){
+        minsSince =60;
+    }
+
+    var endTime = req.query['endTime'];
+    if(typeof endTime == "undefined"){
+        endTime ='now';
+    }
+
+    var intervalSecs=req.query['intervalSecs'];
+    if(typeof intervalSecs == "undefined"){
+        intervalSecs =60;
+    }else if(isNaN(intervalSecs)){
+        intervalSecs =60;
+    }
+
+    var tableName, whereClause=[],
+    selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
+            "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)", "COUNT(info_stats)", "uuid" ];
+
+    tableName = 'StatTable.ComputeStorageDisk.info_stats';
+    selectArr.push("T="+intervalSecs);
+
+    processSources(res, appData, function(error,res,sourceJSON){
+        if (sourceJSON != undefined && sourceJSON.length > 0) {
+            var count = sourceJSON.length;
+            for (i = 0; i < count; i += 1) {
+                var whereClauseArray = [];
+                whereClauseArray.push(createClause('Source', sourceJSON[i], 1));
+                whereClause.push(whereClauseArray);
+            }
+
+            var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+            var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+            var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+            delete queryJSON['limit'];
+            delete queryJSON['dir'];
+            var selectEleCnt = queryJSON['select_fields'].length;
+            queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+            stMonUtils.executeQueryString(queryJSON,
+                commonUtils.doEnsureExecution(function (err, resultJSON) {
+                    resultJSON = parseStorageClusterOSDActivityData(resultJSON, timeObj, timeGran, sourceJSON, intervalSecs);
+                    commonUtils.handleJSONResponse(err, res, resultJSON);
+                }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+        }
+    });
+}
+
 
 function parseStorageClusterOSDActivityData(activityJSON, timeObj, timeGran, sourceJSON, intervalSecs){
     var len = 0, secTime;
@@ -282,23 +341,25 @@ function formatOsdSeriesLoadXMLData(resultJSON){
                 results[i-1]['op_w_latency'] = 0;
 
                 while (1) {
-                    var reads = resultJSON[j]['SUM(info_stats.reads)'];
-                    results[i-1]['reads'] +=  Math.ceil(reads/count);
+                    if (resultJSON[j]['uuid'] != '') {
+                        var reads = resultJSON[j]['SUM(info_stats.reads)'];
+                        results[i-1]['reads'] +=  Math.ceil(reads/count);
 
-                    var writes= resultJSON[j]['SUM(info_stats.writes)'];
-                    results[i-1]['writes'] += Math.ceil(writes/count);
+                        var writes= resultJSON[j]['SUM(info_stats.writes)'];
+                        results[i-1]['writes'] += Math.ceil(writes/count);
 
-                    var reads_kbytes= resultJSON[j]['SUM(info_stats.read_kbytes)'];
-                    results[i-1]['reads_kbytes'] += reads_kbytes/count;
+                        var reads_kbytes= resultJSON[j]['SUM(info_stats.read_kbytes)'];
+                        results[i-1]['reads_kbytes'] += reads_kbytes/count;
 
-                    var writes_kbytes= resultJSON[j]['SUM(info_stats.write_kbytes)'];
-                    results[i-1]['writes_kbytes'] += writes_kbytes/count;
+                        var writes_kbytes= resultJSON[j]['SUM(info_stats.write_kbytes)'];
+                        results[i-1]['writes_kbytes'] += writes_kbytes/count;
 
-                    var op_r_latency = resultJSON[j]['SUM(info_stats.op_r_latency)'];
-                    results[i-1]['op_r_latency'] += op_r_latency/(count);
+                        var op_r_latency = resultJSON[j]['SUM(info_stats.op_r_latency)'];
+                        results[i-1]['op_r_latency'] += op_r_latency/(count);
 
-                    var op_w_latency = resultJSON[j]['SUM(info_stats.op_w_latency)'];
-                    results[i-1]['op_w_latency'] += op_w_latency/(count);
+                        var op_w_latency = resultJSON[j]['SUM(info_stats.op_w_latency)'];
+                        results[i-1]['op_w_latency'] += op_w_latency/(count);
+                    }
                     j++;
                     if (j >= counter ||
                         secTime != (Math.floor(resultJSON[j]['T='] / 1000)))
@@ -415,62 +476,6 @@ function formatPoolSeriesLoadXMLData(resultJSON){
         logutils.logger.error("In formatPoolSeriesLoadXMLData(): JSON Parse error: " + e);
         return null;
     }
-}
-function getStorageClusterDiskActivity(req, res,appData){
-    var sampleCnt = req.query['sampleCnt'];
-    if(typeof sampleCnt == "undefined"){
-        sampleCnt =10;
-    }else if(isNaN(sampleCnt)){
-        sampleCnt =10;
-    }
-
-    var minsSince = req.query['minsSince'];
-    if(typeof minsSince == "undefined"){
-        minsSince =60;
-    }else if(isNaN(minsSince)){
-        minsSince =60;
-    }
-
-    var endTime = req.query['endTime'];
-    if(typeof endTime == "undefined"){
-        endTime ='now';
-    }
-
-    var intervalSecs=req.query['intervalSecs'];
-    if(typeof intervalSecs == "undefined"){
-        intervalSecs =60;
-    }else if(isNaN(intervalSecs)){
-        intervalSecs =60;
-    }
-
-    var tableName, whereClause=[],
-    selectArr = ["SUM(info_stats.reads)", "SUM(info_stats.writes)", "SUM(info_stats.read_kbytes)",
-        "SUM(info_stats.write_kbytes)", "SUM(info_stats.iops)","SUM(info_stats.bw)", "COUNT(info_stats)" ];
-    tableName = 'StatTable.ComputeStorageDisk.info_stats';
-    selectArr.push("T="+intervalSecs);
-
-    processSources(res, appData, function(error,res,sourceJSON) {
-        var count = sourceJSON.length;
-        for (i = 0; i < count; i += 1) {
-            var whereClauseArray = [];
-            whereClauseArray.push(createClause('Source', sourceJSON[i], 1));
-            whereClause.push(whereClauseArray);
-        }
-
-        var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
-        var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
-        var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
-        delete queryJSON['limit'];
-        delete queryJSON['dir'];
-        var selectEleCnt = queryJSON['select_fields'].length;
-        queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-        stMonUtils.executeQueryString(queryJSON,
-            commonUtils.doEnsureExecution(function (err, resultJSON) {
-                resultJSON = parseStorageClusterDiskActivityData(resultJSON, timeObj, timeGran, sourceJSON, intervalSecs);
-                commonUtils.handleJSONResponse(err, res, resultJSON);
-            }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
-    });
-
 }
 
 function parseStorageClusterDiskActivityData(activityJSON, timeObj, timeGran, sourceJSON, intervalSecs){
@@ -602,9 +607,9 @@ function parseStorageOSDStatus(osdJSON){
 exports.getStorageJobClusterStatus = getStorageJobClusterStatus;
 exports.getStorageClusterDFStatus = getStorageClusterDFStatus;
 exports.getStorageClusterHealthStatus = getStorageClusterHealthStatus;
-exports.getStorageClusterOSDActivity = getStorageClusterOSDActivity;
+exports.getStorageClusterCephActivity = getStorageClusterCephActivity;
+exports.getStorageClusterRawDiskActivity=getStorageClusterRawDiskActivity;
 exports.getStorageClusterPoolActivity = getStorageClusterPoolActivity;
-exports.getStorageClusterDiskActivity = getStorageClusterDiskActivity;
 exports.getSources = getSources;
 exports.getStorageClusterUsage= getStorageClusterUsage;
 exports.parseStorageHealthStatusData = parseStorageHealthStatusData;

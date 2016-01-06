@@ -173,6 +173,7 @@ define([
                                             elementId: swl.DISK_ACTIVITY_STATS_ID,
                                             title: swl.TITLE_DISK_ACTIVITY_STATS,
                                             view: "DiskActivityStatsView",
+                                            viewPathPrefix: "monitor/storage/ui/js/views/",
                                             app: cowc.APP_CONTRAIL_STORAGE,
                                             viewConfig: {
                                                 class: 'span6',
