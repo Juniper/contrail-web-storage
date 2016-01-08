@@ -474,16 +474,31 @@ define(['underscore'], function (_) {
         self.renderView = function (renderConfig, renderCallback) {
             var parentElement = renderConfig['parentElement'],
                 viewName = renderConfig['viewName'],
-                viewPathPrefix = contrail.checkIfExist(renderConfig['viewPathPrefix']) ? renderConfig['viewPathPrefix'] : 'monitor/storage/ui/js/views/',
+                viewPathPrefix,viewPath,
                 model = renderConfig['model'],
                 viewAttributes = renderConfig['viewAttributes'],
                 modelMap = renderConfig['modelMap'],
                 rootView = renderConfig['rootView'],
-                viewPath =  viewPathPrefix + viewName,
                 onAllViewsRenderCompleteCB = renderConfig['onAllViewsRenderCompleteCB'],
                 onAllRenderCompleteCB = renderConfig['onAllRenderCompleteCB'],
                 lazyRenderingComplete  = renderConfig['lazyRenderingComplete'],
                 elementView;
+
+            /**
+             * if views are dynamically loaded using viewPathPrefix in a viewConfig, the path should prefix
+             * with 'storage-basedir' as depending on the env, the root dir from which the files are served changes.
+             */
+            if (contrail.checkIfExist(renderConfig['viewPathPrefix'])){
+                viewPathPrefix = renderConfig['viewPathPrefix'];
+                // If viewPathPrefix doesn't start with core-basedir or storage-basedir add storage-basedir
+                if (!(viewPathPrefix.slice(0, 'core-basedir'.length) === 'core-basedir') &&
+                    !(viewPathPrefix.slice(0, 'storage-basedir'.length) === 'storage-basedir')) {
+                    viewPathPrefix =  'storage-basedir/' + viewPathPrefix;
+                }
+            } else {
+                viewPathPrefix =  'storage-basedir/monitor/storage/ui/js/views/';
+            }
+            viewPath =  viewPathPrefix + viewName;
 
             require([viewPath], function(ElementView) {
                 elementView = new ElementView({el: parentElement, model: model, attributes: viewAttributes, rootView: rootView, onAllViewsRenderCompleteCB: onAllViewsRenderCompleteCB, onAllRenderCompleteCB: onAllRenderCompleteCB});
