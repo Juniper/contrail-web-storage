@@ -48,20 +48,20 @@ define([
                                 viewConfig: {
                                     loadChartInChunks: true,
                                     chartOptions: {
-                                        xLabel: 'Total',
-                                        xLabelFormat: function (xValue) {
+                                        yLabel: 'Total',
+                                        yLabelFormat: function (xValue) {
                                             return formatBytes(xValue, true);
                                         },
-                                        forceY: [0,10],
-                                        yLabel: 'Usage (%)',
-                                        yLabelFormat: d3.format(".01f"),
+                                        //forceX: [0,10],
+                                        xLabel: 'Usage (%)',
+                                        xLabelFormat: d3.format(".02f"),
                                         dataParser: function (response) {
                                             return response;
                                         },
                                         tooltipConfigCB: getStorageMonitorTooltipConfig,
                                         clickCB: function (){ return; },
                                         sizeFieldName: '',
-                                        margin: {left: 70},
+                                        margin: {left: 65, right:15},
                                         noDataMessage: "Unable to get Monitor data."
                                     }
                                 }

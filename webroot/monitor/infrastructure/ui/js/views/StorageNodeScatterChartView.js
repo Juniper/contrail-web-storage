@@ -33,8 +33,8 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                     loadChartInChunks: true,
                                     chartOptions: {
                                         xLabel: 'Used (%)',
-                                        xLabelFormat: d3.format(".01f"),
-                                        forceX: [0, 1],
+                                        xLabelFormat: d3.format(".03f"),
+                                        //forceX: [0, 1],
                                         forceY: [0, 10],
                                         yLabel: 'Avg. Bandwidth [Last 30 mins.]',
                                         yLabelFormat: function(yValue) {
@@ -51,7 +51,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                         tooltipConfigCB: getStorageNodeTooltipConfig,
                                         clickCB: onScatterChartClick,
                                         sizeFieldName: 'osds_used_perc',
-                                        margin: {left: 70},
+                                        margin: {left: 65, right:15},
                                         noDataMessage: "Unable to get any storage node details."
                                      }
                                 }

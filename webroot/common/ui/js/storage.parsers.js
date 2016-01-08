@@ -482,8 +482,8 @@ define([
             monObj.rawData = $.extend(true, {}, monObj);
             monObj['addr'] = swu.formatIpPort(monObj['addr']);
             monObj['hostNameColor'] = '#D62728';
-            monObj['x'] = monObj['kb_total'] * 1024;
-            monObj['y'] = 100.00 - monObj['avail_percent'];
+            monObj['y'] = monObj['kb_total'] * 1024;
+            monObj['x'] = 100.00 - monObj['avail_percent'];
             monObj['total'] = formatBytes(monObj['kb_total'] * 1024);
             monObj['used'] = formatBytes(monObj['kb_used'] * 1024);
             monObj['available'] = formatBytes(monObj['kb_avail'] * 1024);

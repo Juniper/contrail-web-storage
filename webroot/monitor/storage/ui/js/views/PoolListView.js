@@ -49,9 +49,9 @@ define([
                                     loadChartInChunks: true,
                                     chartOptions: {
                                         xLabel: 'Usage %',
-                                        xLabelFormat: d3.format(".01f"),
-                                        forceX: [0, 10],
-                                        forceY: [0, 10],
+                                        xLabelFormat: d3.format(".03f"),
+                                        //forceX: [0, 10],
+                                        //forceY: [0, 10],
                                         yLabel: 'Objects',
                                         yLabelFormat: function (yValue) {
                                             var formattedValue = swu.addUnits2Number(yValue, false, false, 2);
@@ -63,7 +63,7 @@ define([
                                         tooltipConfigCB: getPoolTooltipConfig,
                                         clickCB: function (){ return; },
                                         sizeFieldName: 'y',
-                                        margin: {left: 60},
+                                        margin: {left: 65, right:15},
                                         noDataMessage: "Unable to get pool data."
                                     }
                                 }

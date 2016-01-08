@@ -50,7 +50,7 @@ define([
                                     chartOptions: {
                                         xLabel: 'Usage (%)',
                                         yLabel: 'Avg. Bandwidth [R + W]',
-                                        forceX: [0, 100],
+                                        //forceX: [0, 100],
                                         forceY: [0, 10],
                                         yLabelFormat: function (yValue) {
                                             var formattedValue = formatThroughput(yValue, true);
@@ -69,7 +69,7 @@ define([
                                             }
                                         },
                                         sizeFieldName: 'used_perc',
-                                        margin: {left: 70},
+                                        margin: {left: 65, right:15},
                                         noDataMessage: "No Disk data found."
                                     }
                                 }

@@ -85,7 +85,7 @@ define([
                                         y2Formatter: function (y2Value) {
                                             return formatBytes(y2Value, true);
                                         },
-                                        showLegend: false
+                                        showLegend: true
 
                                     },
                                     parseFn: swp.diskActivityThrptIOPsLineBarChartDataParser                                }
