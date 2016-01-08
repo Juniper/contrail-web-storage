@@ -98,8 +98,9 @@ define([
 
     function onScatterChartClick(chartConfig) {
         var diskFQN = chartConfig['name'],
-            storagenodeFQN = chartConfig['host'];
-        swcc.setDiskURLHashParams(null, {fqName: diskFQN, fqHost: storagenodeFQN}, true);
+            storagenodeFQN = chartConfig['host'],
+            diskUUID = chartConfig['uuid'];
+        swcc.setDiskURLHashParams(null, {fqName: diskFQN, fqHost: storagenodeFQN, fqUUID: diskUUID}, true);
     };
 
     function getDiskTooltipConfig(data) {

@@ -13,9 +13,9 @@ define([
             var self = this,
                 viewConfig = this.attributes.viewConfig,
                 diskName = viewConfig.disk,
-                storageNodeName = viewConfig.storageNode;
-
-            self.renderDiskTabs({disk: diskName, storageNode: storageNodeName});
+                storageNodeName = viewConfig.storageNode,
+                uuid= viewConfig.uuid;
+            self.renderDiskTabs({disk: diskName, storageNode: storageNodeName, uuid:uuid});
         },
 
         renderDiskTabs: function(elementObj) {

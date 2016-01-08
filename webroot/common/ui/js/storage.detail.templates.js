@@ -24,9 +24,10 @@ define([
                                     templateGeneratorConfig: [
                                         {
                                             key: 'overall_health',
+                                            label: 'Overall Health',
                                             templateGenerator: 'TextGenerator',
                                             templateGeneratorConfig: {
-                                                formatter: 'health-status-state',
+                                                formatter: "storage-health-status-state",
                                                 iconClass: 'icon-warning-sign'
                                             },
                                             events: {
@@ -37,10 +38,12 @@ define([
                                         },
                                         {
                                             key: 'health_summary.HEALTH_ERR',
+                                            label: 'Error',
                                             templateGenerator: 'TextGenerator'
                                         },
                                         {
                                             key: 'health_summary.HEALTH_WARN',
+                                            label: 'Warning',
                                             templateGenerator: 'TextGenerator'
                                         }
                                     ]
@@ -51,8 +54,7 @@ define([
                 }
             };
         };
-
-        this.getDiskDetailsTemplate = function (detailTheme, detailActions) {
+        this.getDiskSummaryDetailsTemplate = function (detailTheme, detailActions) {
             var detailTheme = contrail.checkIfExist(detailTheme) ? detailTheme : cowc.THEME_DETAIL_DEFAULT;
             return {
                 advancedViewOptions: false,
@@ -84,7 +86,23 @@ define([
                                             templateGenerator: 'TextGenerator'
                                         }
                                     ]
-                                },
+                                }
+                            ]
+                        }
+                    ]
+                }
+            };
+        };
+
+        this.getDiskStatusDetailsTemplate = function (detailTheme, detailActions) {
+            var detailTheme = contrail.checkIfExist(detailTheme) ? detailTheme : cowc.THEME_DETAIL_DEFAULT;
+            return {
+                advancedViewOptions: false,
+                templateGenerator: 'ColumnSectionTemplateGenerator',
+                templateGeneratorConfig: {
+                    columns: [
+                        {
+                            rows: [
                                 {
                                     templateGenerator: 'BlockListTemplateGenerator',
                                     title: swl.TITLE_DISK_STATUS,
@@ -131,6 +149,7 @@ define([
                 }
             };
         };
+
     };
     return SDetailTemplates;
 })

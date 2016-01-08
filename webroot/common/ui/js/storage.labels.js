@@ -128,8 +128,10 @@ define([
         this.TITLE_DISK_STATUS = "Disk Status";
         this.TITLE_DISK_ACTIVITY_STATS = "Disk Activity";
         this.TITLE_DISK_ACTIVITY_THRPT_STATS = "Disk Throughput";
+        this.TITLE_RAW_DISK_ACTIVITY_THRPT_STATS = "Raw Disk Throughput";
         this.TITLE_DISK_ACTIVITY_IOPS_STATS = "Disk IOPs";
         this.TITLE_DISK_ACTIVITY_LATENCY_STATS = "Disk Latency";
+        this.TITLE_RAW_DISK_ACTIVITY_LATENCY_STATS = "Raw Disk Latency";
 
         this.TITLE_MONITORS = "Storage Monitors";
         this.TITLE_MONITOR_SUMMARY = "Storage Monitor Summary";

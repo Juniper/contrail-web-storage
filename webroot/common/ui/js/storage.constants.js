@@ -13,7 +13,8 @@ define([
         this.URL_DISKS_SUMMARY = '/api/tenant/storage/cluster/osds/summary';
         this.URL_DISK_DETAILS = '/api/tenant/storage/cluster/osd/details?name={0}';
         this.URL_DISK_STATUS = '/api/tenant/storage/cluster/osd/status';
-        this.URL_DISK_ACTIVITY_STATS = '/api/tenant/storage/cluster/osd/flow-series?osdName={0}&minsSince=60&sampleCnt=60&hostName={1}&endTime=now';
+        this.URL_DISK_ACTIVITY_STATS = '/api/tenant/storage/cluster/osd/flow-series?osdName={0}&minsSince=60&sampleCnt=60&hostName={1}&uuid={2}&endTime=now';
+        this.URL_RAW_DISK_ACTIVITY_STATS = '/api/tenant/storage/cluster/osd-raw-disk/flow-series?osdName={0}&minsSince=60&sampleCnt=60&hostName={1}&uuid={2}&endTime=now';
 
         this.URL_STORAGENODE_MONITORS_SUMMARY = '/api/tenant/storage/cluster/monitors/summary';
         this.URL_STORAGENODE_MONITOR_DETAILS = '/api/tenant/storage/cluster/monitor/details?name={0}'; //TBD

@@ -400,6 +400,7 @@ function getStorageOSDFlowSeries (req, res, appData) {
     }
     var source = req.query['hostName'];
     var osdName= req.query['osdName'];
+    var uuid= req.query['uuid'];
 
     var name = source +":"+osdName;
 
@@ -413,7 +414,7 @@ function getStorageOSDFlowSeries (req, res, appData) {
 
     whereClause = [
         {'Source':source},
-        {'name':name}
+        {'uuid':uuid}
     ];
 
     whereClause = stMonUtils.formatAndClause(whereClause);
@@ -429,9 +430,62 @@ function getStorageOSDFlowSeries (req, res, appData) {
             resultJSON= formatFlowSeriesForOsdStats(resultJSON, timeObj, timeGran,osdName);
             commonUtils.handleJSONResponse(err, res, resultJSON);
         }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
-
 }
 
+function getStorageOsdDiskFlowSeries (req, res, appData) {
+    var sampleCnt = req.query['sampleCnt'];
+    if(typeof sampleCnt == "undefined"){
+        sampleCnt =10;
+    }else if(isNaN(sampleCnt)){
+        sampleCnt =10;
+    }
+
+    var minsSince = req.query['minsSince'];
+    if(typeof minsSince == "undefined"){
+        minsSince =30;
+    }else if(isNaN(minsSince)){
+        minsSince =30;
+    }
+
+    var endTime = req.query['endTime'];
+    if(typeof endTime == "undefined"){
+        endTime ='now';
+    }
+    var source = req.query['hostName'];
+    var osdName= req.query['osdName'];
+    var uuid= req.query['uuid'];
+
+    var name = source +":"+osdName;
+
+    var tableName, whereClause,
+        selectArr = ["T", "name", "info_stats.reads", "info_stats.writes", "info_stats.read_kbytes","info_stats.write_kbytes"];
+
+    tableName = 'StatTable.ComputeStorageDisk.info_stats';
+    selectArr.push("UUID");
+    selectArr.push("info_stats.op_r_latency");
+    selectArr.push("info_stats.op_w_latency");
+
+    whereClause = [
+        {'Source':source},
+        {'uuid':uuid}
+    ];
+
+    whereClause = stMonUtils.formatAndClause(whereClause);
+    var timeObj = stMonUtils.createTimeQueryJsonObj(minsSince, endTime);
+    var timeGran = stMonUtils.getTimeGranByTimeSlice(timeObj, sampleCnt);
+    var queryJSON = stMonUtils.formatQueryStringWithWhereClause(tableName, whereClause, selectArr, timeObj, true);
+    delete queryJSON['limit'];
+    delete queryJSON['dir'];
+    var selectEleCnt = queryJSON['select_fields'].length;
+    queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
+    console.log("............."+queryJSON);
+
+    stMonUtils.executeQueryString(queryJSON,
+        commonUtils.doEnsureExecution(function(err, resultJSON)  {
+            resultJSON= formatFlowSeriesForOsdStats(resultJSON, timeObj, timeGran,osdName);
+            commonUtils.handleJSONResponse(err, res, resultJSON);
+        }, global.DEFAULT_MIDDLEWARE_API_TIMEOUT));
+}
 
 function formatFlowSeriesForOsdStats(storageFlowSeriesData, timeObj, timeGran,osdName){
     var len = 0, secTime;
@@ -683,6 +737,7 @@ exports.parseOSDFromPG = parseOSDFromPG;
 exports.parseHostFromOSD=parseHostFromOSD;
 exports.parseRootFromHost=parseRootFromHost;
 exports.getStorageOSDFlowSeries= getStorageOSDFlowSeries;
+exports.getStorageOsdDiskFlowSeries=getStorageOsdDiskFlowSeries;
 exports.getStorageOSDAvgBW= getStorageOSDAvgBW;
 exports.getAvgBWHostToOSD=getAvgBWHostToOSD;
 

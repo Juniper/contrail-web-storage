@@ -32,6 +32,7 @@ define([
                 focusedElement: {
                     fqName: fqObj.fqName,
                     fqHost: fqObj.fqHost,
+                    fqUUID: fqObj.fqUUID,
                     type: swc.DETAILS_ELEMENT_DISK
                 }
             };

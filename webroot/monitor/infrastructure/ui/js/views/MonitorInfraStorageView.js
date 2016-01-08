@@ -91,7 +91,8 @@ define([
             app: cowc.APP_CONTRAIL_STORAGE,
             viewConfig: {
                 disk: hashParams.focusedElement.fqName,
-                storageNode: hashParams.focusedElement.fqHost
+                storageNode: hashParams.focusedElement.fqHost,
+                uuid: hashParams.focusedElement.fqUUID
             }
         };
     }

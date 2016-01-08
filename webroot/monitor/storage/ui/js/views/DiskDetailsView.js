@@ -13,14 +13,15 @@ define([
             var self = this,
                 viewConfig = this.attributes.viewConfig,
                 diskName = viewConfig.disk,
-                storageNodeName = viewConfig.storageNode;
+                storageNodeName = viewConfig.storageNode,
+                uuid= viewConfig.uuid;
 
-            self.renderDiskDetails(diskName, storageNodeName);
+            self.renderDiskDetails(diskName, storageNodeName,uuid);
         },
 
-        renderDiskDetails: function (diskName, storageNodeName) {
+        renderDiskDetails: function (diskName, storageNodeName, diskUUID) {
             var self = this,
-                detailsConfig = swvc.getDetailsViewConfig(swc.DETAILS_ELEMENT_DISK, {disk: diskName, storageNode: storageNodeName});
+                detailsConfig = swvc.getDetailsViewConfig(swc.DETAILS_ELEMENT_DISK, {disk: diskName, storageNode: storageNodeName, uuid: diskUUID});
 
             self.renderView4Config(self.$el, null, detailsConfig, null, null, null);
         }

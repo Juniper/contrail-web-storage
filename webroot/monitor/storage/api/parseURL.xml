@@ -203,6 +203,13 @@
     </item>
 
     <item>
+        <url>/api/tenant/storage/cluster/osd-raw-disk/flow-series</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storageOsdsApi.getStorageOsdDiskFlowSeries</callback>
+    </item>
+
+    <item>
         <url>/api/tenant/storage/cluster/osd/avg-bw</url>
         <method>get</method>
         <feature>storage</feature>

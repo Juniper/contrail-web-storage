@@ -27,7 +27,8 @@ define([
                 case swc.TAB_ELEMENT_DISK:
                     var options = {
                         disk: elementObj.disk,
-                        storageNode: elementObj.storageNode
+                        storageNode: elementObj.storageNode,
+                        uuid: elementObj.uuid
                     };
                     config = {
                         elementId: swl.MONITOR_DISK_VIEW_ID,
@@ -42,6 +43,7 @@ define([
 
         self.getStorageNodeTabViewConfig = function (viewConfig) {
             var storageNodeName = viewConfig.storageNode,
+                uuid= viewConfig.uuid,
                 tabsToDisplay = viewConfig.tabsToDisplay,
                 tabObjs = [];
 
@@ -52,7 +54,8 @@ define([
                     view: "DiskListView",
                     app: cowc.APP_CONTRAIL_STORAGE,
                     viewConfig: {
-                        storageNode: storageNodeName
+                        storageNode: storageNodeName,
+                        uuid: uuid
                     }
                 },
             ];
@@ -91,6 +94,7 @@ define([
         self.getDiskTabViewConfig = function (viewConfig) {
             var diskName = viewConfig.disk,
                 storageNodeName = viewConfig.storageNode,
+                uuid= viewConfig.uuid,
                 tabsToDisplay = viewConfig.tabsToDisplay,
                 tabObjs = [];
 
@@ -102,7 +106,8 @@ define([
                     app: cowc.APP_CONTRAIL_STORAGE,
                     viewConfig: {
                         disk: diskName,
-                        storageNode: storageNodeName
+                        storageNode: storageNodeName,
+                        uuid: uuid
                     }
                 },
             ];
@@ -142,9 +147,9 @@ define([
                 case swc.DETAILS_ELEMENT_DISK:
                     var options = {
                         disk: elementObj.disk,
-                        storageNode: elementObj.storageNode
+                        storageNode: elementObj.storageNode,
+                        uuid: elementObj.uuid
                     };
-
                     config = {
                         elementId: cowu.formatElementId([swl.MONITOR_DISK_VIEW_ID]),
                         view: "SectionView",
@@ -153,7 +158,7 @@ define([
                                 {
                                     columns: [
                                         {
-                                            elementId: swl.DISK_DETAILS_ID,
+                                            elementId: swl.DISK_DETAILS_ID+"-summary",
                                             title: swl.TITLE_DISK_DETAILS,
                                             view: "DetailsView",
                                             viewConfig: {
@@ -162,7 +167,7 @@ define([
                                                     url: swc.get(swc.URL_DISK_DETAILS, options.disk),
                                                     type: 'GET'
                                                 },
-                                                templateConfig: swdt.getDiskDetailsTemplate(cowc.THEME_DETAIL_WIDGET, null),
+                                                templateConfig: swdt.getDiskSummaryDetailsTemplate(cowc.THEME_DETAIL_WIDGET, null),
                                                 app: cowc.APP_CONTRAIL_STORAGE,
                                                 dataParser: function (response) {
                                                     return (response.length != 0) ? swp.diskDataParser(response.osd_details) : {};
@@ -170,24 +175,70 @@ define([
                                             }
                                         },
                                         {
+                                            elementId: swl.DISK_DETAILS_ID+"-status",
+                                            title: swl.TITLE_DISK_DETAILS,
+                                            view: "DetailsView",
+                                            viewConfig: {
+                                                class: 'span6',
+                                                ajaxConfig: {
+                                                    url: swc.get(swc.URL_DISK_DETAILS, options.disk),
+                                                    type: 'GET'
+                                                },
+                                                templateConfig: swdt.getDiskStatusDetailsTemplate(cowc.THEME_DETAIL_WIDGET, null),
+                                                app: cowc.APP_CONTRAIL_STORAGE,
+                                                dataParser: function (response) {
+                                                    return (response.length != 0) ? swp.diskDataParser(response.osd_details) : {};
+                                                }
+                                            }
+                                        }
+                                        ]
+                                },
+                                {
+                                    columns: [
+                                        {
                                             elementId: swl.DISK_ACTIVITY_STATS_ID,
                                             title: swl.TITLE_DISK_ACTIVITY_STATS,
                                             view: "DiskActivityStatsView",
                                             viewPathPrefix: "monitor/storage/ui/js/views/",
                                             app: cowc.APP_CONTRAIL_STORAGE,
                                             viewConfig: {
-                                                class: 'span6',
                                                 modelConfig: {
-                                                    modelKey: swc.get(swc.UMID_DISK_UVE, options.storageNode, options.disk),
+                                                    modelKey: swc.get(swc.UMID_DISK_UVE, options.storageNode, options.disk, options.uuid),
                                                     remote: {
                                                         ajaxConfig: {
-                                                            url: swc.get(swc.URL_DISK_ACTIVITY_STATS, options.disk, options.storageNode),
+                                                            url: swc.get(swc.URL_DISK_ACTIVITY_STATS, options.disk, options.storageNode, options.uuid),
                                                             type: 'GET'
                                                         },
                                                         dataParser: swp.diskActivityStatsParser
                                                     },
                                                     cacheConfig: {
-                                                        ucid: swc.get(swc.UCID_DISK_STATS, options.storageNode, options.disk)
+                                                        ucid: swc.get(swc.UCID_DISK_STATS, options.storageNode, options.disk, options.uuid)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    columns: [
+                                        {
+                                            elementId: swl.DISK_ACTIVITY_STATS_ID+"raw-disk",
+                                            title: swl.TITLE_DISK_ACTIVITY_STATS+"raw-disk",
+                                            view: "DiskActivityRawStatsView",
+                                            viewPathPrefix: "monitor/storage/ui/js/views/",
+                                            app: cowc.APP_CONTRAIL_STORAGE,
+                                            viewConfig: {
+                                                modelConfig: {
+                                                    modelKey: swc.get(swc.UMID_DISK_UVE, options.storageNode, options.disk, options.uuid),
+                                                    remote: {
+                                                        ajaxConfig: {
+                                                            url: swc.get(swc.URL_RAW_DISK_ACTIVITY_STATS, options.disk, options.storageNode, options.uuid),
+                                                            type: 'GET'
+                                                        },
+                                                        dataParser: swp.diskActivityStatsParser
+                                                    },
+                                                    cacheConfig: {
+                                                        ucid: swc.get(swc.UCID_DISK_STATS, options.storageNode, options.disk, options.uuid)
                                                     }
                                                 }
                                             }

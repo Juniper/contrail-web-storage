@@ -22,7 +22,11 @@ define([
                     onClick: onClickGrid
                 },
                 cssClass: 'cell-hyperlink-blue',
-                minWidth: 150
+                minWidth: 150,
+                exportConfig: {
+                   allow: true,
+                   stdFormatter: false
+               }
             },
             {
                 field: "",
@@ -53,7 +57,11 @@ define([
                 formatter: function (r, c, v, cd, dc) {
                     return swu.getStorageNodeStatusTmpl(dc['status'])
                 },
-                minWidth: 50
+                minWidth: 50,
+                exportConfig: {
+                   allow: true,
+                   stdFormatter: false
+               }
             }
         ];
 
@@ -73,7 +81,11 @@ define([
                     onClick: onClickGrid
                 },
                 cssClass: 'cell-hyperlink-blue',
-                minWidth: 60
+                minWidth: 60,
+                exportConfig: {
+                   allow: true,
+                   stdFormatter: false
+               }
             },
             {
                 field: "host",
@@ -101,7 +113,11 @@ define([
                 formatter: function (r, c, v, cd, dc) {
                     return dc['status_tmpl'];
                 },
-                minWidth: 50
+                minWidth: 50,
+                exportConfig: {
+                   allow: true,
+                   stdFormatter: false
+               }
             },
             {
                 field: "cluster_status",
@@ -110,7 +126,11 @@ define([
                     return dc['cluster_status_tmpl'];
                 },
                 cssClass: 'grid-status-label',
-                minWidth: 50
+                minWidth: 50,
+                exportConfig: {
+                   allow: true,
+                   stdFormatter: false
+               }
             }
         ];
 
@@ -126,12 +146,16 @@ define([
                 width: 150
             },
             {
-                field: "act-health",
+                field: "act_health",
                 name: "Activity Status",
                 formatter: function (r, c, v, cd, dc) {
                     return swu.getMonitorNodeHealthStatusTmpl(dc['act_health'])
                 },
-                width: 100
+                width: 100,
+                exportConfig: {
+                   allow: true,
+                   stdFormatter: false
+               }
             },
             {
                 field: "health",
@@ -139,7 +163,11 @@ define([
                 formatter: function (r, c, v, cd, dc) {
                     return swu.getMonitorNodeHealthStatusTmpl(dc['health'])
                 },
-                width: 100
+                width: 100,
+                exportConfig: {
+                   allow: true,
+                   stdFormatter: false
+               }
             }
         ];
 
@@ -181,6 +209,7 @@ define([
         } else if ($.inArray(name, ['disk']) > -1) {
             fqObj['fqName'] = selRowDataItem['name'];
             fqObj['fqHost'] = selRowDataItem['host'];
+            fqObj['fqUUID'] = selRowDataItem['uuid'];
             swcc.setDiskURLHashParams(null, fqObj, true);
         } else {
 

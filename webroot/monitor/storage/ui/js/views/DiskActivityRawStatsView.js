@@ -47,23 +47,24 @@ define([
         };
 
         return {
-            elementId: cowu.formatElementId([swl.MONITOR_DISK_ACTIVITY_STATS_ID]),
+            elementId: cowu.formatElementId([swl.MONITOR_DISK_ACTIVITY_STATS_ID+"raw-disk"]),
             view: "SectionView",
             viewConfig: {
                 rows: [
                     {
                         columns: [
                             {
-                                elementId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
+                                elementId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID+"raw-disk",
                                 view: "LineBarWithFocusChartView",
+                                
                                 viewConfig: {
                                     class: 'span6',
                                     widgetConfig: {
-                                        elementId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID + '-widget',
+                                        elementId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID+"raw-disk" + '-widget',
                                         view: "WidgetView",
                                         viewConfig: {
                                             header: {
-                                                title: swl.TITLE_DISK_ACTIVITY_THRPT_STATS,
+                                                title: swl.TITLE_RAW_DISK_ACTIVITY_THRPT_STATS,
                                                 iconClass: false
                                             },
                                             controls: {
@@ -91,17 +92,17 @@ define([
                                     parseFn: swp.diskActivityThrptIOPsLineBarChartDataParser                                }
                             },
                             {
-                                elementId: swl.DISK_ACTIVITY_LATENCY_CHART_ID,
-                                title: swl.TITLE_DISK_ACTIVITY_LATENCY_STATS,
+                                elementId: swl.DISK_ACTIVITY_LATENCY_CHART_ID+"raw-disk",
+                                title: swl.TITLE_RAW_DISK_ACTIVITY_LATENCY_STATS,
                                 view: "LineWithFocusChartView",
                                 viewConfig: {
                                     class: 'span6',
                                     widgetConfig: {
-                                        elementId: swl.DISK_ACTIVITY_LATENCY_CHART_ID + '-widget',
+                                        elementId: swl.DISK_ACTIVITY_LATENCY_CHART_ID+"raw-disk" + '-widget',
                                         view: "WidgetView",
                                         viewConfig: {
                                             header: {
-                                                title: swl.TITLE_DISK_ACTIVITY_LATENCY_STATS,
+                                                title: swl.TITLE_RAW_DISK_ACTIVITY_LATENCY_STATS,
                                                 iconClass: false
                                             },
                                             controls: {
