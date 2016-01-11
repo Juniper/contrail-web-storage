@@ -178,6 +178,7 @@ define([
 
         this.CLUSTER_STATUS_ID = "cluster-status";
         this.TITLE_CLUSTER_STATUS = "Cluster Status";
+         this.TITLE_CLUSTER_HEALTH = "Cluster Health";
 
         this.CLUSTER_DISK_ACTIVITY_STATS_ID = "cluster-disk-activity-stats";
         this.CLUSTER_DISK_ACTIVITY_STATS_TAB_ID = "cluster-disk-activity-stats-tab";

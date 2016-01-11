@@ -18,7 +18,7 @@ define([
                                 {
                                     templateGenerator: 'BlockListTemplateGenerator',
                                     advancedViewOptions: false,
-                                    title: swl.TITLE_CLUSTER_STATUS,
+                                    title: swl.TITLE_CLUSTER_HEALTH,
                                     theme: detailTheme,
                                     templateGeneratorData: 'rawData',
                                     templateGeneratorConfig: [
@@ -27,7 +27,7 @@ define([
                                             label: 'Overall Health',
                                             templateGenerator: 'TextGenerator',
                                             templateGeneratorConfig: {
-                                                formatter: "storage-health-status-state",
+                                                formatter: "HealthStatusFormatter",
                                                 iconClass: 'icon-warning-sign'
                                             },
                                             events: {
@@ -150,6 +150,24 @@ define([
             };
         };
 
+    };
+
+    this.HealthStatusFormatter = function(value, obj, iconClass, key) {
+        var iconHTML = (contrail.checkIfExist(iconClass) ?
+                    '<i class="' + iconClass + ' pull-right padding-3-0"></i>' : '');
+        if (value === 'critical') {
+            return '<span class="red ' + key + '-value" style="font-size: large;">'
+                + value + iconHTML +
+                '</span>';
+        } else  if (value === 'warn') {
+            return '<span class="orange ' + key + '-value" style="font-size: large; ">'
+                + value + iconHTML +
+                '</span>';
+        } else if (value === 'ok') {
+            return '<span class="green" style="font-size: large">' + value + '</span>';
+        } else {
+            return value
+        }
     };
     return SDetailTemplates;
 })
