@@ -70,7 +70,7 @@ module.exports = function (grunt) {
         options: {
             configFile: 'karma.config.js'
         },
-       storageNodeListView: {
+       /*storageNodeListView: {
             options: {
                 files: [
                     {
@@ -101,7 +101,7 @@ module.exports = function (grunt) {
                 },
                 feature: 'stgm'
             }
-        },
+        },*/
         storageDashboardView: {
             options: {
                 files: [
@@ -377,7 +377,7 @@ module.exports = function (grunt) {
             files: ["Gruntfile.js"]
         },
         stgmNoMerge : {
-            storageNodeListView:'storageNodeListView',
+           // storageNodeListView:'storageNodeListView',
             storageDiskListView: 'storageDiskListView',
             storageDiskView: 'storageDiskView',
             storagePoolListView: 'storagePoolListView',
@@ -434,7 +434,7 @@ module.exports = function (grunt) {
             grunt.log.writeln('Test results: ' + karmaConfig['runAllStgmTests']['options']['htmlReporter']['outputFile']);
             printCoverageReportLoc(karmaConfig['runAllStgmTests']['options']['coverageReporter']);
         } else if (target == 'storageNodeListView') {
-            grunt.task.run('karma:storageNodeListView');
+            //grunt.task.run('karma:storageNodeListView');
         }else if (target == 'storageDashboardView') {
             grunt.task.run('karma:storageDashboardView');
         }else if (target == 'storageDiskListView') {

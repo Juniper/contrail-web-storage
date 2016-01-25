@@ -56,6 +56,7 @@ define([
                             {
                                 elementId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
                                 view: "LineBarWithFocusChartView",
+                                title: swl.TITLE_DISK_ACTIVITY_THRPT_STATS,
                                 viewConfig: {
                                     class: 'span6',
                                     widgetConfig: {
@@ -78,17 +79,18 @@ define([
                                     chartOptions: {
                                         height: 250,
                                         y1AxisLabel: swl.DISK_ACTIVITY_IOPS_CHART_YAXIS_LABEL,
+                                        y2AxisLabel: swl.DISK_ACTIVITY_THRPT_CHART_YAXIS_LABEL,
                                         y1Formatter: function (d) {
                                             return swu.addUnits2IOPs(d, false, false, 1);
                                         },
-                                        y2AxisLabel: swl.DISK_ACTIVITY_THRPT_CHART_YAXIS_LABEL,
                                         y2Formatter: function (y2Value) {
                                             return formatBytes(y2Value, true);
                                         },
                                         showLegend: true
 
                                     },
-                                    parseFn: swp.diskActivityThrptIOPsLineBarChartDataParser                                }
+                                    parseFn: swp.diskActivityThrptIOPsLineBarChartDataParser
+                                }
                             },
                             {
                                 elementId: swl.DISK_ACTIVITY_LATENCY_CHART_ID,

@@ -35,6 +35,10 @@ define([
             url: /\/api\/tenant\/storage\/cluster\/osd\/flow\-series.*$/,
             body: JSON.stringify(TestMockdata.flowSeriesForFrontendDiskMockData)
         }));
+        responses.push(CUnit.createFakeServerResponse({
+            url: /\/api\/tenant\/storage\/cluster\/osd-raw-disk\/flow\-series.*$/,
+            body: JSON.stringify(TestMockdata.flowSeriesForFrontendRawDiskMockData)
+        }));
         return responses;
     };
     fakeServerConfig.getResponsesConfig = fakeServerResponsesConfig;
@@ -59,8 +63,8 @@ define([
             rootView: storagePageLoader.monStorageView,
             tests: [
                
-               /* {
-                    viewId: swl.DISK_DETAILS_ID,
+                {
+                    viewId: swl.DISK_DETAILS_ID+"-summary",
                     suites: [
                         {
                             class: DetailsViewTestSuite,
@@ -71,7 +75,19 @@ define([
                             }
                         }
                     ]
-                },*/
+                },{
+                    viewId: swl.DISK_DETAILS_ID+"-status",
+                    suites: [
+                        {
+                            class: DetailsViewTestSuite,
+                            groups: ['all'],
+                            severity: cotc.SEVERITY_LOW,
+                            modelConfig: {
+                                dataGenerator: stu.commonDetailsDataGenerator
+                            }
+                        }
+                    ]
+                },
                 {
                     viewId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
                     suites: [
@@ -84,6 +100,26 @@ define([
                 },
                 {
                     viewId: swl.DISK_ACTIVITY_LATENCY_CHART_ID,
+                    suites: [
+                        {
+                            class: LineWithFocusChartViewTestSuite,
+                            groups: ['all'],
+                            severity: cotc.SEVERITY_LOW
+                        }
+                    ]
+                },
+                {
+                    viewId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID+"raw-disk",
+                    suites: [
+                        {
+                            class: LineWithFocusBarChartViewTestSuite,
+                            groups: ['all'],
+                            severity: cotc.SEVERITY_LOW
+                        }
+                    ]
+                },
+                {
+                    viewId: swl.DISK_ACTIVITY_LATENCY_CHART_ID+"raw-disk",
                     suites: [
                         {
                             class: LineWithFocusChartViewTestSuite,

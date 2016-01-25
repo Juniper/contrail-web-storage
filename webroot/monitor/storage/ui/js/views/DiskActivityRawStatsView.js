@@ -56,7 +56,7 @@ define([
                             {
                                 elementId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID+"raw-disk",
                                 view: "LineBarWithFocusChartView",
-                                
+                                title: swl.TITLE_RAW_DISK_ACTIVITY_THRPT_STATS,
                                 viewConfig: {
                                     class: 'span6',
                                     widgetConfig: {

@@ -44,9 +44,14 @@ define([
         }));
    
         responses.push(CUnit.createFakeServerResponse({
-            url: /\/api\/tenant\/storage\/cluster\/osd\/activity.*$/,
+            url: /\/api\/tenant\/storage\/cluster\/ceph\/activity.*$/,
             body: JSON.stringify(TestMockdata.flowSeriesForClusterOsdActivityMockData)
         }));
+        responses.push(CUnit.createFakeServerResponse({
+            url: /\/api\/tenant\/storage\/cluster\/raw\/disk\/activity.*$/,
+            body: JSON.stringify(TestMockdata.flowSeriesForClusterRawActivityMockData)
+        }));
+
         return responses;
     };
     fakeServerConfig.getResponsesConfig = fakeServerResponsesConfig;
@@ -66,7 +71,7 @@ define([
             rootView: storagePageLoader.monStorageView,
             tests: [
                 {
-                    viewId: swl.CLUSTER_DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
+                    viewId: swl.CLUSTER_CEPH_DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
                     suites: [
                         {
                             class: LineWithFocusBarChartViewTestSuite,
@@ -76,7 +81,27 @@ define([
                     ]
                 },
                 {
-                    viewId: swl.CLUSTER_DISK_ACTIVITY_LATENCY_CHART_ID,
+                    viewId: swl.CLUSTER_CEPH_DISK_ACTIVITY_LATENCY_CHART_ID,
+                    suites: [
+                        {
+                            class: LineWithFocusChartViewTestSuite,
+                            groups: ['all'],
+                            severity: cotc.SEVERITY_LOW
+                        }
+                    ]
+                },
+                {
+                    viewId: swl.CLUSTER_RAW_DISK_ACTIVITY_THRPT_IOPS_CHART_ID,
+                    suites: [
+                        {
+                            class: LineWithFocusBarChartViewTestSuite,
+                            groups: ['all'],
+                            severity: cotc.SEVERITY_LOW
+                        }
+                    ]
+                },
+                {
+                    viewId: swl.CLUSTER_RAW_DISK_ACTIVITY_LATENCY_CHART_ID,
                     suites: [
                         {
                             class: LineWithFocusChartViewTestSuite,
