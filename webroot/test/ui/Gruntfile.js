@@ -19,14 +19,16 @@ module.exports = function (grunt) {
         {pattern: 'contrail-web-core/webroot/css/**/*.css', included: false},
         {pattern: 'contrail-web-core/webroot/css/**/*.ttf', included: false},
         {pattern: 'contrail-web-core/webroot/css/**/*.woff', included: false},
+        {pattern: 'contrail-web-core/webroot/css/**/*.svg', included: false},
         {pattern: 'contrail-web-core/webroot/test/ui/**/*.css', included: false},
 
         {pattern: 'contrail-web-core/webroot/assets/**/*.woff', included: false},
         {pattern: 'contrail-web-core/webroot/assets/**/*.ttf', included: false},
+        {pattern: 'contrail-web-core/webroot/assets/**/*.svg', included: false},
 
         {pattern: 'contrail-web-core/webroot/img/**/*.png', included: false},
         {pattern: 'contrail-web-core/webroot/css/**/*.png', included: false},
-        {pattern: 'contrail-web-core/webroot/assets/select2/styles/**/*.png', included: false},
+        {pattern: 'contrail-web-core/webroot/assets/**/*.png', included: false},
         {pattern: 'contrail-web-core/webroot/css/**/*.gif', included: false},
         {pattern: 'contrail-web-core/webroot/assets/**/*.map', included: false},
 
@@ -42,7 +44,6 @@ module.exports = function (grunt) {
         {pattern: 'contrail-web-storage/webroot/built/common/ui/templates/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/built/common/**/{!(*.test.js), !(*.unit.test.js)}', included: false},
 
-
         {pattern: 'contrail-web-storage/webroot/built/**/ui/js/**/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/monitor/infrastructure/ui/js/**/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/monitor/infrastructure/ui/js/*.js', included: false},
@@ -50,8 +51,6 @@ module.exports = function (grunt) {
 
         {pattern: 'contrail-web-storage/webroot/*.xml', included: false},
         {pattern: 'contrail-web-storage/webroot/common/ui/css/*.css', included: false},
-
-
 
         {pattern: 'contrail-web-core/webroot/js/**/*.js', included: false},
         {pattern: 'contrail-web-core/webroot/built/js/**/*.js', included: false},
@@ -102,42 +101,6 @@ module.exports = function (grunt) {
                 feature: 'stgm'
             }
         },*/
-        storageDashboardView: {
-            options: {
-                files: [
-                    {
-                        pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/views/ClusterStatusView.custom.test.suite.js', 
-                        included: false
-                    },
-                    {
-                        pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/views/PieChartView.custom.test.suite.js', 
-                        included: false
-                    },
-                    {
-                        pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/views/DashboardView.test.js', 
-                        included: false
-                    }
-                ],
-                preprocessors: {
-                    'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js': ['coverage']
-                },
-                junitReporter: {
-                    outputFile: __dirname + '/reports/tests/stgm/views/',
-                    outputFile: 'storage-dashboard-view-test-results.xml',
-                    suite: 'storageDashboardView',
-                    useBrowserName: false
-                },
-                htmlReporter: {
-                    outputFile: __dirname + '/reports/tests/stgm/views/storage-dashboard-view-test-results.html'
-                },
-                coverageReporter: {
-                    type: 'html',
-                    dir: __dirname + '/reports/coverage/stgm/views/storageDashboardView/',
-                    subdir: browserSubdirFn
-                },
-                feature: 'stgm'
-            }
-        },
         storageDiskListView: {
             options: {
                 files: [
@@ -174,7 +137,7 @@ module.exports = function (grunt) {
             options: {
                 files: [
                     {
-                        pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/views/DiskView.test.js', 
+                        pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/views/DiskView.test.js',
                         included: false
                     }
                 ],
@@ -264,29 +227,65 @@ module.exports = function (grunt) {
             }
         },
 
-        stgmUnit: {
+        //stgmUnit: {
+        //    options: {
+        //        files: [
+        //            {
+        //                pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/unit/stgm.unit.test.js',
+        //                included: false
+        //            }
+        //        ],
+        //        preprocessors: {
+        //            'contrail-web-storage/webroot/monitor/storage/ui/js/*.js': ['coverage']
+        //        },
+        //        junitReporter: {
+        //            outputDir: __dirname + '/reports/tests/stgm/unit/',
+        //            outputFile: 'stgm-unit-test-results.xml',
+        //            suite: 'unit',
+        //            useBrowserName: false
+        //        },
+        //        htmlReporter: {
+        //            outputFile: __dirname + '/reports/tests/stgm/unit/stgm-unit-test-results.html'
+        //        },
+        //        coverageReporter: {
+        //            type: 'html',
+        //            dir: __dirname + '/reports/coverage/stgm/unit/',
+        //            subdir: browserSubdirFn
+        //        },
+        //        feature: 'stgm'
+        //    }
+        //},
+        storageDashboardView: {
             options: {
                 files: [
                     {
-                        pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/unit/stgm.unit.test.js',
+                        pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/views/ClusterStatusView.custom.test.suite.js',
+                        included: false
+                    },
+                    {
+                        pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/views/PieChartView.custom.test.suite.js',
+                        included: false
+                    },
+                    {
+                        pattern: 'contrail-web-storage/webroot/monitor/storage/test/ui/views/DashboardView.test.js',
                         included: false
                     }
                 ],
                 preprocessors: {
-                    'contrail-web-storage/webroot/monitor/storage/ui/js/*.js': ['coverage']
+                    'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js': ['coverage']
                 },
                 junitReporter: {
-                    outputDir: __dirname + '/reports/tests/stgm/unit/',
-                    outputFile: 'stgm-unit-test-results.xml',
-                    suite: 'unit',
+                    outputFile: __dirname + '/reports/tests/stgm/views/',
+                    outputFile: 'storage-dashboard-view-test-results.xml',
+                    suite: 'storageDashboardView',
                     useBrowserName: false
                 },
                 htmlReporter: {
-                    outputFile: __dirname + '/reports/tests/stgm/unit/stgm-unit-test-results.html'
+                    outputFile: __dirname + '/reports/tests/stgm/views/storage-dashboard-view-test-results.html'
                 },
                 coverageReporter: {
                     type: 'html',
-                    dir: __dirname + '/reports/coverage/stgm/unit/',
+                    dir: __dirname + '/reports/coverage/stgm/views/storageDashboardView/',
                     subdir: browserSubdirFn
                 },
                 feature: 'stgm'
@@ -426,8 +425,6 @@ module.exports = function (grunt) {
 
 
     grunt.registerTask('stgm', 'Storage Monitoring Test Cases', function (target) {
-        grunt.log.writeln(target);
-        grunt.log.writeln("********************");
         if (target == null) {
             grunt.log.writeln('>>>>>>>> Running Storage Monitoring feature tests. <<<<<<<');
             grunt.task.run('karma:runAllStgmTests');

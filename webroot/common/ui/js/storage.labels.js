@@ -96,7 +96,7 @@ define([
         this.MONITOR_POOL_LIST_ID = "monitor-pool-list";
         this.MONITOR_POOL_GRID_ID = "monitor-pool-grid";
         this.MONITOR_POOL_STATS_ID = "monitor-pool-stats";
-        this.MONITOR_POOL_SCATTER_CHART_ID ='pool-scatter-chart'
+        this.MONITOR_POOL_SCATTER_CHART_ID ='monitor-pool-scatter-chart'
 
         this.MONITOR_STORAGE_DASHBOARD_SECTION_ID ="storage-dashboard-section";
         this.MONITOR_STORAGE_DASHBOARD_PAGE_ID = "monitor-storage-dashboard-page";

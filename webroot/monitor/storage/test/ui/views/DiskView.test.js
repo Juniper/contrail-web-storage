@@ -56,7 +56,7 @@ define([
             }
         }
     };
-    pageConfig.loadTimeout = 500;
+    pageConfig.loadTimeout = cotc.PAGE_LOAD_TIMEOUT * 5;
 
     var getTestConfig = function() {
         return {
@@ -134,7 +134,7 @@ define([
 
     };
 
-    
+
 
     var pageTestConfig = CUnit.createPageTestConfig(moduleId, testType, fakeServerConfig, pageConfig, getTestConfig);
 

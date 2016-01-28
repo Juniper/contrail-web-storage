@@ -38,7 +38,7 @@ define([
             type: 'disk'
         }
     };
-    pageConfig.loadTimeout = 2000;
+    pageConfig.loadTimeout = cotc.PAGE_LOAD_TIMEOUT * 2;
 
     var getTestConfig = function() {
         return {

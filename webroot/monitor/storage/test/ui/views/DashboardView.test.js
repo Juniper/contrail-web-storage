@@ -64,7 +64,7 @@ define([
             type: 'storage'
         }
     };
-    pageConfig.loadTimeout = 500;
+    pageConfig.loadTimeout = cotc.PAGE_LOAD_TIMEOUT * 5;
 
     var getTestConfig = function() {
         return {

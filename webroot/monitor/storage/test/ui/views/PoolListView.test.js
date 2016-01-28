@@ -36,14 +36,14 @@ define([
             type: 'pool'
         }
     };
-    pageConfig.loadTimeout = 2000;
+    pageConfig.loadTimeout = cotc.PAGE_LOAD_TIMEOUT * 2;
 
     var getTestConfig = function() {
         return {
             rootView: storagePageLoader.monStorageView,
             tests: [
                 {
-                    viewId: swl.MONITOR_POOL_SCATTER_CHART_ID,
+                    viewId: swl.POOL_SCATTER_CHART_ID,
                     suites: [
                         {
                             class: ZoomScatterChartTestSuite,
@@ -85,7 +85,6 @@ define([
     };
 
     var pageTestConfig = CUnit.createPageTestConfig(moduleId, testType, fakeServerConfig, pageConfig, getTestConfig);
-    console.log(pageTestConfig);
     CUnit.startTestRunner(pageTestConfig);
 
 });
