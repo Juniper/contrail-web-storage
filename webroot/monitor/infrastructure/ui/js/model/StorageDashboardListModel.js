@@ -13,8 +13,22 @@ define([
                         url: swc.get(swc.URL_STORAGENODES_SUMMARY),
                         type: "GET"
                     },
+                    onAllRequestsCompleteCB: function(storageListModel) {
+                        var fetchContrailListModel = new ContrailListModel({
+                            remote : {
+                                ajaxConfig : {
+                                    url : swc.get(swc.URL_STORAGENODES_SUMMARY) + '?forceRefresh'
+                                },
+                                onAllRequestsCompleteCB: function(fetchedStorageListModel) {
+                                    var data = fetchedStorageListModel.getItems();
+                                    storageListModel.setData(data);
+                                },
+                               dataParser: swp.storagenodeDataParser
+                            },
+                        });
+                    },
                     dataParser: swp.storagenodeDataParser
-                },
+                 },
                 cacheConfig: {
                     ucid: swc.UCID_ALL_STORAGENODE_LIST
                 }

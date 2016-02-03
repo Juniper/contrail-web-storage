@@ -21,6 +21,20 @@ define([
                         url: storageNodeName != null ? swc.get(swc.URL_STORAGENODE_DISKS, storageNodeName) : swc.URL_DISKS_SUMMARY,
                         type: "GET"
                     },
+                    onAllRequestsCompleteCB: function(diskListModel) {
+                        var fetchContrailListModel = new ContrailListModel({
+                            remote : {
+                                ajaxConfig : {
+                                   url: storageNodeName != null ? swc.get(swc.URL_STORAGENODE_DISKS, storageNodeName) : swc.URL_DISKS_SUMMARY + '?forceRefresh',
+                                },
+                                onAllRequestsCompleteCB: function(fetchedDiskListModel) {
+                                    var data = fetchedDiskListModel.getItems();
+                                    diskListModel.setData(data);
+                                },
+                                dataParser: swp.disksDataParser
+                            },
+                        });
+                    },
                     dataParser: swp.disksDataParser
                 },
                 cacheConfig: {
