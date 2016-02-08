@@ -13,7 +13,7 @@ define([
     
 ], function (_, Backbone, ContrailView, BreadcrumbView,StorageDashboardListModel, 
     MonitorInfraDashboardView, StorageDashboardView ) {
-    var MonitorStorageView = Backbone.View.extend({
+    var MonitorStorageView = ContrailView.extend({
         el: $(contentContainer),
 
         renderDashboard: function () {
@@ -32,11 +32,12 @@ define([
             breadcrumbView.renderDomainBreadcrumbDropdown(fqName, function (domainSelectedValueData, domainBreadcrumbChanged) {
 
             });
-            cowu.renderView4Config(this.$el, null, getStorageNodeViewConfig(hashParams));
+            self.renderView4Config(this.$el, null, getStorageNodeViewConfig(hashParams));
         },
 
         renderStorageNodeList: function (viewConfig) {
-            cowu.renderView4Config(this.$el, null, getStorageNodeListConfig());
+            var self = this;
+            self.renderView4Config(this.$el, null, getStorageNodeListConfig());
         },
 
         renderDisk: function (viewConfig) {
@@ -46,7 +47,7 @@ define([
 
             //TBD breadcrumb update
 
-            cowu.renderView4Config(self.$el, null, getDiskViewConfig(hashParams));
+            self.renderView4Config(self.$el, null, getDiskViewConfig(hashParams));
         }
     });
 

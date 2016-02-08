@@ -20,31 +20,14 @@ define([
                 type: 'GET'
             };
 
-            var fetchedDiskList ={
-                function(diskListModel) {
-                    var fetchContrailListModel = new ContrailListModel({
-                        remote : {
-                            ajaxConfig : {
-                               url: storageNodeName != null ? swc.get(swc.URL_STORAGENODE_DISKS, storageNodeName) : swc.URL_DISKS_SUMMARY + '?forceRefresh',
-                            },
-                            onAllRequestsCompleteCB: function(fetchedDiskListModel) {
-                                var data = fetchedDiskListModel.getItems();
-                                diskListModel.setData(data);
-                            },
-                            dataParser: swp.disksDataParser
-                        },
-                    });
-                }
-            }
-
             var ucid = storageNodeName != null ? (swc.UCID_PREFIX_MS_LISTS + storageNodeName + ":disks") : swc.UCID_ALL_DISK_LIST;
 
-            self.renderView4Config(self.$el, self.model, getDisksGridViewConfig(diskRemoteConfig,fetchedDiskList, ucid, pagerOptions));
+            self.renderView4Config(self.$el, self.model, getDisksGridViewConfig(diskRemoteConfig, ucid, pagerOptions));
 
         }
     });
 
-    function getDisksGridViewConfig(diskRemoteConfig, fetchedDiskList, ucid, pagerOptions) {
+    function getDisksGridViewConfig(diskRemoteConfig, ucid, pagerOptions) {
         return {
             elementId: cowu.formatElementId([swl.MONITOR_DISK_LIST_VIEW_ID]),
             view: "SectionView",
@@ -57,7 +40,7 @@ define([
                                 title: swl.TITLE_DISKS,
                                 view: "GridView",
                                 viewConfig: {
-                                    elementConfig: getDisksGridConfig(diskRemoteConfig, fetchedDiskList, ucid, pagerOptions)
+                                    elementConfig: getDisksGridConfig(diskRemoteConfig, ucid, pagerOptions)
                                 }
                             }
                         ]
@@ -68,7 +51,6 @@ define([
     };
 
     var getDisksGridConfig = function (diskRemoteConfig, fetchedDiskList, ucid, pagerOptions) {
-
         var gridElementConfig = {
             header: {
                 title: {
@@ -93,7 +75,20 @@ define([
                 dataSource: {
                     remote: {
                         ajaxConfig: diskRemoteConfig,
-                        onAllRequestsCompleteCB:fetchedDiskList,
+                        onAllRequestsCompleteCB : function(diskListModel) {
+                            var fetchContrailListModel = new ContrailListModel({
+                                remote : {
+                                    ajaxConfig : {
+                                       url: ucid != null ? swc.get(swc.URL_STORAGENODE_DISKS, ucid) : swc.URL_DISKS_SUMMARY + '?forceRefresh',
+                                    },
+                                    onAllRequestsCompleteCB: function(fetchedDiskListModel) {
+                                        var data = fetchedDiskListModel.getItems();
+                                        diskListModel.setData(data);
+                                    },
+                                    dataParser: swp.disksDataParser
+                                },
+                            });
+                        },
                         dataParser: swp.disksDataParser
                     },
                     cacheConfig: {
