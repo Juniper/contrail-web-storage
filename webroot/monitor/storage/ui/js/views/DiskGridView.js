@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
@@ -50,7 +51,8 @@ define([
         }
     };
 
-    var getDisksGridConfig = function (diskRemoteConfig, fetchedDiskList, ucid, pagerOptions) {
+    var getDisksGridConfig = function (diskRemoteConfig, ucid, pagerOptions) {
+
         var gridElementConfig = {
             header: {
                 title: {
@@ -75,20 +77,6 @@ define([
                 dataSource: {
                     remote: {
                         ajaxConfig: diskRemoteConfig,
-                        onAllRequestsCompleteCB : function(diskListModel) {
-                            var fetchContrailListModel = new ContrailListModel({
-                                remote : {
-                                    ajaxConfig : {
-                                       url: ucid != null ? swc.get(swc.URL_STORAGENODE_DISKS, ucid) : swc.URL_DISKS_SUMMARY + '?forceRefresh',
-                                    },
-                                    onAllRequestsCompleteCB: function(fetchedDiskListModel) {
-                                        var data = fetchedDiskListModel.getItems();
-                                        diskListModel.setData(data);
-                                    },
-                                    dataParser: swp.disksDataParser
-                                },
-                            });
-                        },
                         dataParser: swp.disksDataParser
                     },
                     cacheConfig: {
@@ -201,3 +189,6 @@ define([
 
     return DiskGridView;
 });
+
+
+
