@@ -77,7 +77,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                 type: swl.TITLE_CHART_ELEMENT_STORAGENODE
             },
             content: {
-                iconClass: 'icon-contrail-storage-node',
+                iconClass: false,
                 info: [
                     {label:'Disk Count', value: data['osds'].length},
                     {label:'Available', value: data['osds_available']},

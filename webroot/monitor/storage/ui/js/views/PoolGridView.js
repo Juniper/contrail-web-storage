@@ -13,41 +13,40 @@ define([
             var self = this,
                 viewConfig = this.attributes.viewConfig,
                 poolName = viewConfig['pool'],
-                pagerOptions = viewConfig['pagerOptions'];
+                pagerOptions = viewConfig['pagerOptions'],
+                monitorRemoteConfig = {
+                    url: poolName != null ? swc.get(swc.URL_POOL_DETAILS, poolName) : swc.URL_POOLS_SUMMARY,
+                    type: 'GET'
+                },
+                ucid = poolName != null ? (swc.UCID_PREFIX_MS_LISTS + poolName + ":pool") : swc.UCID_ALL_POOL_LIST;
 
-            var monitorRemoteConfig = {
-                url: poolName != null ? swc.get(swc.URL_POOL_DETAILS, poolName) : swc.URL_POOLS_SUMMARY,
-                type: 'GET'
-            };
-
-            var ucid = poolName != null ? (swc.UCID_PREFIX_MS_LISTS + poolName + ":pool") : swc.UCID_ALL_POOL_LIST;
-
-            self.renderView4Config(self.$el, self.model, getPoolsGridViewConfig(monitorRemoteConfig, ucid, pagerOptions));
-
+            this.renderView4Config(self.$el,
+                self.model,
+                getPoolsGridViewConfig(monitorRemoteConfig, ucid, pagerOptions),
+                null,
+                null,
+                null,
+                function() {
+                    self.model.onDataUpdate.subscribe(function () {
+                        if($('#'+swl.MONITOR_POOL_GRID_ID).data('contrailGrid')) {
+                            $('#'+swl.MONITOR_POOL_GRID_ID).data('contrailGrid')._grid.invalidate();
+                        }
+                    });
+            });
         }
     });
 
     var getPoolsGridViewConfig = function (monitorRemoteConfig, ucid, pagerOptions) {
         return {
-            elementId: cowu.formatElementId([swl.MONITOR_POOL_LIST_VIEW_ID]),
-            view: "SectionView",
-            viewConfig: {
-                rows: [
-                    {
-                        columns: [
-                            {
-                                elementId: swl.MONITOR_POOL_GRID_ID,
-                                title: swl.TITLE_POOLS,
-                                view: "GridView",
-                                viewConfig: {
-                                    elementConfig: getPoolsGridConfig(monitorRemoteConfig, ucid, pagerOptions)
-                                }
-                            }
-                        ]
-                    }
-                ]
+            elementId : swl.MONITOR_POOL_GRID_ID,
+            title : swl.TITLE_POOLS,
+            view : "GridView",
+            viewConfig : {
+                elementConfig :
+                    getPoolsGridConfig(
+                        monitorRemoteConfig, ucid, pagerOptions)
             }
-        }
+        };
     };
 
     var getPoolsGridConfig = function (monitorRemoteConfig, ucid, pagerOptions) {

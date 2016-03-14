@@ -12,41 +12,40 @@ define([
         render: function () {
             var self = this,
                 viewConfig = this.attributes.viewConfig,
-                storageNodeName = viewConfig['storageNode'],
-                pagerOptions = viewConfig['pagerOptions'];
-
-            var monitorRemoteConfig = {
-                url: storageNodeName != null ? swc.get(swc.URL_STORAGENODE_MONITOR_DETAILS, storageNodeName) : swc.URL_STORAGENODE_MONITORS_SUMMARY,
-                type: 'GET'
-            };
-
-            var ucid = storageNodeName != null ? (swc.UCID_PREFIX_MS_LISTS + storageNodeName + ":monitor") : swc.UCID_ALL_MONITOR_LIST;
-
-            self.renderView4Config(self.$el, self.model, getStorageMonsGridViewConfig(monitorRemoteConfig, ucid, pagerOptions));
+                monName = viewConfig['storageNode'],
+                pagerOptions = viewConfig['pagerOptions'],
+                monitorRemoteConfig = {
+                   url: monName != null ? swc.get(swc.URL_STORAGENODE_MONITOR_DETAILS, monName) : swc.URL_STORAGENODE_MONITORS_SUMMARY,
+                   type: 'GET'
+                };
+                ucid = monName != null ? (swc.UCID_PREFIX_MS_LISTS + monName + ":monitor") : swc.UCID_ALL_MONITOR_LIST;
+            this.renderView4Config(self.$el,
+                self.model,
+                getStorageMonsGridViewConfig(monitorRemoteConfig, ucid, pagerOptions),
+                null,
+                null,
+                null,
+                function() {
+                    self.model.onDataUpdate.subscribe(function () {
+                        if($('#'+swl.MONITOR_STORAGE_MONITOR_GRID_ID).data('contrailGrid')) {
+                            $('#'+swl.MONITOR_STORAGE_MONITOR_GRID_ID).data('contrailGrid')._grid.invalidate();
+                        }
+                    });
+            });
         }
     });
 
     function getStorageMonsGridViewConfig(monitorRemoteConfig, ucid, pagerOptions) {
-        return {
-            elementId: cowu.formatElementId([swl.MONITOR_STORAGE_MONITOR_LIST_VIEW_ID]),
-            view: "SectionView",
-            viewConfig: {
-                rows: [
-                    {
-                        columns: [
-                            {
-                                elementId: swl.MONITOR_STORAGE_MONITOR_GRID_ID,
-                                title: swl.TITLE_MONITORS,
-                                view: "GridView",
-                                viewConfig: {
-                                    elementConfig: getStorageMonsGridConfig(monitorRemoteConfig, ucid, pagerOptions)
-                                }
-                            }
-                        ]
-                    }
-                ]
+       return {
+            elementId : swl.MONITOR_STORAGE_MONITOR_GRID_ID,
+            title : swl.TITLE_MONITORS,
+            view : "GridView",
+            viewConfig : {
+                elementConfig :
+                    getStorageMonsGridConfig(
+                        monitorRemoteConfig, ucid, pagerOptions)
             }
-        }
+        };
     };
 
     var getStorageMonsGridConfig = function (monitorRemoteConfig, ucid, pagerOptions) {

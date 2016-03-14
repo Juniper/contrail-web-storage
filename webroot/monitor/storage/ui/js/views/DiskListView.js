@@ -5,8 +5,8 @@
 define([
     'underscore',
     'contrail-view',
-    'contrail-list-model'
-], function (_, ContrailView, ContrailListModel) {
+    'monitor-storage-basedir/js/models/DiskListModel'
+], function (_, ContrailView, DiskListModel) {
     var DiskListView = ContrailView.extend({
         el: $(contentContainer),
 
@@ -14,36 +14,8 @@ define([
             var self = this,
                 viewConfig = self.attributes.viewConfig,
                 storageNodeName = viewConfig['storageNode'];
-
-            var listModelConfig = {
-                remote: {
-                    ajaxConfig: {
-                        url: storageNodeName != null ? swc.get(swc.URL_STORAGENODE_DISKS, storageNodeName) : swc.URL_DISKS_SUMMARY,
-                        type: "GET"
-                    },
-                    onAllRequestsCompleteCB: function(diskListModel) {
-                        var fetchContrailListModel = new ContrailListModel({
-                            remote : {
-                                ajaxConfig : {
-                                   url: storageNodeName != null ? swc.get(swc.URL_STORAGENODE_DISKS, storageNodeName) : swc.URL_DISKS_SUMMARY + '?forceRefresh',
-                                },
-                                onAllRequestsCompleteCB: function(fetchedDiskListModel) {
-                                    var data = fetchedDiskListModel.getItems();
-                                    diskListModel.setData(data);
-                                },
-                                dataParser: swp.disksDataParser
-                            },
-                        });
-                    },
-                    dataParser: swp.disksDataParser
-                },
-                cacheConfig: {
-                    ucid: storageNodeName != null ? (swc.UCID_PREFIX_MS_LISTS + storageNodeName + ":disks") : swc.UCID_ALL_DISK_LIST
-                }
-            };
-
-            var contrailListModel = new ContrailListModel(listModelConfig);
-            self.renderView4Config(self.$el, contrailListModel, getDiskListViewConfig());
+            var diskListModel = new DiskListModel(storageNodeName);
+            self.renderView4Config(self.$el, diskListModel, getDiskListViewConfig());
         }
     });
 
