@@ -13,42 +13,40 @@ define([
         render: function () {
             var self = this,
                 viewConfig = this.attributes.viewConfig,
+                pagerOptions = viewConfig['pagerOptions'],
                 storageNodeName = viewConfig['storageNode'],
-                pagerOptions = viewConfig['pagerOptions'];
-
-            var diskRemoteConfig = {
-                url: storageNodeName != null ? swc.get(swc.URL_STORAGENODE_DISKS, storageNodeName) : swc.URL_DISKS_SUMMARY,
-                type: 'GET'
-            };
-
-            var ucid = storageNodeName != null ? (swc.UCID_PREFIX_MS_LISTS + storageNodeName + ":disks") : swc.UCID_ALL_DISK_LIST;
-
-            self.renderView4Config(self.$el, self.model, getDisksGridViewConfig(diskRemoteConfig, ucid, pagerOptions));
-
+                diskRemoteConfig = {
+                    url: storageNodeName != null ? swc.get(swc.URL_STORAGENODE_DISKS, storageNodeName) : swc.URL_DISKS_SUMMARY,
+                    type: 'GET'
+                },
+                ucid = storageNodeName != null ? (swc.UCID_PREFIX_MS_LISTS + storageNodeName + ":disks") : swc.UCID_ALL_DISK_LIST;
+            this.renderView4Config(self.$el,
+                self.model,
+                getDisksGridViewConfig(diskRemoteConfig, ucid, pagerOptions),
+                null,
+                null,
+                null,
+                function() {
+                    self.model.onDataUpdate.subscribe(function () {
+                        if($('#'+swl.MONITOR_DISK_GRID_ID).data('contrailGrid')) {
+                            $('#'+swl.MONITOR_DISK_GRID_ID).data('contrailGrid')._grid.invalidate();
+                        }
+                    });
+            });
         }
     });
 
     function getDisksGridViewConfig(diskRemoteConfig, ucid, pagerOptions) {
-        return {
-            elementId: cowu.formatElementId([swl.MONITOR_DISK_LIST_VIEW_ID]),
-            view: "SectionView",
-            viewConfig: {
-                rows: [
-                    {
-                        columns: [
-                            {
-                                elementId: swl.MONITOR_DISK_GRID_ID,
-                                title: swl.TITLE_DISKS,
-                                view: "GridView",
-                                viewConfig: {
-                                    elementConfig: getDisksGridConfig(diskRemoteConfig, ucid, pagerOptions)
-                                }
-                            }
-                        ]
-                    }
-                ]
+         return {
+            elementId : swl.MONITOR_DISK_GRID_ID,
+            title : swl.TITLE_DISKS,
+            view : "GridView",
+            viewConfig : {
+                elementConfig :
+                    getDisksGridConfig(
+                        diskRemoteConfig, ucid, pagerOptions)
             }
-        }
+        };
     };
 
     var getDisksGridConfig = function (diskRemoteConfig, ucid, pagerOptions) {

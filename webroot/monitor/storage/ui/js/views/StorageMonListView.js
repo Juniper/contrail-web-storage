@@ -5,8 +5,8 @@
 define([
     'underscore',
     'contrail-view',
-    'contrail-list-model'
-], function (_, ContrailView, ContrailListModel) {
+    'monitor-storage-basedir/js/models/MonitorListModel'
+], function (_, ContrailView, MonitorListModel) {
     var StorageMonListView = ContrailView.extend({
         el: $(contentContainer),
 
@@ -14,22 +14,8 @@ define([
             var self = this,
                 viewConfig = self.attributes.viewConfig,
                 storageNodeName = viewConfig['storageNode'];
-
-            var listModelConfig = {
-                remote: {
-                    ajaxConfig: {
-                        url: storageNodeName != null ? swc.get(swc.URL_STORAGENODE_MONITOR_DETAILS, storageNodeName) : swc.URL_STORAGENODE_MONITORS_SUMMARY,
-                        type: "GET"
-                    },
-                    dataParser: swp.storageMonitorsDataParser
-                },
-                cacheConfig: {
-                    ucid: storageNodeName != null ? (swc.UCID_PREFIX_MS_LISTS + storageNodeName + ":monitor") : swc.UCID_ALL_MONITOR_LIST
-                }
-            };
-
-            var contrailListModel = new ContrailListModel(listModelConfig);
-            self.renderView4Config(self.$el, contrailListModel, getStorageMonListViewConfig());
+            var monListModel = new MonitorListModel(storageNodeName);
+            self.renderView4Config(self.$el, monListModel, getStorageMonListViewConfig());
         }
     });
 
@@ -100,7 +86,7 @@ function getStorageMonitorTooltipConfig(data) {
             type: swl.TITLE_CHART_ELEMENT_STORAGENODE_MONITOR
         },
         content: {
-            iconClass: 'icon-contrail-storage-node',
+            iconClass: false,
             info: [
                 {label: 'Available', value: data['avail_percent']},
                 {label: 'Latency', value: data['latency']},

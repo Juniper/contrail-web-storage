@@ -131,7 +131,7 @@ define(['underscore'], function (_) {
                     type: swl.TITLE_CHART_ELEMENT_DISK
                 },
                 content: {
-                    iconClass: 'icon-contrail-storage-disk',
+                    iconClass: false,
                     info: [
                         {label: 'Total', value: data['total']},
                         {label: 'Used', value: data['used']},
@@ -147,6 +147,7 @@ define(['underscore'], function (_) {
                         }
                     ]
                 },
+                delay : cowc.TOOLTIP_DELAY,
                 dimension: {
                     width: 350
                 }

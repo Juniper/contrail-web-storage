@@ -5,31 +5,17 @@
 define([
     'underscore',
     'contrail-view',
-    'contrail-list-model'
-], function (_, ContrailView, ContrailListModel) {
+    'monitor-storage-basedir/js/models/PoolListModel'
+], function (_, ContrailView, PoolListModel) {
     var PoolListView = ContrailView.extend({
         el: $(contentContainer),
 
         render: function () {
             var self = this,
                 viewConfig = self.attributes.viewConfig,
-                poolName = viewConfig['pool'];
-
-            var listModelConfig = {
-                remote: {
-                    ajaxConfig: {
-                        url: poolName != null ? swc.get(swc.URL_POOL_DETAILS, poolName) : swc.URL_POOLS_SUMMARY,
-                        type: "GET"
-                    },
-                    dataParser: swp.poolsDataParser
-                },
-                cacheConfig: {
-                    ucid: poolName != null ? (swc.UCID_PREFIX_MS_LISTS + poolName + ":pool") : swc.UCID_ALL_POOL_LIST
-                }
-            };
-
-            var contrailListModel = new ContrailListModel(listModelConfig);
-            self.renderView4Config(self.$el, contrailListModel, getPoolListViewConfig());
+                poolName = viewConfig['pool'],
+                poolListModel = new PoolListModel(poolName);
+                self.renderView4Config(self.$el, poolListModel, getPoolListViewConfig());
         }
     });
 
@@ -105,7 +91,7 @@ define([
                 type: swl.TITLE_CHART_ELEMENT_POOL
             },
             content: {
-                iconClass: 'icon-contrail-storage-pool',
+                iconClass: false,
                 info: [
                     {label: 'Used', value: data['used']},
                     {label: 'Max Available', value: data['max_avail']},

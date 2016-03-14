@@ -2,32 +2,17 @@
  * Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
  */
 
-define([
-    'underscore',
-    'contrail-view',
-    'contrail-list-model'
-], function (_, ContrailView, ContrailListModel) {
+define(
+    ['underscore', 'contrail-view', 'storage-dashboard-model'],
+    function(_, ContrailView, StorageDashboardListModel) {
     var StorageNodeListView = ContrailView.extend({
         el: $(contentContainer),
 
         render: function () {
             var self = this, viewConfig = this.attributes.viewConfig;
 
-            var listModelConfig = {
-                remote: {
-                    ajaxConfig: {
-                        url: swc.get(swc.URL_STORAGENODES_SUMMARY),
-                        type: "GET"
-                    },
-                    dataParser: swp.storagenodeDataParser
-                },
-                cacheConfig: {
-                    ucid: swc.UCID_ALL_STORAGENODE_LIST
-                }
-            };
-
-            var contrailListModel = new ContrailListModel(listModelConfig);
-            self.renderView4Config(this.$el, contrailListModel, getStorageNodeListViewConfig());
+          var sDashBoardListModel = new StorageDashboardListModel();
+            self.renderView4Config(this.$el, sDashBoardListModel, getStorageNodeListViewConfig());
         }
     });
 
@@ -103,7 +88,7 @@ define([
                 type: swl.TITLE_CHART_ELEMENT_STORAGENODE
             },
             content: {
-                iconClass: 'icon-contrail-storage-node',
+                iconClass: false,
                 info: [
                     {label:'Disk Count', value: data['osds'].length},
                     {label:'Available', value: data['osds_available']},

@@ -13,39 +13,38 @@ define([
             var self = this,
                 viewConfig = self.attributes.viewConfig,
                 pagerOptions = viewConfig['pagerOptions'],
-                ucid = swc.UCID_ALL_STORAGENODE_LIST;
-
-            var storageNodesRemoteConfig = {
-                url: swc.get(swc.URL_STORAGENODES_SUMMARY),
-                type: "GET"
-            };
-
-            self.renderView4Config(self.$el, self.model, getStorageNodeGridViewConfig(storageNodesRemoteConfig, ucid, pagerOptions));
+                ucid = swc.UCID_ALL_STORAGENODE_LIST,
+                storageNodesRemoteConfig = {
+                    url: swc.get(swc.URL_STORAGENODES_SUMMARY),
+                    type: "GET"
+                };
+            this.renderView4Config(self.$el,
+                self.model,
+                getStorageNodeGridViewConfig(storageNodesRemoteConfig, ucid, pagerOptions),
+                null,
+                null,
+                null,
+                function() {
+                    self.model.onDataUpdate.subscribe(function () {
+                        if($('#'+swl.STORAGENODES_GRID_ID).data('contrailGrid')) {
+                            $('#'+swl.STORAGENODES_GRID_ID).data('contrailGrid')._grid.invalidate();
+                        }
+                    });
+            });
         }
     });
 
     var getStorageNodeGridViewConfig = function (storagenodesRemoteConfig, ucid, pagerOptions) {
         return {
-            elementId: cowu.formatElementId([swl.MONITOR_STORAGENODE_LIST_VIEW_ID]),
-            view: "SectionView",
-            viewConfig: {
-                rows: [
-                    {
-                        columns: [
-                            {
-                                elementId: swl.STORAGENODES_GRID_ID,
-                                title: swl.TITLE_STORAGENODES_SUMMARY,
-                                view: "GridView",
-                                viewConfig: {
-                                    elementConfig: getStorageNodeGridConfig(storagenodesRemoteConfig, ucid, pagerOptions)
-                                }
-                            }
-                        ]
-                    }
-                ]
+            elementId : swl.STORAGENODES_GRID_ID,
+            title : swl.TITLE_STORAGENODES_SUMMARY,
+            view : "GridView",
+            viewConfig : {
+                elementConfig :
+                    getStorageNodeGridConfig(
+                        storagenodesRemoteConfig, ucid, pagerOptions)
             }
-        }
-
+        };
     };
 
     var getStorageNodeGridConfig = function (storageNodesRemoteConfig, ucid, pagerOptions) {
