@@ -32,29 +32,32 @@ module.exports = function (grunt) {
         {pattern: 'contrail-web-core/webroot/css/**/*.gif', included: false},
         {pattern: 'contrail-web-core/webroot/assets/**/*.map', included: false},
 
+        {pattern: 'contrail-web-core/webroot/js/**/*.js', included: false},
+        {pattern: 'contrail-web-core/webroot/built/js/**/*.js', included: false},
+        {pattern: 'contrail-web-core/webroot/templates/*.tmpl', included: false},
+
         //Everything except library test suites and test files.
         {pattern: 'contrail-web-core/webroot/test/ui/js/**/{!(*.test.js), !(*.lib.test.suite.js)}', included: false},
 
         {pattern: 'contrail-web-storage/webroot/test/ui/strg.test.app.js'},
         {pattern: 'contrail-web-storage/webroot/test/ui/*.js', included: false},
+
         {pattern: 'contrail-web-storage/webroot/common/ui/templates/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/common/**/*.js', included: false},
 
         //For built dir
         {pattern: 'contrail-web-storage/webroot/built/common/ui/templates/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/built/common/**/{!(*.test.js), !(*.unit.test.js)}', included: false},
-
         {pattern: 'contrail-web-storage/webroot/built/**/ui/js/**/*.js', included: false},
+
         {pattern: 'contrail-web-storage/webroot/monitor/infrastructure/ui/js/**/*.js', included: false},
-        {pattern: 'contrail-web-storage/webroot/monitor/infrastructure/ui/js/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js', included: false},
+
 
         {pattern: 'contrail-web-storage/webroot/*.xml', included: false},
         {pattern: 'contrail-web-storage/webroot/common/ui/css/*.css', included: false},
 
-        {pattern: 'contrail-web-core/webroot/js/**/*.js', included: false},
-        {pattern: 'contrail-web-core/webroot/built/js/**/*.js', included: false},
-        {pattern: 'contrail-web-core/webroot/templates/*.tmpl', included: false},
+
 
         {pattern: 'contrail-web-storage/webroot/**/test/**/*.mock.data.js', included: false},
         {pattern: 'contrail-web-storage/webroot/**/test/**/*.unit.test.suite.js', included: false}
@@ -344,7 +347,7 @@ module.exports = function (grunt) {
             files: [],
             preprocessors: {
                 'contrail-web-core/webroot/js/**/*.js': ['coverage'],
-                'contrail-web-storage/webroot/monitor/**/ui/js/**/*.js': ['coverage']
+                'contrail-web-storage/webroot/**/ui/js/**/*.js': ['coverage']
             },
             junitReporter: {
                 outputDir: __dirname + '/reports/tests/',
@@ -356,9 +359,18 @@ module.exports = function (grunt) {
                 outputFile: __dirname + '/reports/tests/web-storage-test-results.html'
             },
             coverageReporter: {
-                type: 'html',
-                dir: __dirname + '/reports/coverage/webStorage/',
-                subdir: browserSubdirFn
+                reporters: [
+                    {
+                        type: 'html',
+                        dir: __dirname + '/reports/coverage/webStorage/',
+                        subdir: browserSubdirFn
+                    },
+                    {
+                        type: 'cobertura',
+                        dir: __dirname + '/reports/coverage/webStorage/',
+                        subdir: browserSubdirFn
+                    }
+                ]
             }
         }
     };

@@ -141,11 +141,6 @@
 
 
 
-.node use {
-    fill: #fff;
-    opacity: 1;
-    cursor: pointer;
-}
 .node-root {
     stroke: steelblue;
     stroke-width: 1.5px;
@@ -155,9 +150,15 @@
     stroke-width: 1.5px;
 }
 
+/*
 .node {
     font: 10px Open Sans;
 }
+.node use {
+    fill: #fff;
+    opacity: 1;
+    cursor: pointer;
+} */
 
 .link {
     fill: none;
