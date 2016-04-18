@@ -139,13 +139,6 @@
     padding-top: 15px;
 }
 
-
-
-.node use {
-    fill: #fff;
-    opacity: 1;
-    cursor: pointer;
-}
 .node-root {
     stroke: steelblue;
     stroke-width: 1.5px;
@@ -155,9 +148,16 @@
     stroke-width: 1.5px;
 }
 
+/*
+.node use {
+    fill: #fff;
+    opacity: 1;
+    cursor: pointer;
+}
 .node {
     font: 10px Open Sans;
 }
+*/
 
 .link {
     fill: none;
