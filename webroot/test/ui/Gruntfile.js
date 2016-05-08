@@ -13,7 +13,7 @@ module.exports = function (grunt) {
 
     var commonFiles = [
         {pattern: 'contrail-web-core/webroot/assets/**/!(tests)/*.js', included: false},
-        {pattern: 'contrail-web-core/webroot/built/assets/**/!(tests)/*.js', included: false},
+        {pattern: 'contrail-web-core/webroot/dist/assets/**/!(tests)/*.js', included: false},
 
         {pattern: 'contrail-web-core/webroot/assets/**/*.css', included: false},
         {pattern: 'contrail-web-core/webroot/css/**/*.css', included: false},
@@ -33,7 +33,7 @@ module.exports = function (grunt) {
         {pattern: 'contrail-web-core/webroot/assets/**/*.map', included: false},
 
         {pattern: 'contrail-web-core/webroot/js/**/*.js', included: false},
-        {pattern: 'contrail-web-core/webroot/built/js/**/*.js', included: false},
+        {pattern: 'contrail-web-core/webroot/dist/js/**/*.js', included: false},
         {pattern: 'contrail-web-core/webroot/templates/*.tmpl', included: false},
 
         //Everything except library test suites and test files.
@@ -45,10 +45,10 @@ module.exports = function (grunt) {
         {pattern: 'contrail-web-storage/webroot/common/ui/templates/*.tmpl', included: false},
         {pattern: 'contrail-web-storage/webroot/common/**/*.js', included: false},
 
-        //For built dir
-        {pattern: 'contrail-web-storage/webroot/built/common/ui/templates/*.tmpl', included: false},
-        {pattern: 'contrail-web-storage/webroot/built/common/**/{!(*.test.js), !(*.unit.test.js)}', included: false},
-        {pattern: 'contrail-web-storage/webroot/built/**/ui/js/**/*.js', included: false},
+        //For dist dir
+        {pattern: 'contrail-web-storage/webroot/dist/common/ui/templates/*.tmpl', included: false},
+        {pattern: 'contrail-web-storage/webroot/dist/common/**/{!(*.test.js), !(*.unit.test.js)}', included: false},
+        {pattern: 'contrail-web-storage/webroot/dist/**/ui/js/**/*.js', included: false},
 
         {pattern: 'contrail-web-storage/webroot/monitor/infrastructure/ui/js/**/*.js', included: false},
         {pattern: 'contrail-web-storage/webroot/monitor/storage/ui/js/**/*.js', included: false},
