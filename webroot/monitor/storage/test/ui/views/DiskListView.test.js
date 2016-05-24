@@ -2,6 +2,7 @@
  * Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
  */
 define([
+    'co-test-constants',
     'co-test-runner',
     'strg-test-utils',
     'strg-test-messages',
@@ -10,7 +11,7 @@ define([
     'co-grid-view-test-suite',
     'co-chart-view-zoom-scatter-test-suite',
     'strg-disks-list-view-custom-test-suite'
-], function (CUnit, stu, stm, TestMockdata, GridListModelTestSuite, GridViewTestSuite, ZoomScatterChartTestSuite, 
+], function (cotc, CUnit, stu, stm, TestMockdata, GridListModelTestSuite, GridViewTestSuite, ZoomScatterChartTestSuite, 
     CustomTestSuite) {
 
     var moduleId = stm.STORAGE_DISK_LIST_VIEW_COMMON_TEST_MODULE;

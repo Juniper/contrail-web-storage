@@ -2,6 +2,7 @@
  * Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
  */
 define([
+    'co-test-constants',
     'co-test-runner',
     'strg-test-utils',
     'strg-test-messages',
@@ -12,7 +13,7 @@ define([
     'co-chart-view-line-test-suite',
     'strg-dashboard-piechart-custom-test-suite',
     'strg-dashboard-cluster-status-custom-test-suite'
-], function (CUnit, stu, stm, TestMockdata, GridListModelTestSuite, GridViewTestSuite, LineWithFocusBarChartViewTestSuite, 
+], function (cotc, CUnit, stu, stm, TestMockdata, GridListModelTestSuite, GridViewTestSuite, LineWithFocusBarChartViewTestSuite, 
     LineWithFocusChartViewTestSuite, CustomTestSuite1, CustomTestSuite2) {
 
     var moduleId = stm.STORAGE_DASHBOARD_COMMON_TEST_MODULE;
