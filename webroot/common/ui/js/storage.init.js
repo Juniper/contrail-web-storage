@@ -26,7 +26,7 @@ define([
     swdt = new DetailTemplates();
     sInitComplete = true;
 
-    var deferredObj = contentHandler.initFeatureAppDefObjMap[FEATURE_PCK_WEB_STORAGE];
+    var deferredObj = globalObj['initFeatureAppDefObjMap'][FEATURE_PCK_WEB_STORAGE];
 
     if(contrail.checkIfExist(deferredObj)) {
         deferredObj.resolve()
