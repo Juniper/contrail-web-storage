@@ -52,7 +52,8 @@ function getStorageAppPaths (strgBaseDir, strgBuildDir) {
         'mon-infra-storage-dashboard': strgWebDir + '/monitor/infrastructure/ui/js/views/MonitorInfraStorageView',
         'storage-dashboard-model': strgWebDir + '/monitor/infrastructure/ui/js/model/StorageDashboardListModel',
         'storage-node-scatter-chart-view': strgWebDir + '/monitor/infrastructure/ui/js/views/StorageNodeScatterChartView',
-        'storage-bar-chart-info-view': strgWebDir + '/monitor/infrastructure/ui/js/views/StorageBarChartInfoView'
+        'storage-bar-chart-info-view': strgWebDir + '/monitor/infrastructure/ui/js/views/StorageBarChartInfoView',
+        'storage-alerts-grid-view': strgWebDir + '/monitor/storage/ui/js/views/StorageAlertGridView'
     };
 }
 

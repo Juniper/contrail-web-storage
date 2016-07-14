@@ -2,7 +2,8 @@
  * Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
  */
 
-define(['underscore'], function (_) {
+define(['underscore',
+    'contrail-list-model'], function (_,ContrailListModel) {
     var SUtils = function () {
         var self = this;
 
@@ -299,27 +300,31 @@ define(['underscore'], function (_) {
         };
 
         self.showStorageAlertsPopup = function (alerts) {
-
-            if (! globalObj['dataSources'].hasOwnProperty('alertsDS')) {
-                globalObj['dataSources']['alertsDS'] = {
-                    dataSource: new ContrailDataView(),
-                    //depends: ['storageNodeDS'],
-                    deferredObj: $.Deferred()
-                };
-            }
-            var alertsDS = globalObj['dataSources']['alertsDS'];
-
-            /*
-             * will create alerts only from cluster health. will not append to existing msgs.
-             */
-            /*
-             var origAlerts = alertsDS['dataSource'].getItems();
-             $.each(alerts, function(idx, alert) {
-                origAlerts.push(alert);
-             });
-             */
-            alertsDS['dataSource'].setData(alerts);
-            loadAlertsContent();
+            var prefixId = 'dashboard-alerts';
+            var cfgObj = ifNull(cfgObj,{});
+            var modalTemplate =
+                contrail.getTemplate4Id('core-modal-template');
+            var modalId = 'dashboard-alerts-modal';
+            var modalLayout = modalTemplate({prefixId: prefixId, modalId: modalId});
+            var formId = prefixId + '_modal';
+            var modalConfig = {
+                    'modalId': modalId,
+                    'className': 'modal-840',
+                    'body': modalLayout,
+                    'title': 'Cluster Health',
+                    'onCancel': function() {
+                        $("#" + modalId).modal('hide');
+                    }
+                }
+            var alertListModel = new ContrailListModel({data:alerts});
+            cowu.createModal(modalConfig);
+            require(['storage-alerts-grid-view'], function(StroageAlertsGridView) {
+                        var alertGridView = new StroageAlertsGridView({
+                            el:$("#" + modalId).find('#' + formId),
+                            model: alertListModel
+                        });
+                        alertGridView.render();
+                    });
         };
 
         self.byteToGB = function (bytes) {
