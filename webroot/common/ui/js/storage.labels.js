@@ -143,7 +143,7 @@ define([
         this.TITLE_POOL_DETAILS = "Pool Details";
         this.TITLE_POOL_STATS = "Pool Stats";
 
-        this.TITLE_CLUSTER_USAGE = "Cluster Usage";
+        this.TITLE_CLUSTER_USAGE = "Cluster Storage Usage";
         this.TITLE_CLUSTER_CEPH_THROUGHPUT = "Ceph Throughput";
         this.TITLE_CLUSTER_CEPH_LATENCY = "Ceph Latency";
         this.TITLE_CLUSTER_RAW_DISK_THROUGHPUT = "Raw Disk Throughput";
@@ -178,7 +178,7 @@ define([
 
         this.CLUSTER_STATUS_ID = "cluster-status";
         this.TITLE_CLUSTER_STATUS = "Cluster Status";
-         this.TITLE_CLUSTER_HEALTH = "Cluster Health";
+         this.TITLE_CLUSTER_HEALTH = "Cluster Storage Health";
 
         this.CLUSTER_DISK_ACTIVITY_STATS_ID = "cluster-disk-activity-stats";
         this.CLUSTER_DISK_ACTIVITY_STATS_TAB_ID = "cluster-disk-activity-stats-tab";
