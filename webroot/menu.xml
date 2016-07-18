@@ -31,7 +31,7 @@ and need to add the iconClass tag wherever we need to show some icons
                      <iconClass>icon-desktop</iconClass>
                      <access>
                         <roles>
-                            <role>superAdmin</role>
+                            <role>cloudAdmin</role>
                         </roles>
                         <orchModels>
                             <model>openstack</model>
