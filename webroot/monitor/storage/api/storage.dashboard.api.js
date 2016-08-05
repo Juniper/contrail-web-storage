@@ -225,7 +225,7 @@ function getStorageClusterCephActivity(req, res,appData){
             delete queryJSON['dir'];
             var selectEleCnt = queryJSON['select_fields'].length;
             queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-            stMonUtils.executeQueryString(queryJSON,
+            stMonUtils.executeQueryString(queryJSON, appData,
                 commonUtils.doEnsureExecution(function (err, resultJSON) {
                     resultJSON = parseStorageClusterOSDActivityData(resultJSON, timeObj, timeGran, sourceJSON, intervalSecs);
                     commonUtils.handleJSONResponse(err, res, resultJSON);
@@ -283,7 +283,7 @@ function getStorageClusterRawDiskActivity(req, res,appData){
             delete queryJSON['dir'];
             var selectEleCnt = queryJSON['select_fields'].length;
             queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-            stMonUtils.executeQueryString(queryJSON,
+            stMonUtils.executeQueryString(queryJSON, appData,
                 commonUtils.doEnsureExecution(function (err, resultJSON) {
                     resultJSON = parseStorageClusterOSDActivityData(resultJSON, timeObj, timeGran, sourceJSON, intervalSecs);
                     commonUtils.handleJSONResponse(err, res, resultJSON);
@@ -421,7 +421,7 @@ function getStorageClusterPoolActivity(req, res,appData){
         delete queryJSON['dir'];
         var selectEleCnt = queryJSON['select_fields'].length;
         queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-        stMonUtils.executeQueryString(queryJSON,
+        stMonUtils.executeQueryString(queryJSON, appData,
             commonUtils.doEnsureExecution(function (err, resultJSON) {
                 resultJSON = parseStorageClusterPoolActivityData(resultJSON, timeObj, timeGran, sourceJSON, intervalSecs);
                 commonUtils.handleJSONResponse(err, res, resultJSON);

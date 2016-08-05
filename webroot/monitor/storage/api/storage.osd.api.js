@@ -425,7 +425,7 @@ function getStorageOSDFlowSeries (req, res, appData) {
     delete queryJSON['dir'];
     var selectEleCnt = queryJSON['select_fields'].length;
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-    stMonUtils.executeQueryString(queryJSON,
+    stMonUtils.executeQueryString(queryJSON, appData,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
             resultJSON= formatFlowSeriesForOsdStats(resultJSON, timeObj, timeGran,osdName);
             commonUtils.handleJSONResponse(err, res, resultJSON);
@@ -480,7 +480,7 @@ function getStorageOsdDiskFlowSeries (req, res, appData) {
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
     console.log("............."+queryJSON);
 
-    stMonUtils.executeQueryString(queryJSON,
+    stMonUtils.executeQueryString(queryJSON, appData,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
             resultJSON= formatFlowSeriesForOsdStats(resultJSON, timeObj, timeGran,osdName);
             commonUtils.handleJSONResponse(err, res, resultJSON);
@@ -573,7 +573,7 @@ function parseStorageOSDAvgBW(osdName, source, callback){
     delete queryJSON['dir'];
     var selectEleCnt = queryJSON['select_fields'].length;
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-    stMonUtils.executeQueryString(queryJSON,
+    stMonUtils.executeQueryString(queryJSON, appData,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
             if(resultJSON !== 'undefined' && typeof resultJSON['value'] !== "undefined") {
                 resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
@@ -704,7 +704,7 @@ function postParseStorageOSDAvgBW(callback){
                 var selectEleCnt = queryJSON['select_fields'].length;
                 queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
                 queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-                stMonUtils.executeQueryString(queryJSON,
+                stMonUtils.executeQueryString(queryJSON, appData,
                 commonUtils.doEnsureExecution(function(err, resultJSON)  {
                     if(resultJSON !== 'undefined' && typeof resultJSON['value'] !== "undefined") {
                         resultJSON = formatOsdAvgBWLoadXMLData(resultJSON);
