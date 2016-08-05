@@ -17,7 +17,7 @@ var commonUtils = require(process.mainModule.exports["corePath"]  + '/src/server
 
 function processStorageSummaryRequestByJob(pubChannel, saveChannelKey, jobData, done){
     storageCommon.processStorageTopologyRawList(null, jobData, function(error,res,data){
-        infraApi.parseStorageTopologyTree(data, function(resultJSON){
+        infraApi.parseStorageTopologyTree(data, jobData, function(resultJSON){
             if (null != error) {
                 redisPub.publishDataToRedis(pubChannel, saveChannelKey,
                     global.HTTP_STATUS_INTERNAL_ERROR,

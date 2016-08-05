@@ -11,7 +11,9 @@ var cacheApi = require(process.mainModule.exports["corePath"] +
     global = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/global'),
     config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
     logutils = require(process.mainModule.exports["corePath"] + '/src/serverroot/utils/log.utils'),
-    opApiServer = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/opServer.api'),
+   // opApiServer = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/opServer.api'),
+    opApiServer = require(process.mainModule.exports["corePath"] +
+                          '/src/serverroot/common/opServer.api'),
     stMonUtils= require('../../../common/utils/storage.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
     async = require('async'),
@@ -104,7 +106,7 @@ function getStorageOSDsSummary (req, res, appData) {
 }
 
 
-function parseStorageOSDSummary(osdJSON, callback){
+function parseStorageOSDSummary(osdJSON, appData, callback){
     var emptyObj = {};  
     var osdList={};
     var osdPG= osdJSON[0];
@@ -119,7 +121,7 @@ function parseStorageOSDSummary(osdJSON, callback){
         osds=parseOSDFromTree(osdDump,tOSDs);
         parseOSDFromPG(osds,osdPG);
         appendHostToOSD(osds,hostMap);
-        getAvgBWHostToOSD(osds,hostMap, function(osds){
+        getAvgBWHostToOSD(osds,hostMap, appData, function(osds){
             osdMapJSON["osds"]= osds;
             osdList= osdMapJSON;
             callback(osdList);
@@ -295,8 +297,8 @@ function parseHostFromOSD(hostJSON,osdsJSON, version, treeReplace) {
 
 
 
-function getAvgBWHostToOSD(osds,hostJSON, callback){
-    postParseStorageOSDAvgBW(function(resultJSON){
+function getAvgBWHostToOSD(osds,hostJSON, appData, callback){
+    postParseStorageOSDAvgBW(appData, function(resultJSON){
         var hstCnt= hostJSON.length;
         for(i=0;i< hstCnt;i++){
             var cldCnt= hostJSON[i].children.length;
@@ -650,16 +652,16 @@ function formatOsdAvgBWLoadXMLData(resultJSON){
     }
 }
 
-function getStorageOsdsUVEsList (req, res){
-    postParseStorageOSDAvgBW(function(resultJSON){
+function getStorageOsdsUVEsList (req, res, appData){
+    postParseStorageOSDAvgBW(appData, function(resultJSON){
             commonUtils.handleJSONResponse(null, res, resultJSON);
         });
 }
-function processStorgaeOsdsNames(callback){
-     var results = [];
+function processStorageOsdsNames(appData,callback){
+    var results = [];
     var url = '/analytics/uves/storage-osds';
 
-    opServer.api.get(url, function(err, data) {
+    opApiServer.apiGet(url, appData, function(err, data) {
         if (err || (null == data)) {
             callback(results)
         } else {
@@ -678,7 +680,7 @@ function createClause(fieldName, fieldValue, operator){
     return whereClause;
 }
 
-function postParseStorageOSDAvgBW(callback){
+function postParseStorageOSDAvgBW(appData, callback){
     var sampleCnt = 10, minsSince = 30, endTime ='now';
     var intervalSecs = 3600;
     var emptyObj = {};
@@ -688,7 +690,7 @@ function postParseStorageOSDAvgBW(callback){
             "SUM(info_stats.write_kbytes)", "SUM(info_stats.op_r_latency)", "SUM(info_stats.op_w_latency)", "COUNT(info_stats)" ];
 
     tableName = 'StatTable.ComputeStorageOsd.info_stats';
-    processStorgaeOsdsNames(function(sourceJSON){
+    processStorageOsdsNames(appData, function(sourceJSON){
             if (sourceJSON != undefined && sourceJSON.length > 0) {
                 var count = sourceJSON.length;
                 for (i = 0; i < count; i += 1) {

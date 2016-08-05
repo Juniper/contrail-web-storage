@@ -73,7 +73,7 @@ function parseStorageTopologyDetails(req, res, resultJSON){
     commonUtils.handleJSONResponse(null, res, hJSON);
 }
 
-function parseStorageTopologyTree(osdJSON, callback){
+function parseStorageTopologyTree(osdJSON, appData, callback){
     var osdList={};
     var osdPG= osdJSON[0];
     var osdTree= osdJSON[1];
@@ -122,7 +122,7 @@ function parseStorageTopologyTree(osdJSON, callback){
             }
             osdApi.parseOSDFromPG(osds, osdPG);
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
-            osdApi.getAvgBWHostToOSD(osds,hostMap, function(osds){
+            osdApi.getAvgBWHostToOSD(osds,hostMap, appData, function(osds){
                 hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
                 var treeList ={};
                 treeList= parseRootFromHost(rootMap, hostMap);

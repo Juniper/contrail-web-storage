@@ -13,7 +13,7 @@ var util = require('util'),
 
 function processStorageOSDsSummaryRequestByJob(pubChannel, saveChannelKey, jobData, done){
    storageCommon.processStorageTopologyRawList(null, jobData, function(error,res,data){
-        osdApi.parseStorageOSDSummary(data, function(resultJSON){
+        osdApi.parseStorageOSDSummary(data, jobData, function(resultJSON){
             if (null != error) {
                 redisPub.publishDataToRedis(pubChannel, saveChannelKey,
                     global.HTTP_STATUS_INTERNAL_ERROR,
