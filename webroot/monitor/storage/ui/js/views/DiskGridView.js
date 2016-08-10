@@ -104,7 +104,7 @@ define([
                         templateGeneratorConfig: {
                             columns: [
                                 {
-                                    class: 'span6',
+                                    class: 'col-xs-6',
                                     rows: [
                                         {
                                             title: swl.TITLE_DISK_DETAILS,
@@ -147,7 +147,7 @@ define([
                                     ]
                                 },
                                 {
-                                    class: 'span6',
+                                    class: 'col-xs-6',
                                     rows: [
                                         {
                                             title: swl.TITLE_DISK_USAGE,

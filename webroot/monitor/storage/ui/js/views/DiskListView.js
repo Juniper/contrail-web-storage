@@ -131,21 +131,21 @@ define([
                     items: [
                         {
                             text: 'Up & In',
-                            labelCssClass: 'icon-circle okay',
+                            labelCssClass: 'fa fa-circle okay',
                             events: {
                                 click: function (event) {}
                             }
                         },
                         {
                             text: 'Up & Out',
-                            labelCssClass: 'icon-circle medium',
+                            labelCssClass: 'fa fa-circle medium',
                             events: {
                                 click: function (event) {}
                             }
                         },
                         {
                             text: 'Down',
-                            labelCssClass: 'icon-circle error',
+                            labelCssClass: 'fa fa-circle error',
                             events: {
                                 click: function (event) {}
                             }
@@ -158,7 +158,7 @@ define([
                     items: [
                         {
                             text: 'Total Disk Memory',
-                            labelCssClass: 'icon-circle',
+                            labelCssClass: 'fa fa-circle',
                             events: {
                                 click: function (event) {}
                             }

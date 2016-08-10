@@ -19,7 +19,7 @@ and need to add the iconClass tag wherever we need to show some icons
                     <template>storage.tmpl</template>
                 </resource>
             </resources>
-            <iconClass>icon-bar-chart</iconClass>
+            <iconClass>fa fa-bar-chart-o</iconClass>
             <items>
                 <item>
                     <label>Infrastructure</label>
@@ -28,7 +28,7 @@ and need to add the iconClass tag wherever we need to show some icons
                             <rootDir>/monitor/infrastructure/ui</rootDir>
                         </resource>
                     </resources>
-                     <iconClass>icon-desktop</iconClass>
+                     <iconClass>fa fa-desktop</iconClass>
                      <access>
                         <roles>
                             <role>cloudAdmin</role>
@@ -89,7 +89,7 @@ and need to add the iconClass tag wherever we need to show some icons
                 </item>
                 <item>
                     <label>Storage</label>
-                    <iconClass>icon-tasks</iconClass>
+                    <iconClass>menu-icon fa fa-tasks</iconClass>
                     <resources>
                         <resource>
                             <rootDir>/common/ui</rootDir>
@@ -179,19 +179,19 @@ and need to add the iconClass tag wherever we need to show some icons
         <item>
             <name>configure</name>
             <label>Configure</label>
-            <iconClass>icon-wrench</iconClass>
+            <iconClass>fa fa-wrench</iconClass>
             <items></items>
         </item>
         <item>
             <label>Setting</label>
             <name>setting</name>
-            <iconClass>icon-cog</iconClass>
+            <iconClass>fa fa-cog</iconClass>
             <items></items>
         </item>
         <item>
             <label>Query</label>
             <name>query</name>
-            <iconClass>icon-search</iconClass>
+            <iconClass>fa fa-search</iconClass>
             <items></items>
         </item>
     </items>

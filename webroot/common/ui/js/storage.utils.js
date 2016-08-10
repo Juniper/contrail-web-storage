@@ -48,15 +48,15 @@ define(['underscore',
         self.getHealthIconClass = function (status) {
             var labelClass;
             if (status == 'OK')
-                labelClass = "icon-arrow-up";
+                labelClass = "fa fa-arrow-up";
             else if (status == 'WARN' || status == 'CRITICAL')
-                labelClass = "icon-warning-sign";
+                labelClass = "fa fa-exclamation-triangle";
             else if (status == 'DOWN')
-                labelClass = "icon-arrow-down";
+                labelClass = "fa fa-arrow-down";
             else if (status == 'CLUSTER IDLE')
-                labelClass = "icon-info-sign";
+                labelClass = "fa fa-info-circle";
             else {
-                labelClass = "icon-pause";
+                labelClass = "fa fa-pause";
             }
             return labelClass;
         };
@@ -143,7 +143,7 @@ define(['underscore',
                         {
                             type: 'link',
                             text: 'View',
-                            iconClass: 'icon-external-link',
+                            iconClass: 'fa fa-external-link',
                             callback: obj.actions.linkCallbackFn
                         }
                     ]

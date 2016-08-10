@@ -108,7 +108,7 @@ define(
                             title: swl.STORAGENODE_SUMMARY_TITLE,
                             view: "StorageNodeScatterChartView",
                             viewConfig : {
-                                // class: 'span9'
+                                // class: 'col-xs-9'
                                 'margin-left': '160px'
                             },
                              viewPathPrefix: "monitor/infrastructure/" +

@@ -58,7 +58,7 @@ define([
                                 view: "LineBarWithFocusChartView",
                                 title: swl.TITLE_DISK_ACTIVITY_THRPT_STATS,
                                 viewConfig: {
-                                    class: 'span6',
+                                    class: 'col-xs-6',
                                     widgetConfig: {
                                         elementId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID + '-widget',
                                         view: "WidgetView",
@@ -97,7 +97,7 @@ define([
                                 title: swl.TITLE_DISK_ACTIVITY_LATENCY_STATS,
                                 view: "LineWithFocusChartView",
                                 viewConfig: {
-                                    class: 'span6',
+                                    class: 'col-xs-6',
                                     widgetConfig: {
                                         elementId: swl.DISK_ACTIVITY_LATENCY_CHART_ID + '-widget',
                                         view: "WidgetView",

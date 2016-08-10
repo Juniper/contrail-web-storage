@@ -162,7 +162,7 @@ define([
                                             title: swl.TITLE_DISK_DETAILS,
                                             view: "DetailsView",
                                             viewConfig: {
-                                                class: 'span6',
+                                                class: 'col-xs-6',
                                                 ajaxConfig: {
                                                     url: swc.get(swc.URL_DISK_DETAILS, options.disk),
                                                     type: 'GET'
@@ -179,7 +179,7 @@ define([
                                             title: swl.TITLE_DISK_DETAILS,
                                             view: "DetailsView",
                                             viewConfig: {
-                                                class: 'span6',
+                                                class: 'col-xs-6',
                                                 ajaxConfig: {
                                                     url: swc.get(swc.URL_DISK_DETAILS, options.disk),
                                                     type: 'GET'

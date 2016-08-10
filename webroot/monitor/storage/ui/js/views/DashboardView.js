@@ -32,7 +32,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     elementId: swl.CLUSTER_STATUS_ID+ '-rtd',
                                                     view: "DetailsView",
                                                     viewConfig: {
-                                                        class: 'span3',
+                                                        class: 'col-xs-3',
                                                         templateConfig: swdt.getClusterStausDetailTemplate(cowc.THEME_DETAIL_WIDGET, null),
                                                         app: cowc.APP_CONTRAIL_STORAGE,
                                                         ajaxConfig: {
@@ -48,7 +48,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     view: "ClusterUsageView",
                                                     app: cowc.APP_CONTRAIL_STORAGE,
                                                     viewConfig: {
-                                                        class: 'span3',
+                                                        class: 'col-xs-3',
                                                         modelConfig: {
                                                             remote: {
                                                                 ajaxConfig: {
@@ -69,7 +69,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     viewPathPrefix: "core-basedir/js/views/",
                                                     app: cowc.APP_CONTRAIL_STORAGE,
                                                     viewConfig: {
-                                                        class: 'span3',
+                                                        class: 'col-xs-3',
                                                         widgetConfig: {
                                                             elementId: swl.POOL_STATS_CHART_ID + '-widget',
                                                             view: "WidgetView",
@@ -122,7 +122,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     viewPathPrefix: "core-basedir/js/views/",
                                                     app: cowc.APP_CONTRAIL_STORAGE,
                                                     viewConfig: {
-                                                        class: 'span3',
+                                                        class: 'col-xs-3',
                                                         widgetConfig: {
                                                             elementId: swl.DISK_STATUS_CHART_ID + '-widget',
                                                             view: "WidgetView",
@@ -226,7 +226,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     title: swl.TITLE_CLUSTER_CEPH_THROUGHPUT,
                                                     view: "LineBarWithFocusChartView",
                                                     viewConfig: {
-                                                        class: 'span6',
+                                                        class: 'col-xs-6',
                                                         widgetConfig: {
                                                             elementId: swl.CLUSTER_CEPH_DISK_ACTIVITY_THRPT_IOPS_CHART_ID + '-widget',
                                                             view: "WidgetView",
@@ -278,7 +278,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     title: swl.TITLE_CLUSTER_CEPH_LATENCY,
                                                     view: "LineWithFocusChartView",
                                                     viewConfig: {
-                                                        class: 'span6',
+                                                        class: 'col-xs-6',
                                                         widgetConfig: {
                                                             elementId: swl.CLUSTER_CEPH_DISK_ACTIVITY_LATENCY_CHART_ID + '-widget',
                                                             view: "WidgetView",
@@ -328,7 +328,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     title: swl.TITLE_CLUSTER_RAW_DISK_THROUGHPUT,
                                                     view: "LineBarWithFocusChartView",
                                                     viewConfig: {
-                                                        class: 'span6',
+                                                        class: 'col-xs-6',
                                                         widgetConfig: {
                                                             elementId: swl.CLUSTER_RAW_DISK_ACTIVITY_THRPT_IOPS_CHART_ID + '-widget',
                                                             view: "WidgetView",
@@ -380,7 +380,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                                                     title: swl.TITLE_CLUSTER_RAW_DISK_LATENCY,
                                                     view: "LineWithFocusChartView",
                                                     viewConfig: {
-                                                        class: 'span6',
+                                                        class: 'col-xs-6',
                                                         widgetConfig: {
                                                             elementId: swl.CLUSTER_RAW_DISK_ACTIVITY_LATENCY_CHART_ID + '-widget',
                                                             view: "WidgetView",
@@ -458,7 +458,7 @@ define(['underscore', 'contrail-view'], function(_, ContrailView) {
                     {
                         type: 'link',
                         text: 'View',
-                        iconClass: 'icon-external-link',
+                        iconClass: 'fa fa-external-link',
                         callback: onScatterChartClick
                     }
                 ]

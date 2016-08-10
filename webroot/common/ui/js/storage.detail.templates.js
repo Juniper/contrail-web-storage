@@ -28,7 +28,7 @@ define([
                                             templateGenerator: 'TextGenerator',
                                             templateGeneratorConfig: {
                                                 formatter: "HealthStatusFormatter",
-                                                iconClass: 'icon-warning-sign'
+                                                iconClass: 'fa fa-exclamation-triangle'
                                             },
                                             events: {
                                                 click: function(event, detailsData) {
