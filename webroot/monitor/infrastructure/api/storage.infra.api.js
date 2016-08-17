@@ -73,7 +73,7 @@ function parseStorageTopologyDetails(req, res, resultJSON){
     commonUtils.handleJSONResponse(null, res, hJSON);
 }
 
-function parseStorageTopologyTree(osdJSON, callback){
+function parseStorageTopologyTree(osdJSON, appData, callback){
     var osdList={};
     var osdPG= osdJSON[0];
     var osdTree= osdJSON[1];
@@ -122,7 +122,7 @@ function parseStorageTopologyTree(osdJSON, callback){
             }
             osdApi.parseOSDFromPG(osds, osdPG);
             hostMap = parseMonitorWithHost(monsJSON, hostMap);
-            osdApi.getAvgBWHostToOSD(osds,hostMap, function(osds){
+            osdApi.getAvgBWHostToOSD(osds,hostMap, appData, function(osds){
                 hostMap = osdApi.parseHostFromOSD(hostMap, osds, version, true);
                 var treeList ={};
                 treeList= parseRootFromHost(rootMap, hostMap);
@@ -166,7 +166,7 @@ function parseStorageTopologyTree(osdJSON, callback){
                 var tempDefaultList =[];
                 tempDefaultList[0]= defaultList;
                 osdList.topology= tempDefaultList;
-                osdList.cluster_status = jsonPath(dashApi.parseStorageHealthStatusData(status), "$.cluster_status")[0];
+                osdList.cluster_status = jsonPath(parseStorageHealthStatusData(status), "$.cluster_status")[0];
                 osdList.cluster_status.monitor_count= JSON.parse(mons_total);
                 osdList.cluster_status.monitor_active= JSON.parse(mons_active);
                 callback(osdList);
@@ -253,6 +253,26 @@ function parseRootFromHost(rootJSON, hostJSON){
     var new_jsonstr = jsonstr.replace(/children/g, "hosts");
     rootJSON = JSON.parse(new_jsonstr);
     return rootJSON;
+}
+function parseStorageHealthStatusData(resultJSON){
+    var emptyObj = {};
+        var healthJSON = {};
+        var status = jsonPath(resultJSON, "$..overall_status");
+        var summary= jsonPath(resultJSON, "$..summary");
+        var details= jsonPath(resultJSON, "$..detail");
+       // var pgmap= jsonPath(resultJSON, "$..pgmap");
+        if (status.length > 0 ) {
+            var temp = new Object();
+            temp['last_updated_time']= new Date();
+            temp["overall_status"] = status[0];
+            temp["health"]={};
+            temp["health"]["details"] = details[0];
+            temp["health"]["summary"] = summary[0];
+          //  temp["pgmap"] = pgmap[0];
+            healthJSON['cluster_status']= temp;
+            return healthJSON;
+        }
+        return emptyObj;
 }
 
 function getStorageNodeDisks(req, res, appData) {

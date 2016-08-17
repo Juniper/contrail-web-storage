@@ -11,6 +11,25 @@ var commonUtils = require(process.mainModule.exports["corePath"]  + '/src/server
     assert = require('assert'),
     storageCommonapi = module.exports;
 
+function processClusterStorageHealth(res, appData, callback){
+    var urlOSDList = "/cluster/storage/health/list";
+    dataObjArr = getClusterHealthURLs(appData);
+    async.map(dataObjArr,
+        commonUtils.getAPIServerResponse(storageRest.apiGet, true),
+        function(err, resultJSON) {
+             callback(err,res,resultJSON);
+        });
+}
+function getClusterHealthURLs(appData){
+    var dataObjArr = [];
+    urlHealth = storageApi.url.health;
+    commonUtils.createReqObj(dataObjArr, urlHealth, null, null,
+        null, null, appData);
+    urlPGStat = storageApi.url.pgStat;
+    commonUtils.createReqObj(dataObjArr, urlPGStat, null, null,
+        null, null, appData);
+    return dataObjArr;
+}
 
 
 function processStorageTopologyRawList(res, appData, callback){
@@ -43,3 +62,4 @@ function getTopologyURLs(appData){
 
 exports.processStorageTopologyRawList = processStorageTopologyRawList;
 exports.getTopologyURLs=getTopologyURLs;
+exports.processClusterStorageHealth=processClusterStorageHealth;

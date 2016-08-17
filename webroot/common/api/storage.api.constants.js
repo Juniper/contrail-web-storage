@@ -11,6 +11,7 @@ storage.url.status = "/status";
 storage.url.monStatus = "/mon_status";
 storage.url.df = "/df";
 
+storage.url.pgStat = "/pg/stat";
 storage.url.pgDumpSummary = "/pg/dump?dumpcontents=summary";
 storage.url.pgDumpOSDs = "/pg/dump?dumpcontents=osds";
 storage.url.pgDumpStuck = "/pg/dump_stuck";

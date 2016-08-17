@@ -8,6 +8,30 @@ define(['underscore'], function (_) {
       "cluster_status": {
         "last_updated_time": "2015-10-28T22:50:51.356Z",
         "overall_status": "HEALTH_ERR",
+        "pg": {
+          "pg_summary": {
+            "num_pg_by_state": [
+              {
+                "num": 5704,
+                "name": "active+clean"
+              }
+            ],
+            "io_sec": 3,
+            "num_pgs": 5704,
+            "raw_bytes": 479965509304320,
+            "num_bytes": 88667365810,
+            "read_bytes_sec": 0,
+            "version": 127717,
+            "raw_bytes_used": 181717057536,
+            "write_bytes_sec": 4554,
+            "raw_bytes_avail": 479783792246784
+          },
+          "status": "OK",
+          "state": [
+            "active+clean"
+          ],
+          "count": "5704/5704"
+        },
         "health": {
           "details": [
             "osd.5 is full at 95%",

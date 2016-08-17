@@ -15,7 +15,7 @@ var commonUtils = require(process.mainModule.exports["corePath"] +
 function getStoragePGSummary(req, res, appData){
     var dataObjArr = [];
     var resultJSON = [];
-    urlStatus = storageApi.url.status;
+    urlStatus = storageApi.url.pgStat;
     commonUtils.createReqObj(dataObjArr, urlStatus, null, null, 
                                          null, null, appData);
 
@@ -35,17 +35,17 @@ function parseStoragePGData(pgJSON){
     var pgMapJSON ={};
     var pgStatusJson= pgJSON[0];
     var pgSummary= pgJSON[1];
-    var pgMap = jsonPath(pgStatusJson, "$..pgmap");
+    var pgMap = jsonPath(pgStatusJson, "$..output");
     var pgDelta = jsonPath(pgSummary, "$..pg_stats_delta")[0];
     var pgSum= jsonPath(pgSummary, "$..pg_stats_sum")[0];
     var osdSum= jsonPath(pgSummary, "$..osd_stats_sum")[0];
 
     if (pgMap.length > 0) {
-        pgMapJSON['pg_overview']= pgMap[0];
+        pgMapJSON['pg_overview']= pgStatusJson;
         pgMapJSON['pg_stats_delta']=pgDelta;
         pgMapJSON['pg_stats_sum']=pgSum;
         pgMapJSON['osd_stats_sum']=osdSum;
-        pgMapJSON['stamp'] =jsonPath(pgSummary, "$.output.stamp")[0];
+        //pgMapJSON['stamp'] =jsonPath(pgSummary, "$.output.stamp")[0];
         return pgMapJSON;
     }
     return emptyObj;
@@ -69,9 +69,31 @@ function parseStoragePGStuckData(pgStuckJSON){
     return pgStuckJSON;
 }
 
+function getStoragePGState(req, res, appData){
+    urlPools = storageApi.url.pgStat;
+    storageRest.apiGet(urlPools, appData, function (error, resultJSON) {
+            if(!error && (resultJSON)) {
+                var resultJSON = parseStoragePGStateDetails(resultJSON);
+                commonUtils.handleJSONResponse(null, res, resultJSON);
+            } else {
+                commonUtils.handleJSONResponse(error, res, null);
+            }
+        });
+}
+
+
+function parseStoragePGStateDetails(poolJSON){
+    var pDetails = jsonPath(poolJSON, "$..num_pg_by_state")[0];
+    var pJSON = {};
+        pJSON['pg_states'] = pDetails;
+    return pJSON;
+}
+
+
 /* List all public functions */
 exports.getStoragePGSummary = getStoragePGSummary;
 exports.getStoragePGStuck=getStoragePGStuck;
+exports.getStoragePGState =getStoragePGState;
 
 
 

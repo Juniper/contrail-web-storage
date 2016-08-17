@@ -12,6 +12,7 @@ var cacheApi = require(process.mainModule.exports["corePath"] +
     config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
     logutils = require(process.mainModule.exports["corePath"] + '/src/serverroot/utils/log.utils'),
     stMonUtils= require('../../../common/utils/storage.utils'),
+    storageCommon= require('../../../common/api/storage.common.api'),
     commonUtils = require(process.mainModule.exports["corePath"] +
                         '/src/serverroot/utils/common.utils'),
     storageRest= require('../../../common/api/storage.rest.api'),
@@ -51,47 +52,46 @@ function getStorageJobClusterStatus(req, res ){
 }
 
 function getStorageClusterHealthStatus(req, res, appData){
-    var urlHealth = storageApi.url.health;
-    cookieClusterStatus= "/api/tenant/storage/cluster/status";
-    redisClient.get(cookieClusterStatus, function(error, cachedJSONStr) {
-        if (error || cachedJSONStr == null) {
-            storageRest.apiGet(urlHealth, appData, function (error, resultJSON) {
-                if(!error && (resultJSON)) {
-                    var resultJSON = parseStorageHealthStatusData(resultJSON);
+
+    storageCommon.processClusterStorageHealth(res, appData, function(error,res,data){
+           // callback(error,res,parseStorageHealthStatusData(data));
+            var resultJSON = parseStorageHealthStatusData(data);
                     if(!resultJSON) {
                         resultJSON = [];
                     }
-                    redisClient.setex(cookieClusterStatus, expireTime, JSON.stringify(resultJSON));
-                    commonUtils.handleJSONResponse(null, res, resultJSON);
-                } else {
-                    commonUtils.handleJSONResponse(error, res, null);
-                }
-            });
-        } else {
-            commonUtils.handleJSONResponse(null, res, JSON.parse(cachedJSONStr));
-        }
+           commonUtils.handleJSONResponse(null, res, resultJSON);
     });
 }
 
 function parseStorageHealthStatusData(resultJSON){
-    var emptyObj = {};  
-        var healthJSON = {};
-        var status = jsonPath(resultJSON, "$..overall_status");
-        var summary= jsonPath(resultJSON, "$..summary");
-        var details= jsonPath(resultJSON, "$..detail");
-       // var pgmap= jsonPath(resultJSON, "$..pgmap");
-        if (status.length > 0 ) {
-            var temp = new Object();
-            temp['last_updated_time']= new Date();
-            temp["overall_status"] = status[0];
-            temp["health"]={};
-            temp["health"]["details"] = details[0];
-            temp["health"]["summary"] = summary[0];
-          //  temp["pgmap"] = pgmap[0];
-            healthJSON['cluster_status']= temp;
-            return healthJSON;
-        }
-        return emptyObj;
+    var emptyObj = {};
+    var healthJSON = {};
+    var status = jsonPath(resultJSON[0], "$..overall_status");
+    var summary= jsonPath(resultJSON[0], "$..summary");
+    var details= jsonPath(resultJSON[0], "$..detail");
+    var pg_summary= jsonPath(resultJSON[1], "$..output");
+    var pg_state  = jsonPath(resultJSON[1], "$..name");
+    var pg_state_count= jsonPath(resultJSON[1], "$..num");
+    var pg_num_count= jsonPath(resultJSON[1], "$..num_pgs");
+    var pg_status= jsonPath(resultJSON[1], "$..status");
+   // var pgmap= jsonPath(resultJSON, "$..pgmap");
+    if (status.length > 0 ) {
+        var temp = new Object();
+        temp['last_updated_time']= new Date();
+        temp["overall_status"] = status[0];
+        temp["pg"] = {};
+        temp["pg"]["pg_summary"]= pg_summary[0];
+        temp["pg"]["status"]= pg_status[0];
+        temp["pg"]["state"] = pg_state;
+        temp["pg"]["count"] = pg_state_count +"/"+ pg_num_count;
+        temp["health"]={};
+        temp["health"]["details"] = details[0];
+        temp["health"]["summary"] = summary[0];
+      //  temp["pgmap"] = pgmap[0];
+        healthJSON['cluster_status']= temp;
+        return healthJSON;
+    }
+    return emptyObj;
 }
 
 function getStorageClusterDFStatus(req, res, appData){
@@ -225,7 +225,7 @@ function getStorageClusterCephActivity(req, res,appData){
             delete queryJSON['dir'];
             var selectEleCnt = queryJSON['select_fields'].length;
             queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-            stMonUtils.executeQueryString(queryJSON,
+            stMonUtils.executePostQueryString(queryJSON, appData,
                 commonUtils.doEnsureExecution(function (err, resultJSON) {
                     resultJSON = parseStorageClusterOSDActivityData(resultJSON, timeObj, timeGran, sourceJSON, intervalSecs);
                     commonUtils.handleJSONResponse(err, res, resultJSON);
@@ -283,7 +283,7 @@ function getStorageClusterRawDiskActivity(req, res,appData){
             delete queryJSON['dir'];
             var selectEleCnt = queryJSON['select_fields'].length;
             queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-            stMonUtils.executeQueryString(queryJSON,
+            stMonUtils.executePostQueryString(queryJSON, appData,
                 commonUtils.doEnsureExecution(function (err, resultJSON) {
                     resultJSON = parseStorageClusterOSDActivityData(resultJSON, timeObj, timeGran, sourceJSON, intervalSecs);
                     commonUtils.handleJSONResponse(err, res, resultJSON);
@@ -421,7 +421,7 @@ function getStorageClusterPoolActivity(req, res,appData){
         delete queryJSON['dir'];
         var selectEleCnt = queryJSON['select_fields'].length;
         queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-        stMonUtils.executeQueryString(queryJSON,
+        stMonUtils.executePostQueryString(queryJSON, appData,
             commonUtils.doEnsureExecution(function (err, resultJSON) {
                 resultJSON = parseStorageClusterPoolActivityData(resultJSON, timeObj, timeGran, sourceJSON, intervalSecs);
                 commonUtils.handleJSONResponse(err, res, resultJSON);

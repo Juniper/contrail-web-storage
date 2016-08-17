@@ -3,11 +3,8 @@ var commonUtils = require(process.mainModule.exports["corePath"] + '/src/serverr
     config = require(process.mainModule.exports["corePath"] + '/config/config.global.js'),
     logutils = require(process.mainModule.exports["corePath"] + '/src/serverroot/utils/log.utils'),
     global = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/global'),
-    rest = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/rest.api');
-
-    opServer = rest.getAPIServer({apiName:global.label.OPS_API_SERVER,
-        server:config.analytics.server_ip,
-        port:config.analytics.server_port });
+    rest = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/rest.api'),
+    opApiServer = require(process.mainModule.exports["corePath"] + '/src/serverroot/common/opServer.api');
 
 function createTimeQueryJsonObj (minsSince, endTime){
     var startTime = 0, timeObj = {};
@@ -119,16 +116,24 @@ function formatQueryStringWithWhereClause (table, whereClause, selectFieldObjArr
     return commonUtils.cloneObj(queryJSON);
 }
 
-function executeQueryString (queryJSON, callback){
+function executePostQueryString (opServerPostData, appData, callback){
     var resultData, startTime = (new Date()).getTime(), endTime;
-    opServer.authorize(function () {
-        opServer.api.post(global.RUN_QUERY_URL, queryJSON, function (error, jsonData) {
+        opApiServer.apiPost(global.RUN_QUERY_URL, opServerPostData, appData,  function (error, jsonData) {
             endTime = (new Date()).getTime();
             logutils.logger.debug("Query executed in " + ((endTime - startTime) / 1000) +
-                'secs ' + JSON.stringify(queryJSON));
+                'secs ' + JSON.stringify(opServerPostData));
             callback(error, jsonData);
         });
-    });
+
+}
+
+function executeGetQueryString (opServerURL, appData, callback){
+    var resultData, startTime = (new Date()).getTime(), endTime;
+        opApiServer.apiGet(opServerURL, appData, function(error, jsonData) {
+            endTime = (new Date()).getTime();
+            logutils.logger.debug("opServerURL:" + ((endTime - startTime) / 1000) +'secs ' + opServerURL);
+               callback(error, jsonData);
+            });
 }
 
 exports.formatAndClause= formatAndClause;
@@ -136,10 +141,8 @@ exports.getQueryJSON4Table = getQueryJSON4Table;
 exports.createTimeQueryJsonObj=createTimeQueryJsonObj;
 exports.getTimeGranByTimeSlice = getTimeGranByTimeSlice;
 exports.formatQueryStringWithWhereClause= formatQueryStringWithWhereClause;
-exports.executeQueryString= executeQueryString;
-
-
-
+exports.executePostQueryString =executePostQueryString;
+exports.executeGetQueryString = executeGetQueryString;
 
 
 Object.defineProperty(Object.prototype, "merge", {

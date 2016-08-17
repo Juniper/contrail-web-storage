@@ -104,6 +104,9 @@ define(
                         dataSource : {
                             dataView: self.model
                         }
+                    },
+                    footer: {
+                        pager: {options: {pageSize: 10, pageSizeSelect: [5, 10, 50, 100]}}
                     }
                 };
                 return gridElementConfig;

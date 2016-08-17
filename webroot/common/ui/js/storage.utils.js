@@ -207,7 +207,7 @@ define(['underscore',
                     }) + " critical</span>";
             else
                 return "<span> " + statusTmpl({
-                        sevLevel: sevLevels['NOTICE'],
+                        sevLevel: sevLevels['ERROR'],
                         sevLevels: sevLevels
                     }) + " N/A</span>";
         };
@@ -299,7 +299,7 @@ define(['underscore',
             return alertsList.sort(dashboardUtils.sortInfraAlerts);
         };
 
-        self.showStorageAlertsPopup = function (alerts) {
+       self.showStorageAlertsPopup  = function (alerts) {
             var prefixId = 'dashboard-alerts';
             var cfgObj = ifNull(cfgObj,{});
             var modalTemplate =
@@ -324,6 +324,32 @@ define(['underscore',
                             model: alertListModel
                         });
                         alertGridView.render();
+                    });
+        };
+
+        self.showStoragePGStatusPopup = function (pg) {
+            var prefixId = 'dashboard-pg-info';
+            var cfgObj = ifNull(cfgObj,{});
+            var modalTemplate =
+                contrail.getTemplate4Id('core-modal-template');
+            var modalId = 'dashboard-pg-info-modal';
+            var modalLayout = modalTemplate({prefixId: prefixId, modalId: modalId});
+            var formId = prefixId + '_modal';
+            var modalConfig = {
+                    'modalId': modalId,
+                    'className': 'modal-840',
+                    'body': modalLayout,
+                    'title': 'Placement group summary',
+                    'onCancel': function() {
+                        $("#" + modalId).modal('hide');
+                    }
+                }
+            cowu.createModal(modalConfig);
+            require(['pg-summary-details-view'], function(PGSummaryDetailsView) {
+                        var pgGridView = new PGSummaryDetailsView({
+                            el:$("#" + modalId).find('#' + formId),
+                        });
+                        pgGridView.render();
                     });
         };
 

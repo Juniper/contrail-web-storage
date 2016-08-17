@@ -151,7 +151,7 @@ function getStoragePoolFlowSeries (req, res, appData) {
     delete queryJSON['dir'];
     var selectEleCnt = queryJSON['select_fields'].length;
     queryJSON['select_fields'].splice(selectEleCnt - 1, 1);
-    stMonUtils.executeQueryString(queryJSON,
+    stMonUtils.executePostQueryString(queryJSON, appData,
         commonUtils.doEnsureExecution(function(err, resultJSON)  {
             resultJSON= formatFlowSeriesForPoolStats(resultJSON, timeObj, timeGran);
             commonUtils.handleJSONResponse(err, res, resultJSON);

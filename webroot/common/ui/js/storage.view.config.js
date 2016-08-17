@@ -158,6 +158,7 @@ define([
                                 {
                                     columns: [
                                         {
+
                                             elementId: swl.DISK_DETAILS_ID+"-summary",
                                             title: swl.TITLE_DISK_DETAILS,
                                             view: "DetailsView",
@@ -198,49 +199,23 @@ define([
                                         {
                                             elementId: swl.DISK_ACTIVITY_STATS_ID,
                                             title: swl.TITLE_DISK_ACTIVITY_STATS,
-                                            view: "DiskActivityStatsView",
+                                            view: "DiskStatsTabView",
                                             viewPathPrefix: "monitor/storage/ui/js/views/",
                                             app: cowc.APP_CONTRAIL_STORAGE,
                                             viewConfig: {
-                                                modelConfig: {
-                                                    modelKey: swc.get(swc.UMID_DISK_UVE, options.storageNode, options.disk, options.uuid),
-                                                    remote: {
-                                                        ajaxConfig: {
-                                                            url: swc.get(swc.URL_DISK_ACTIVITY_STATS, options.disk, options.storageNode, options.uuid),
-                                                            type: 'GET'
-                                                        },
-                                                        dataParser: swp.diskActivityStatsParser
-                                                    },
-                                                    cacheConfig: {
-                                                        ucid: swc.get(swc.UCID_DISK_STATS, options.storageNode, options.disk, options.uuid)
-                                                    }
-                                                }
+                                                options: options,
+                                                 class: 'col-xs-6',
                                             }
-                                        }
-                                    ]
-                                },
-                                {
-                                    columns: [
+                                        },
                                         {
                                             elementId: swl.DISK_ACTIVITY_STATS_ID+"raw-disk",
                                             title: swl.TITLE_DISK_ACTIVITY_STATS+"raw-disk",
-                                            view: "DiskActivityRawStatsView",
+                                            view: "RawDiskStatsTabView",
                                             viewPathPrefix: "monitor/storage/ui/js/views/",
                                             app: cowc.APP_CONTRAIL_STORAGE,
                                             viewConfig: {
-                                                modelConfig: {
-                                                    modelKey: swc.get(swc.UMID_DISK_UVE, options.storageNode, options.disk, options.uuid),
-                                                    remote: {
-                                                        ajaxConfig: {
-                                                            url: swc.get(swc.URL_RAW_DISK_ACTIVITY_STATS, options.disk, options.storageNode, options.uuid),
-                                                            type: 'GET'
-                                                        },
-                                                        dataParser: swp.diskActivityStatsParser
-                                                    },
-                                                    cacheConfig: {
-                                                        ucid: swc.get(swc.UCID_DISK_STATS, options.storageNode, options.disk, options.uuid)
-                                                    }
-                                                }
+                                                options: options,
+                                                 class: 'col-xs-6',
                                             }
                                         }
                                     ]

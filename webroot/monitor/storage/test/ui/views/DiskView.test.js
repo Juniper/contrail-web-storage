@@ -100,30 +100,10 @@ define([
                     ]
                 },
                 {
-                    viewId: swl.DISK_ACTIVITY_LATENCY_CHART_ID,
-                    suites: [
-                        {
-                            class: LineWithFocusChartViewTestSuite,
-                            groups: ['all'],
-                            severity: cotc.SEVERITY_LOW
-                        }
-                    ]
-                },
-                {
                     viewId: swl.DISK_ACTIVITY_THRPT_IOPS_CHART_ID+"raw-disk",
                     suites: [
                         {
                             class: LineWithFocusBarChartViewTestSuite,
-                            groups: ['all'],
-                            severity: cotc.SEVERITY_LOW
-                        }
-                    ]
-                },
-                {
-                    viewId: swl.DISK_ACTIVITY_LATENCY_CHART_ID+"raw-disk",
-                    suites: [
-                        {
-                            class: LineWithFocusChartViewTestSuite,
                             groups: ['all'],
                             severity: cotc.SEVERITY_LOW
                         }

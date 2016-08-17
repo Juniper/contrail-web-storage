@@ -13,6 +13,9 @@ define([
 
             var gVar =0;
 
+            if(response.topology == undefined){
+                return retArr;
+            }
             // with multi-backend support, there are different topology output in response.
             // currently only using 'default' type which is the common pool.
             $.each(response.topology, function (idx, topology) {
@@ -310,21 +313,25 @@ define([
                 var output = response.osd_stat.output;
                 retArr.push({
                     label: "Up",
+                    key:"up",
                     value: output.num_up_osds,
                     color: d3Colors.blue
                 });
                 retArr.push({
                     label: "Down",
+                    key:"down",
                     value: output.num_down_osds,
                     color: d3Colors.red
                 });
                 retArr.push({
                     label: "In",
+                    key:"in",
                     value: output.num_in_osds,
                     color: d3Colors.green
                 });
                 retArr.push({
                     label: "Out",
+                    key:"out",
                     value: output.num_out_osds,
                     color: d3Colors.orange
                 });
@@ -366,35 +373,42 @@ define([
 
             if (response != null && response.hasOwnProperty('flow-series')) {
                 $.each(response['flow-series'], function (idx, sample) {
-                    var ts = Math.floor(sample['MessageTS'] / 1000);
+                    var ts = Math.round(sample['MessageTS'] / 1000);
+                    var reads_kbytes = Math.floor(sample['reads_kbytes'] * 1024);
+                    var writes_kbytes = Math.floor(sample['writes_kbytes'] * 1024);
+                    var reads = parseInt(sample['reads']);
+                    var writes = parseInt(sample['writes']);
+                    var op_r_latency = parseInt(sample['op_r_latency']);
+                    var op_w_latency = parseInt(sample['op_w_latency']);
+
                     //Throughput Data
                     readThrptData.values.push({
                         'x': ts,
-                        'y': sample['reads_kbytes'] * 1024
+                        'y': reads_kbytes
                     });
                     writeThrptData.values.push({
                         'x': ts,
-                        'y': sample['writes_kbytes'] * 1024
+                        'y': writes_kbytes
                     });
 
                     //IOPS Data
                     readIopsData.values.push({
                         'x': ts,
-                        'y': sample['reads']
+                        'y': reads
                     });
                     writeIopsData.values.push({
                         'x': ts,
-                        'y': sample['writes']
+                        'y': writes
                     });
 
                     //Latency Data
                     readLatData.values.push({
                         'x': ts,
-                        'y': sample['op_r_latency']
+                        'y': op_r_latency
                     });
                     writeLatData.values.push({
                         'x': ts,
-                        'y': sample['op_w_latency']
+                        'y': op_w_latency
                     });
                 });
             }
@@ -535,7 +549,13 @@ define([
 
         this.poolsDataParser = function (response) {
             var retArr = [];
+
+
             if (response != null) {
+                if(response.pools == undefined){
+                    return retArr;
+                }
+
                 $.each(response.pools, function (idx, pool) {
                     pool = self.poolDataParser(pool);
                     retArr.push(pool);
@@ -544,7 +564,33 @@ define([
             return retArr;
 
         };
+        this.pgSummaryParser =function(response){
+             var pgObj = {};
 
+            if (response != null) {
+                var allStates = response['output']
+                    pgObj['rawData'] = $.extend(true, {}, allStates);
+                    pgObj['num_bytes'] = formatBytes(allStates['num_bytes']);
+                    pgObj['raw_bytes'] = formatBytes(allStates['raw_bytes']);
+                    pgObj['raw_bytes_avail'] = formatBytes(allStates['raw_bytes_avail']);
+                    pgObj['raw_bytes_used'] = formatBytes(allStates['raw_bytes_used']);
+                    pgObj['num_pgs'] = formatNumberByCommas(allStates['num_pgs']);
+                    pgObj['version'] = formatNumberByCommas(allStates['version']);
+            }
+            return pgObj;
+        }
+        this.pgStateParser =function(response){
+             var retArr = [];
+            if (response != null) {
+                var allStates = response['pg_states']
+
+                $.each(allStates, function (idx, state) {
+                    //state = self.pgStateParser(state);
+                    retArr.push(state);
+                });
+            }
+            return retArr;
+        }
         this.poolsBarChartDataParser = function (response) {
             var usageKeys = [],
                 objectKeys = [],
@@ -743,6 +789,8 @@ define([
                     overall_health: swu.getClusterHealthTitle(response['cluster_status']['overall_status']),
                     health_status: swu.getClusterHealthTitle(response['cluster_status']['overall_status']),
                     health: response['cluster_status']['health'],
+                    pg: response['cluster_status']['pg'],
+                    pg_status: response['cluster_status']['pg']['status'],
                     alerts: swu.processStorageHealthAlerts(response['cluster_status'])
                 };
             }

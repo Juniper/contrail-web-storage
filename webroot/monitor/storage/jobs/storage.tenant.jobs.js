@@ -13,7 +13,7 @@ var util = require('util'),
 
 function processStorageOSDsSummaryRequestByJob(pubChannel, saveChannelKey, jobData, done){
    storageCommon.processStorageTopologyRawList(null, jobData, function(error,res,data){
-        osdApi.parseStorageOSDSummary(data, function(resultJSON){
+        osdApi.parseStorageOSDSummary(data, jobData, function(resultJSON){
             if (null != error) {
                 redisPub.publishDataToRedis(pubChannel, saveChannelKey,
                     global.HTTP_STATUS_INTERNAL_ERROR,
@@ -26,21 +26,16 @@ function processStorageOSDsSummaryRequestByJob(pubChannel, saveChannelKey, jobDa
                     global.HTTP_STATUS_RESP_OK,
                     JSON.stringify(resultJSON),
                     JSON.stringify(resultJSON),
-                    1, 0, done, jobData);
+                    1, 0, done);
             }
         });
     });
 }
 
 function processStorageClusterStatus(pubChannel, saveChannelKey, jobData, done){
-    
     url = "/status";
-    console.log("URL"+url);
     storageRest.apiGet(url, jobData, function (error, resultJSON) {
-
             if(!error && (resultJSON)) {
-                console.log("resultJSON"+resultJSON);
-                console.log("error"+error);
                      redisPub.publishDataToRedis(pubChannel, saveChannelKey,
                         global.HTTP_STATUS_RESP_OK,
                         JSON.stringify(resultJSON),
@@ -51,7 +46,7 @@ function processStorageClusterStatus(pubChannel, saveChannelKey, jobData, done){
                                               global.HTTP_STATUS_INTERNAL_ERROR,
                                         global.STR_CACHE_RETRIEVE_ERROR,
                                         global.STR_CACHE_RETRIEVE_ERROR, 0,
-                                        0, done, jobData);
+                                        0, done);
             }
         });   
 }

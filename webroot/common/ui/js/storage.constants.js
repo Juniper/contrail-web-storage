@@ -22,6 +22,9 @@ define([
         this.URL_POOLS_SUMMARY = '/api/tenant/storage/cluster/pools/summary';
         this.URL_POOL_DETAILS = '/api/tenant/storage/cluster/pool/details?name={0}'; //TBD
 
+        this.URL_PG_STATE="/api/tenant/storage/cluster/pgs/states";
+        this.URL_PG_SUMMARY="/api/tenant/storage/cluster/pgs/summary";
+
         this.URL_CLUSTER_USAGE = '/api/tenant/storage/cluster/usage';
         this.URL_CLUSTER_STATUS = '/api/tenant/storage/cluster/status';
         this.URL_CLUSTER_THROUGHPUT_SUMMARY = '/api/tenant/storage/cluster/throughput/summary';

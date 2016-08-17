@@ -179,6 +179,12 @@
         <feature>storage</feature>
         <callback>storagePGsApi.getStoragePGSummary</callback>
     </item>
+    <item>
+        <url>/api/tenant/storage/cluster/pgs/states</url>
+        <method>get</method>
+        <feature>storage</feature>
+        <callback>storagePGsApi.getStoragePGState</callback>
+    </item>
 
     <item>
         <url>/api/tenant/storage/cluster/pgs/stuck</url>
