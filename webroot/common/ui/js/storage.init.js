@@ -12,9 +12,10 @@ define([
     'storage-messages',
     'storage-parsers',
     'storage-view-config',
-    'storage-detail-templates'
-], function (_, Constants, GridConfig, ChartConfig, Labels, Utils, Messages, Parsers, ViewConfig,
-            DetailTemplates) {
+    'storage-detail-templates',
+    'contrail-common'
+], function (_, Constants, GridConfig, ChartConfig, Labels, Utils, Messages, Parsers, ViewConfig, DetailTemplates, Contrail) {
+    contrail = new Contrail();
     swc = new Constants();
     swgc = new GridConfig();
     swcc = new ChartConfig();
