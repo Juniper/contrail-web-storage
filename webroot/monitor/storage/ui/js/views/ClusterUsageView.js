@@ -6,8 +6,9 @@ define([
     'underscore',
     'contrail-view',
     'contrail-list-model',
+    'chart-utils',
     'monitor-storage-basedir/js/models/UsageAndStatusDonutChartModel'
-], function (_, ContrailView, ContrailListModel, UsageAndStatusDonutChart) {
+], function (_, ContrailView, ContrailListModel, chUtils, UsageAndStatusDonutChart) {
     var ClusterUsageView = ContrailView.extend({
         el: $(contentContainer),
 
