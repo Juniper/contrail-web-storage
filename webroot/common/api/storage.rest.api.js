@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
  */
 
-var storageConfig = require('../config/storage.config.global');
+var storageConfig = require('../../../config/config.global.storage');
 
 var storageApi= require('./storage.api.constants');
 
@@ -33,7 +33,7 @@ function apiGet (url, appData, callback)
     var headers = {};
     headers['Accept'] = 'application/json';
     url = storageApi.rest.serverVersion + url;
-    
+
     storageServer.api.get(url, function(err, data) {
         callback(err, data);
     }, headers);
@@ -64,4 +64,3 @@ exports.apiGet = apiGet;
 exports.apiPut = apiPut;
 exports.apiPost = apiPost;
 exports.apiDelete = apiDelete;
-
