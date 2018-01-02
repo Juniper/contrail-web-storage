@@ -35,7 +35,7 @@ module.exports = function (grunt) {
         {pattern: 'contrail-web-core/webroot/js/**/*.js', included: false},
         {pattern: 'contrail-web-core/webroot/dist/js/**/*.js', included: false},
         {pattern: 'contrail-web-core/webroot/common/ui/templates/*.tmpl', included: false},
-
+        {pattern: 'contrail-web-core/webroot/reports/qe/ui/js/common/qe.utils.js', included: false},
         //Everything except library test suites and test files.
         {pattern: 'contrail-web-core/webroot/test/ui/js/**/{!(*.test.js), !(*.lib.test.suite.js)}', included: false},
 
