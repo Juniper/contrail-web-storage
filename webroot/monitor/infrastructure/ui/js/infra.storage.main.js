@@ -14,14 +14,14 @@ function MonitorInfraStorageLoader() {
 
        // check4StorageInit(function () {
         if (self.infraStorageView == null) {
-            require(['mon-infra-dashboard-view'],function() {
+            /*require(['mon-infra-dashboard-view'],function() {
                require(['mon-infra-storage-dashboard'], function (MonitorInfraStorageView) {
                     self.infraStorageView = new MonitorInfraStorageView({
                         el: $(contentContainer)
                     });
                     self.renderView(renderFn, hashParams);
                 });
-            });
+            });*/
         }else {
             self.renderView(renderFn, hashParams);
         }

@@ -8,20 +8,20 @@ define([
     'contrail-view',
     'storage-bread-crumb-view',
     'storage-dashboard-model',
-    'mon-infra-dashboard-view',
     'storage-dashboard-view',
     
 ], function (_, Backbone, ContrailView, BreadcrumbView,StorageDashboardListModel, 
-    MonitorInfraDashboardView, StorageDashboardView ) {
+     StorageDashboardView ) {
     var MonitorStorageView = ContrailView.extend({
         el: $(contentContainer),
 
         renderDashboard: function () {
            var self = this;
             //No need to instantiate as it's a singleton class
-            var monitorInfraDashboardView = MonitorInfraDashboardView;
-            monitorInfraDashboardView.addInfoboxes(getInfoboxesConfig());
+            //var monitorInfraDashboardView = MonitorInfraDashboardView;
+            //monitorInfraDashboardView.addInfoboxes(getInfoboxesConfig());
         },
+        getInfoboxesConfig: getInfoboxesConfig,
 
         renderStorageNode: function (viewConfig) {
             var self = this,
