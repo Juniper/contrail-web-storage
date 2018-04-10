@@ -145,6 +145,10 @@ exports.executePostQueryString =executePostQueryString;
 exports.executeGetQueryString = executeGetQueryString;
 
 
+/*
+ * License: CC-BY-SA-3.0
+ * https://stackoverflow.com/questions/171251/how-can-i-merge-properties-of-two-javascript-objects-dynamically
+ */
 Object.defineProperty(Object.prototype, "merge", {
     enumerable: false,
     value: function () {
